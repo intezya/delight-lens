@@ -9,38 +9,154 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TopicsRouteImport } from './routes/topics'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TopicsTopicIdRouteImport } from './routes/topics.$topicId'
 
+const TopicsRoute = TopicsRouteImport.update({
+  id: '/topics',
+  path: '/topics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewsRoute = ReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TopicsTopicIdRoute = TopicsTopicIdRouteImport.update({
+  id: '/$topicId',
+  path: '/$topicId',
+  getParentRoute: () => TopicsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/impact': typeof ImpactRoute
+  '/insights': typeof InsightsRoute
+  '/reviews': typeof ReviewsRoute
+  '/settings': typeof SettingsRoute
+  '/topics': typeof TopicsRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/impact': typeof ImpactRoute
+  '/insights': typeof InsightsRoute
+  '/reviews': typeof ReviewsRoute
+  '/settings': typeof SettingsRoute
+  '/topics': typeof TopicsRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/impact': typeof ImpactRoute
+  '/insights': typeof InsightsRoute
+  '/reviews': typeof ReviewsRoute
+  '/settings': typeof SettingsRoute
+  '/topics': typeof TopicsRouteWithChildren
+  '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/impact'
+    | '/insights'
+    | '/reviews'
+    | '/settings'
+    | '/topics'
+    | '/topics/$topicId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/impact'
+    | '/insights'
+    | '/reviews'
+    | '/settings'
+    | '/topics'
+    | '/topics/$topicId'
+  id:
+    | '__root__'
+    | '/'
+    | '/impact'
+    | '/insights'
+    | '/reviews'
+    | '/settings'
+    | '/topics'
+    | '/topics/$topicId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ImpactRoute: typeof ImpactRoute
+  InsightsRoute: typeof InsightsRoute
+  ReviewsRoute: typeof ReviewsRoute
+  SettingsRoute: typeof SettingsRoute
+  TopicsRoute: typeof TopicsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/topics': {
+      id: '/topics'
+      path: '/topics'
+      fullPath: '/topics'
+      preLoaderRoute: typeof TopicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reviews': {
+      id: '/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +164,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/topics/$topicId': {
+      id: '/topics/$topicId'
+      path: '/$topicId'
+      fullPath: '/topics/$topicId'
+      preLoaderRoute: typeof TopicsTopicIdRouteImport
+      parentRoute: typeof TopicsRoute
+    }
   }
 }
 
+interface TopicsRouteChildren {
+  TopicsTopicIdRoute: typeof TopicsTopicIdRoute
+}
+
+const TopicsRouteChildren: TopicsRouteChildren = {
+  TopicsTopicIdRoute: TopicsTopicIdRoute,
+}
+
+const TopicsRouteWithChildren =
+  TopicsRoute._addFileChildren(TopicsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ImpactRoute: ImpactRoute,
+  InsightsRoute: InsightsRoute,
+  ReviewsRoute: ReviewsRoute,
+  SettingsRoute: SettingsRoute,
+  TopicsRoute: TopicsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
