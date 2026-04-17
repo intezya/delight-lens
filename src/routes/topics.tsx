@@ -41,14 +41,14 @@ function TopicsPage() {
           const Icon = meta.icon;
           return (
             <section key={kind}>
-              <SectionHeader
-                title={
-                  <span className="inline-flex items-center gap-2">
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <div>
+                  <h3 className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
                     <Icon className="h-4 w-4" style={{ color: meta.color }} /> {meta.title}
-                  </span> as unknown as string
-                }
-                subtitle={`${meta.subtitle} · ${grouped[kind].length} тем`}
-              />
+                  </h3>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{meta.subtitle} · {grouped[kind].length} тем</p>
+                </div>
+              </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {grouped[kind].map((t, idx) => {
                   const total = t.total;
