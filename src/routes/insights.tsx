@@ -1,0 +1,114 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { AppShell } from "@/components/app-shell";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
+import { INSIGHTS, type InsightStatus } from "@/lib/mock/data";
+import { InsightCard } from "@/components/insight-card";
+import { Button } from "@/components/ui/button";
+import { Sparkles, LayoutGrid, Columns3 } from "lucide-react";
+import { AiBadge } from "@/components/atoms";
+
+export const Route = createFileRoute("/insights")({
+  head: () => ({
+    meta: [
+      { title: "AI Insights — Voicelens" },
+      { name: "description", content: "AI-сгенерированные гипотезы для продактов и аналитиков." },
+    ],
+  }),
+  component: InsightsPage,
+});
+
+const STATUSES: { key: InsightStatus | "all"; label: string }[] = [
+  { key: "all", label: "Все" },
+  { key: "new", label: "New" },
+  { key: "validated", label: "Validated" },
+  { key: "in_progress", label: "In progress" },
+  { key: "implemented", label: "Implemented" },
+  { key: "rejected", label: "Rejected" },
+];
+
+function InsightsPage() {
+  const [status, setStatus] = useState<InsightStatus | "all">("all");
+  const [layout, setLayout] = useState<"grid" | "kanban">("grid");
+
+  const counts = STATUSES.reduce<Record<string, number>>((acc, s) => {
+    acc[s.key] = s.key === "all" ? INSIGHTS.length : INSIGHTS.filter(i => i.status === s.key).length;
+    return acc;
+  }, {});
+
+  const filtered = status === "all" ? INSIGHTS : INSIGHTS.filter(i => i.status === status);
+
+  return (
+    <AppShell
+      title="AI-инсайты и гипотезы"
+      subtitle={`${INSIGHTS.length} активных гипотез · сгенерированы AI на основе ваших отзывов`}
+      actions={<Button size="sm" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Сгенерировать</Button>}
+    >
+      <div className="space-y-4 p-4 md:p-6">
+        {/* Hero banner */}
+        <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/60 via-card to-card p-5">
+          <div className="grid-bg pointer-events-none absolute inset-0 opacity-20" />
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl">
+              <div className="mb-2 flex items-center gap-2"><AiBadge /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Сводка периода</span></div>
+              <h2 className="display text-2xl font-semibold tracking-tight">AI выделил {INSIGHTS.filter(i => i.signal > 70).length} сильных гипотез из 1 792 отзывов</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Принятие в работу всех «critical» гипотез ожидаемо снизит долю негатива на 22% в течение 4 недель.</p>
+            </div>
+            <div className="flex gap-3">
+              <div className="rounded-lg border bg-card px-4 py-3">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg confidence</p>
+                <p className="num display text-2xl font-semibold">{Math.round(INSIGHTS.reduce((s, i) => s + i.confidence, 0) / INSIGHTS.length)}%</p>
+              </div>
+              <div className="rounded-lg border bg-card px-4 py-3">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">В работе</p>
+                <p className="num display text-2xl font-semibold">{counts.in_progress}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Tabs value={status} onValueChange={(v) => setStatus(v as any)}>
+            <TabsList className="h-9">
+              {STATUSES.map(s => (
+                <TabsTrigger key={s.key} value={s.key} className="h-8 gap-1.5 text-xs">
+                  {s.label}
+                  <span className="num rounded bg-muted px-1 text-[10px] font-medium tabular-nums text-muted-foreground">{counts[s.key]}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+          <div className="ml-auto">
+            <Tabs value={layout} onValueChange={(v) => setLayout(v as any)}>
+              <TabsList className="h-9">
+                <TabsTrigger value="grid" className="h-8 px-2 text-xs"><LayoutGrid className="mr-1 h-3.5 w-3.5" /> Сетка</TabsTrigger>
+                <TabsTrigger value="kanban" className="h-8 px-2 text-xs"><Columns3 className="mr-1 h-3.5 w-3.5" /> Канбан</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
+
+        {layout === "grid" ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filtered.map(i => <InsightCard key={i.id} insight={i} />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+            {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(col => (
+              <div key={col} className="flex flex-col gap-3 rounded-xl border bg-muted/20 p-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider">{col.replace("_", " ")}</h4>
+                  <span className="num rounded bg-card px-1.5 text-[10px] font-medium">{counts[col]}</span>
+                </div>
+                <div className="space-y-3">
+                  {INSIGHTS.filter(i => i.status === col).map(i => <InsightCard key={i.id} insight={i} compact />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </AppShell>
+  );
+}
