@@ -16,6 +16,7 @@ import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicsTopicIdRouteImport } from './routes/topics.$topicId'
+import { Route as InsightsInsightIdRouteImport } from './routes/insights.$insightId'
 
 const TopicsRoute = TopicsRouteImport.update({
   id: '/topics',
@@ -52,33 +53,41 @@ const TopicsTopicIdRoute = TopicsTopicIdRouteImport.update({
   path: '/$topicId',
   getParentRoute: () => TopicsRoute,
 } as any)
+const InsightsInsightIdRoute = InsightsInsightIdRouteImport.update({
+  id: '/$insightId',
+  path: '/$insightId',
+  getParentRoute: () => InsightsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/impact': typeof ImpactRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/settings': typeof SettingsRoute
   '/topics': typeof TopicsRouteWithChildren
+  '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/impact': typeof ImpactRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/settings': typeof SettingsRoute
   '/topics': typeof TopicsRouteWithChildren
+  '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/impact': typeof ImpactRoute
-  '/insights': typeof InsightsRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/settings': typeof SettingsRoute
   '/topics': typeof TopicsRouteWithChildren
+  '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/settings'
     | '/topics'
+    | '/insights/$insightId'
     | '/topics/$topicId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/settings'
     | '/topics'
+    | '/insights/$insightId'
     | '/topics/$topicId'
   id:
     | '__root__'
@@ -108,13 +119,14 @@ export interface FileRouteTypes {
     | '/reviews'
     | '/settings'
     | '/topics'
+    | '/insights/$insightId'
     | '/topics/$topicId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ImpactRoute: typeof ImpactRoute
-  InsightsRoute: typeof InsightsRoute
+  InsightsRoute: typeof InsightsRouteWithChildren
   ReviewsRoute: typeof ReviewsRoute
   SettingsRoute: typeof SettingsRoute
   TopicsRoute: typeof TopicsRouteWithChildren
@@ -171,8 +183,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicsTopicIdRouteImport
       parentRoute: typeof TopicsRoute
     }
+    '/insights/$insightId': {
+      id: '/insights/$insightId'
+      path: '/$insightId'
+      fullPath: '/insights/$insightId'
+      preLoaderRoute: typeof InsightsInsightIdRouteImport
+      parentRoute: typeof InsightsRoute
+    }
   }
 }
+
+interface InsightsRouteChildren {
+  InsightsInsightIdRoute: typeof InsightsInsightIdRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsInsightIdRoute: InsightsInsightIdRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
 
 interface TopicsRouteChildren {
   TopicsTopicIdRoute: typeof TopicsTopicIdRoute
@@ -188,7 +219,7 @@ const TopicsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ImpactRoute: ImpactRoute,
-  InsightsRoute: InsightsRoute,
+  InsightsRoute: InsightsRouteWithChildren,
   ReviewsRoute: ReviewsRoute,
   SettingsRoute: SettingsRoute,
   TopicsRoute: TopicsRouteWithChildren,
