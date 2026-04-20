@@ -5,6 +5,7 @@ import { getTopic, type Insight } from "@/lib/mock/data";
 import { Check, X, ArrowRight, MessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { Link } from "@tanstack/react-router";
 
 export function InsightCard({ insight, compact }: { insight: Insight; compact?: boolean }) {
   const topic = getTopic(insight.topicId);
@@ -64,7 +65,9 @@ export function InsightCard({ insight, compact }: { insight: Insight; compact?: 
         <div className="-mb-1 flex flex-wrap items-center gap-1.5">
           <Button size="sm" className="h-7 text-[11px]"><Check className="mr-1 h-3 w-3" /> Принять</Button>
           <Button size="sm" variant="outline" className="h-7 text-[11px]"><X className="mr-1 h-3 w-3" /> Отклонить</Button>
-          <Button size="sm" variant="ghost" className="ml-auto h-7 text-[11px]">Детали <ArrowRight className="ml-1 h-3 w-3" /></Button>
+          <Button asChild size="sm" variant="ghost" className="ml-auto h-7 text-[11px]">
+            <Link to="/insights/$insightId" params={{ insightId: insight.id }}>Детали <ArrowRight className="ml-1 h-3 w-3" /></Link>
+          </Button>
         </div>
       )}
     </Card>
