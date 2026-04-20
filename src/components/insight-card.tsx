@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AiBadge, ConfidenceBar, ImpactIcon, PriorityBadge, SignalBar, StatusBadge, TopicChip } from "./atoms";
@@ -9,6 +10,10 @@ import { Link } from "@tanstack/react-router";
 
 export function InsightCard({ insight, compact }: { insight: Insight; compact?: boolean }) {
   const topic = getTopic(insight.topicId);
+  const [relativeTime, setRelativeTime] = useState<string>("");
+  useEffect(() => {
+    setRelativeTime(formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }));
+  }, [insight.createdAt]);
   return (
     <Card className="group flex flex-col gap-3 border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-2)]">
       <div className="flex items-start justify-between gap-3">
@@ -17,13 +22,20 @@ export function InsightCard({ insight, compact }: { insight: Insight; compact?: 
           <StatusBadge status={insight.status} />
           <PriorityBadge priority={insight.priority} />
         </div>
-        <span className="text-[10px] text-muted-foreground">
-          {formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru })}
+        <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
+          {relativeTime}
         </span>
       </div>
 
       <div>
-        <h4 className="text-sm font-semibold leading-snug tracking-tight">{insight.title}</h4>
+        <Link
+          to="/insights/$insightId"
+          params={{ insightId: insight.id }}
+          className="group/title inline-flex items-start gap-1 text-sm font-semibold leading-snug tracking-tight hover:text-ai transition-colors"
+        >
+          <h4 className="leading-snug">{insight.title}</h4>
+          <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 opacity-0 -translate-x-1 transition-all group-hover/title:opacity-100 group-hover/title:translate-x-0" />
+        </Link>
         {!compact && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-3">{insight.description}</p>}
       </div>
 
