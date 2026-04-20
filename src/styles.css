@@ -96,25 +96,27 @@
   --input: oklch(0.92 0.01 255);
   --ring: oklch(0.65 0.04 258);
 
-  /* Semantic sentiment / signal palette */
-  --positive: oklch(0.62 0.13 162);
-  --positive-soft: oklch(0.95 0.04 162);
-  --positive-foreground: oklch(0.28 0.08 162);
-  --negative: oklch(0.62 0.18 22);
-  --negative-soft: oklch(0.96 0.035 22);
-  --negative-foreground: oklch(0.32 0.13 22);
-  --mixed: oklch(0.74 0.14 75);
-  --mixed-soft: oklch(0.96 0.05 80);
-  --mixed-foreground: oklch(0.4 0.11 70);
-  --ai: oklch(0.58 0.17 285);
-  --ai-soft: oklch(0.96 0.04 285);
-  --ai-foreground: oklch(0.32 0.13 285);
+  /* Unified semantic palette — restrained, B2B analytic.
+     Only 3 functional accents: positive (green), negative (red), neutral (slate).
+     "mixed" and "ai" map to muted slate tones to avoid color overload. */
+  --positive: oklch(0.58 0.11 165);
+  --positive-soft: oklch(0.955 0.025 165);
+  --positive-foreground: oklch(0.3 0.08 165);
+  --negative: oklch(0.58 0.16 25);
+  --negative-soft: oklch(0.96 0.03 25);
+  --negative-foreground: oklch(0.34 0.12 25);
+  --mixed: oklch(0.55 0.03 258);
+  --mixed-soft: oklch(0.955 0.008 258);
+  --mixed-foreground: oklch(0.32 0.04 258);
+  --ai: oklch(0.32 0.04 260);
+  --ai-soft: oklch(0.955 0.008 258);
+  --ai-foreground: oklch(0.22 0.04 260);
 
-  --chart-1: oklch(0.58 0.17 285); /* ai indigo */
-  --chart-2: oklch(0.62 0.13 162); /* positive */
-  --chart-3: oklch(0.62 0.18 22);  /* negative */
-  --chart-4: oklch(0.74 0.14 75);  /* mixed amber */
-  --chart-5: oklch(0.55 0.08 230); /* steel blue */
+  --chart-1: oklch(0.32 0.04 260); /* primary slate */
+  --chart-2: oklch(0.58 0.11 165); /* positive */
+  --chart-3: oklch(0.58 0.16 25);  /* negative */
+  --chart-4: oklch(0.62 0.03 258); /* neutral steel */
+  --chart-5: oklch(0.78 0.02 258); /* light slate */
 
   --sidebar: oklch(0.985 0.004 250);
   --sidebar-foreground: oklch(0.22 0.04 260);
@@ -147,24 +149,24 @@
   --input: oklch(1 0 0 / 14%);
   --ring: oklch(0.55 0.04 260);
 
-  --positive: oklch(0.7 0.13 162);
-  --positive-soft: oklch(0.28 0.06 162);
-  --positive-foreground: oklch(0.92 0.06 162);
-  --negative: oklch(0.7 0.18 22);
-  --negative-soft: oklch(0.3 0.09 22);
-  --negative-foreground: oklch(0.94 0.04 22);
-  --mixed: oklch(0.78 0.13 75);
-  --mixed-soft: oklch(0.32 0.07 75);
-  --mixed-foreground: oklch(0.94 0.05 80);
-  --ai: oklch(0.7 0.17 285);
-  --ai-soft: oklch(0.3 0.08 285);
-  --ai-foreground: oklch(0.94 0.05 285);
+  --positive: oklch(0.7 0.12 165);
+  --positive-soft: oklch(0.28 0.05 165);
+  --positive-foreground: oklch(0.92 0.05 165);
+  --negative: oklch(0.7 0.16 25);
+  --negative-soft: oklch(0.3 0.08 25);
+  --negative-foreground: oklch(0.94 0.04 25);
+  --mixed: oklch(0.7 0.025 258);
+  --mixed-soft: oklch(0.28 0.02 258);
+  --mixed-foreground: oklch(0.94 0.005 258);
+  --ai: oklch(0.93 0.01 255);
+  --ai-soft: oklch(0.28 0.025 260);
+  --ai-foreground: oklch(0.94 0.005 258);
 
-  --chart-1: oklch(0.7 0.17 285);
-  --chart-2: oklch(0.7 0.13 162);
-  --chart-3: oklch(0.7 0.18 22);
-  --chart-4: oklch(0.78 0.13 75);
-  --chart-5: oklch(0.65 0.09 230);
+  --chart-1: oklch(0.93 0.01 255);
+  --chart-2: oklch(0.7 0.12 165);
+  --chart-3: oklch(0.7 0.16 25);
+  --chart-4: oklch(0.62 0.025 258);
+  --chart-5: oklch(0.45 0.02 258);
 
   --sidebar: oklch(0.18 0.02 260);
   --sidebar-foreground: oklch(0.96 0.005 250);
