@@ -92,7 +92,8 @@ export const Route = createFileRoute("/insights/$insightId")({
 });
 
 function InsightDetailPage() {
-  const { insight } = Route.useLoaderData();
+  const data = Route.useLoaderData();
+  const insight = data!.insight;
   const topic = getTopic(insight.topicId);
   const [createdAgo, setCreatedAgo] = useState("");
 
