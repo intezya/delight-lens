@@ -15,6 +15,7 @@ import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as ImpactRouteImport } from './routes/impact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as TopicsTopicIdRouteImport } from './routes/topics.$topicId'
 import { Route as InsightsInsightIdRouteImport } from './routes/insights.$insightId'
 
@@ -48,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
+} as any)
 const TopicsTopicIdRoute = TopicsTopicIdRouteImport.update({
   id: '/$topicId',
   path: '/$topicId',
@@ -68,16 +74,17 @@ export interface FileRoutesByFullPath {
   '/topics': typeof TopicsRouteWithChildren
   '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
+  '/insights/': typeof InsightsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/impact': typeof ImpactRoute
-  '/insights': typeof InsightsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/settings': typeof SettingsRoute
   '/topics': typeof TopicsRouteWithChildren
   '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
+  '/insights': typeof InsightsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +96,7 @@ export interface FileRoutesById {
   '/topics': typeof TopicsRouteWithChildren
   '/insights/$insightId': typeof InsightsInsightIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
+  '/insights/': typeof InsightsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,16 +109,17 @@ export interface FileRouteTypes {
     | '/topics'
     | '/insights/$insightId'
     | '/topics/$topicId'
+    | '/insights/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/impact'
-    | '/insights'
     | '/reviews'
     | '/settings'
     | '/topics'
     | '/insights/$insightId'
     | '/topics/$topicId'
+    | '/insights'
   id:
     | '__root__'
     | '/'
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/topics'
     | '/insights/$insightId'
     | '/topics/$topicId'
+    | '/insights/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof InsightsRoute
+    }
     '/topics/$topicId': {
       id: '/topics/$topicId'
       path: '/$topicId'
@@ -195,10 +212,12 @@ declare module '@tanstack/react-router' {
 
 interface InsightsRouteChildren {
   InsightsInsightIdRoute: typeof InsightsInsightIdRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
 }
 
 const InsightsRouteChildren: InsightsRouteChildren = {
   InsightsInsightIdRoute: InsightsInsightIdRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
 }
 
 const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
@@ -227,3 +246,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -94,6 +94,11 @@ export const Route = createFileRoute("/insights/$insightId")({
 function InsightDetailPage() {
   const { insight } = Route.useLoaderData();
   const topic = getTopic(insight.topicId);
+  const [createdAgo, setCreatedAgo] = useState("");
+
+  useEffect(() => {
+    setCreatedAgo(formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }));
+  }, [insight.createdAt]);
 
   // Evidence: pick a few topic-related reviews
   const evidence = REVIEWS.filter((r) => r.topics.includes(insight.topicId)).slice(0, 5);
@@ -171,9 +176,9 @@ function InsightDetailPage() {
                   <Users className="h-3.5 w-3.5" />
                   <span className="font-medium text-foreground">{insight.owner.name}</span> · {insight.owner.team}
                 </span>
-                <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1.5" suppressHydrationWarning>
                   <Calendar className="h-3.5 w-3.5" />
-                  Создано {formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru })}
+                  Создано {createdAgo}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
