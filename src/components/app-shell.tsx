@@ -1,8 +1,8 @@
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
-import { GlobalFiltersBar } from "./global-filters";
-import { Bell, HelpCircle } from "lucide-react";
+import { Bell, HelpCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function AppShell({ children, title, subtitle, actions }: { children: React.ReactNode; title: string; subtitle?: string; actions?: React.ReactNode }) {
   return (
