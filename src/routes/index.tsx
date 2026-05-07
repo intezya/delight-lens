@@ -14,7 +14,7 @@ import {
   Sparkles, ArrowRight, AlertTriangle, Repeat, TrendingUp, MessageSquare,
   ChevronRight, CheckCircle2, ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ElementType } from "react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
