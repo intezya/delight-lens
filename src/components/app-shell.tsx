@@ -18,13 +18,24 @@ export function AppShell({ children, title, subtitle, actions }: { children: Rea
                 {subtitle && <span className="truncate text-[10px] text-muted-foreground">{subtitle}</span>}
               </div>
             </div>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-1.5">
+              <Select defaultValue="30d">
+                <SelectTrigger className="h-8 w-[150px] text-xs">
+                  <Calendar className="mr-1.5 h-3.5 w-3.5" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7d">Последние 7 дней</SelectItem>
+                  <SelectItem value="30d">Последние 30 дней</SelectItem>
+                  <SelectItem value="90d">Последние 90 дней</SelectItem>
+                  <SelectItem value="ytd">С начала года</SelectItem>
+                </SelectContent>
+              </Select>
               {actions}
               <Button variant="ghost" size="icon" className="h-8 w-8"><Bell className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" className="h-8 w-8"><HelpCircle className="h-4 w-4" /></Button>
             </div>
           </header>
-          <GlobalFiltersBar />
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </SidebarInset>
       </div>
