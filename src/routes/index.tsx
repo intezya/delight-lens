@@ -14,7 +14,7 @@ import {
   Sparkles, ArrowRight, AlertTriangle, Repeat, TrendingUp, MessageSquare,
   ChevronRight, CheckCircle2, ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ElementType } from "react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -158,17 +158,18 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       : "border-l-ai bg-ai-soft/15";
   const iconCls = item.severity === "critical" ? "text-negative" : item.severity === "high" ? "text-mixed" : "text-ai";
 
+  const TitleWrap: ElementType = item.insightId ? Link : "div";
+  const titleProps = item.insightId
+    ? { to: "/insights/$insightId", params: { insightId: item.insightId }, className: "block min-w-0 flex-1 space-y-1 hover:[&_h4]:text-ai" }
+    : { className: "block min-w-0 flex-1 space-y-1" };
+
   return (
     <div className={cn("group rounded-lg border border-l-[3px] bg-card transition hover:shadow-[var(--shadow-elev-1)]", sevTone)}>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className="flex w-full items-start gap-3 p-3.5 text-left"
-      >
+      <div className="flex w-full items-start gap-3 p-3.5 text-left">
         <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", iconCls)} />
-        <div className="min-w-0 flex-1 space-y-1">
+        <TitleWrap {...titleProps}>
           <div className="flex items-center justify-between gap-3">
-            <h4 className="truncate text-sm font-medium">{item.title}</h4>
+            <h4 className="truncate text-sm font-medium transition-colors">{item.title}</h4>
             <span className="num shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-foreground">{item.metric}</span>
           </div>
           <p className="line-clamp-1 text-[11.5px] leading-relaxed text-muted-foreground">{item.reason}</p>
@@ -176,9 +177,16 @@ function AttentionCard({ item }: { item: AttentionItem }) {
             {item.topicId && <TopicChip name={getTopic(item.topicId)?.name ?? ""} kind={getTopic(item.topicId)?.kind} />}
             <span className="inline-flex items-center gap-1"><MessageSquare className="h-3 w-3" />{item.reviewCount} отзывов</span>
           </div>
-        </div>
-        <ChevronDown className={cn("mt-1 h-4 w-4 shrink-0 text-muted-foreground transition", open && "rotate-180")} />
-      </button>
+        </TitleWrap>
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          aria-label={open ? "Свернуть" : "Развернуть действия"}
+          className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ChevronDown className={cn("h-4 w-4 transition", open && "rotate-180")} />
+        </button>
+      </div>
 
       {open && (
         <div className="flex flex-wrap items-center gap-2 border-t bg-background/40 px-3.5 py-2.5">
