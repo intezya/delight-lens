@@ -158,7 +158,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       : "border-l-ai bg-ai-soft/15";
   const iconCls = item.severity === "critical" ? "text-negative" : item.severity === "high" ? "text-mixed" : "text-ai";
 
-  const TitleWrap: React.ElementType = item.insightId ? Link : "div";
+  const TitleWrap: ElementType = item.insightId ? Link : "div";
   const titleProps = item.insightId
     ? { to: "/insights/$insightId", params: { insightId: item.insightId }, className: "block min-w-0 flex-1 space-y-1 hover:[&_h4]:text-ai" }
     : { className: "block min-w-0 flex-1 space-y-1" };
