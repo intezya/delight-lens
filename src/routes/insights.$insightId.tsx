@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AiBadge,
   ConfidenceBar,
@@ -150,7 +151,7 @@ function InsightDetailPage() {
         </Button>
       }
     >
-      <div className="mx-auto max-w-[1400px] space-y-5 p-4 md:p-6">
+      <div className="mx-auto max-w-[1400px] space-y-6 p-4 md:p-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/insights" className="hover:text-foreground">Insights</Link>
@@ -158,7 +159,7 @@ function InsightDetailPage() {
           <span className="font-medium text-foreground">{insight.id.toUpperCase()}</span>
         </nav>
 
-        {/* === 1. HEADER === */}
+        {/* === HEADER === */}
         <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/40 via-card to-card p-6 shadow-[var(--shadow-elev-2)]">
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-15" />
           <div className="relative grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -183,7 +184,7 @@ function InsightDetailPage() {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
-                  Период анализа: последние 30 дней
+                  Период: последние 30 дней
                 </span>
               </div>
             </div>
@@ -205,7 +206,7 @@ function InsightDetailPage() {
           </div>
         </Card>
 
-        {/* === 2. WHY AI SUGGESTED === */}
+        {/* === AI EXPLANATION (always visible — sets context) === */}
         <Card className="border-l-4 border-l-ai p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ai-soft text-ai-foreground">
@@ -226,208 +227,230 @@ function InsightDetailPage() {
           </div>
         </Card>
 
-        {/* === 3. EVIDENCE === */}
-        <section>
-          <SectionHeader
-            title="Доказательства"
-            subtitle="Конкретные отзывы, на которых построена гипотеза"
-            action={<Button variant="ghost" size="sm" className="h-7 text-xs">Все {clusterReviews.length} отзыва <ArrowRight className="ml-1 h-3 w-3" /></Button>}
-          />
-          <div className="grid gap-3 md:grid-cols-2">
-            {evidence.map((r) => (
-              <Card key={r.id} className="group flex flex-col gap-2 border p-4 transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-1)]">
-                <div className="flex items-start gap-2">
-                  <Quote className="mt-0.5 h-4 w-4 shrink-0 text-ai/60" />
-                  <p className="text-sm leading-relaxed text-foreground">«{r.text}»</p>
+        {/* === TABS: разделяем плотную информацию === */}
+        <Tabs defaultValue="evidence" className="w-full">
+          <TabsList className="h-auto w-full justify-start gap-1 rounded-lg bg-muted/50 p-1">
+            <TabsTrigger value="evidence" className="gap-1.5 text-xs data-[state=active]:bg-card">
+              <Quote className="h-3.5 w-3.5" /> Доказательства
+              <span className="ml-1 rounded-full bg-muted px-1.5 text-[10px] num">{clusterReviews.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="data" className="gap-1.5 text-xs data-[state=active]:bg-card">
+              <TrendingUp className="h-3.5 w-3.5" /> Данные
+            </TabsTrigger>
+            <TabsTrigger value="priority" className="gap-1.5 text-xs data-[state=active]:bg-card">
+              <Flame className="h-3.5 w-3.5" /> Приоритет
+            </TabsTrigger>
+            <TabsTrigger value="action" className="gap-1.5 text-xs data-[state=active]:bg-card">
+              <Lightbulb className="h-3.5 w-3.5" /> В работу
+            </TabsTrigger>
+            <TabsTrigger value="decision" className="gap-1.5 text-xs data-[state=active]:bg-card">
+              <Check className="h-3.5 w-3.5" /> Решение
+            </TabsTrigger>
+          </TabsList>
+
+          {/* --- EVIDENCE --- */}
+          <TabsContent value="evidence" className="mt-5 space-y-4">
+            <SectionHeader
+              title="Конкретные отзывы"
+              subtitle="На которых построена гипотеза"
+              action={<Button variant="ghost" size="sm" className="h-7 text-xs">Все {clusterReviews.length} <ArrowRight className="ml-1 h-3 w-3" /></Button>}
+            />
+            <div className="grid gap-3 md:grid-cols-2">
+              {evidence.map((r) => (
+                <Card key={r.id} className="group flex flex-col gap-2 border p-4 transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-1)]">
+                  <div className="flex items-start gap-2">
+                    <Quote className="mt-0.5 h-4 w-4 shrink-0 text-ai/60" />
+                    <p className="text-sm leading-relaxed text-foreground">«{r.text}»</p>
+                  </div>
+                  <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-2 text-[11px]">
+                    <SentimentPill sentiment={r.sentiment} />
+                    <SourceBadge source={r.source} />
+                    <span className="text-muted-foreground">· {format(new Date(r.date), "d MMM yyyy", { locale: ru })}</span>
+                    <div className="ml-auto flex flex-wrap gap-1">
+                      {r.topics.slice(0, 2).map((t) => {
+                        const tp = getTopic(t);
+                        return tp ? <TopicChip key={t} name={tp.name} kind={tp.kind} /> : null;
+                      })}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* --- DATA --- */}
+          <TabsContent value="data" className="mt-5 space-y-4">
+            <SectionHeader title="Сводка по данным" subtitle="Объём кластера, динамика, вклад площадок" />
+            <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+              <Card className="p-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <SummaryStat label="Отзывов в кластере" value={clusterSize.toString()} hint="за 30 дней" />
+                  <SummaryStat label="Доля негатива" value={`${negShare}%`} hint={<Delta value={6} invert />} />
+                  <SummaryStat label="Повторяемость" value={`${repeatRate}%`} hint="повторные жалобы" />
+                  <SummaryStat label="Δ за 30 дней" value="+24%" hint={<span className="text-negative">рост обращений</span>} />
                 </div>
-                <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-2 text-[11px]">
-                  <SentimentPill sentiment={r.sentiment} />
-                  <SourceBadge source={r.source} />
-                  <span className="text-muted-foreground">· {format(new Date(r.date), "d MMM yyyy", { locale: ru })}</span>
-                  <div className="ml-auto flex flex-wrap gap-1">
-                    {r.topics.slice(0, 2).map((t) => {
-                      const tp = getTopic(t);
-                      return tp ? <TopicChip key={t} name={tp.name} kind={tp.kind} /> : null;
+                <Separator className="my-4" />
+                <div>
+                  <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Вклад площадок</p>
+                  <div className="space-y-2">
+                    {sourceContribution.slice(0, 5).map((s) => {
+                      const pct = Math.round((s.count / Math.max(1, totalContribution)) * 100);
+                      return (
+                        <div key={s.source} className="flex items-center gap-3">
+                          <div className="w-24 shrink-0">
+                            <SourceBadge source={s.source} />
+                          </div>
+                          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                            <div className="absolute inset-y-0 left-0 rounded-full bg-ai/70" style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="num w-10 text-right text-[11px] font-medium tabular-nums text-muted-foreground">{pct}%</span>
+                        </div>
+                      );
                     })}
                   </div>
                 </div>
               </Card>
-            ))}
-          </div>
-        </section>
 
-        {/* === 4. DATA SUMMARY === */}
-        <section>
-          <SectionHeader title="Сводка по данным" subtitle="Объём кластера, динамика, вклад площадок" />
-          <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+              <Card className="flex flex-col p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-xs font-semibold">Динамика темы за 30 дней</p>
+                  <span className="num text-[10px] text-muted-foreground">обращений / день</span>
+                </div>
+                <div className="h-[260px] flex-1">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={series} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="grad-vol" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="var(--ai)" stopOpacity={0.4} />
+                          <stop offset="100%" stopColor="var(--ai)" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} interval={4} />
+                      <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
+                      <RTooltip
+                        contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
+                        labelStyle={{ color: "var(--muted-foreground)", fontSize: 11 }}
+                      />
+                      <Area type="monotone" dataKey="volume" stroke="var(--ai)" strokeWidth={2} fill="url(#grad-vol)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* --- PRIORITY --- */}
+          <TabsContent value="priority" className="mt-5 space-y-4">
+            <SectionHeader title="Почему это приоритетно" subtitle="Оценка по 4 измерениям" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <PriorityTile icon={Flame} title="Severity" score={severityScore} description="Тяжесть последствий для клиента и репутации" tone="negative" />
+              <PriorityTile icon={Repeat} title="Frequency" score={frequencyScore} description="Как часто проблема повторяется в отзывах" tone="mixed" />
+              <PriorityTile icon={Building2} title="Business impact" score={businessImpactScore} description="Влияние на retention, рейтинг площадок, конверсию" tone="ai" />
+              <PriorityTile icon={Zap} title="Urgency" score={urgencyScore} description="Скорость нарастания и риск эскалации" tone="negative" />
+            </div>
+          </TabsContent>
+
+          {/* --- ACTIONABLE --- */}
+          <TabsContent value="action" className="mt-5 space-y-4">
+            <SectionHeader title="Что можно передать в работу" subtitle="Готовая формулировка и первый шаг" />
+            <Card className="overflow-hidden">
+              <div className="border-l-4 border-l-positive bg-positive-soft/30 p-5">
+                <div className="mb-2 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-positive" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-positive-foreground">Гипотеза в формате «если…, то…»</span>
+                </div>
+                <p className="text-sm leading-relaxed text-foreground">
+                  <span className="font-semibold">Если</span> {ifThen.condition}, <span className="font-semibold">то</span> {ifThen.outcome}.
+                </p>
+              </div>
+              <div className="grid gap-0 sm:grid-cols-3">
+                <HandoffField icon={Users} label="Кому передать" value={insight.owner.team} sub={insight.owner.name} />
+                <HandoffField icon={Target} label="Ожидаемый результат" value={insight.expectedEffect} sub="за 4–6 недель" />
+                <HandoffField icon={ArrowRight} label="Первый шаг" value={ifThen.firstStep} sub="ответственный — владелец гипотезы" last />
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* --- DECISION --- */}
+          <TabsContent value="decision" className="mt-5 space-y-4">
+            <SectionHeader title="Решение пользователя" subtitle="Зафиксируйте вердикт и передайте в работу" />
             <Card className="p-5">
-              <div className="grid grid-cols-2 gap-4">
-                <SummaryStat label="Отзывов в кластере" value={clusterSize.toString()} hint="за 30 дней" />
-                <SummaryStat label="Доля негатива" value={`${negShare}%`} hint={<Delta value={6} invert />} />
-                <SummaryStat label="Повторяемость" value={`${repeatRate}%`} hint="повторные жалобы" />
-                <SummaryStat label="Δ за 30 дней" value="+24%" hint={<span className="text-negative">рост обращений</span>} />
-              </div>
-              <Separator className="my-4" />
-              <div>
-                <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Вклад площадок</p>
-                <div className="space-y-2">
-                  {sourceContribution.slice(0, 5).map((s) => {
-                    const pct = Math.round((s.count / Math.max(1, totalContribution)) * 100);
-                    return (
-                      <div key={s.source} className="flex items-center gap-3">
-                        <div className="w-24 shrink-0">
-                          <SourceBadge source={s.source} />
-                        </div>
-                        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                          <div className="absolute inset-y-0 left-0 rounded-full bg-ai/70" style={{ width: `${pct}%` }} />
-                        </div>
-                        <span className="num w-10 text-right text-[11px] font-medium tabular-nums text-muted-foreground">{pct}%</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </Card>
-
-            <Card className="flex flex-col p-5">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-xs font-semibold">Динамика темы за 30 дней</p>
-                <span className="num text-[10px] text-muted-foreground">обращений / день</span>
-              </div>
-              <div className="h-[220px] flex-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={series} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="grad-vol" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--ai)" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="var(--ai)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} interval={4} />
-                    <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
-                    <RTooltip
-                      contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
-                      labelStyle={{ color: "var(--muted-foreground)", fontSize: 11 }}
+              <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
+                <div className="space-y-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Вердикт</p>
+                  <div className="grid gap-2">
+                    <DecisionButton
+                      active={decision === "accept"}
+                      onClick={() => setDecision("accept")}
+                      icon={Check}
+                      title="Принять гипотезу"
+                      description="Передать в работу команде"
+                      tone="positive"
                     />
-                    <Area type="monotone" dataKey="volume" stroke="var(--ai)" strokeWidth={2} fill="url(#grad-vol)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                    <DecisionButton
+                      active={decision === "reject"}
+                      onClick={() => setDecision("reject")}
+                      icon={X}
+                      title="Отклонить"
+                      description="Не подтверждается или не релевантно"
+                      tone="negative"
+                    />
+                    <DecisionButton
+                      active={decision === "more_data"}
+                      onClick={() => setDecision("more_data")}
+                      icon={HelpCircle}
+                      title="Нужны дополнительные данные"
+                      description="Запросить у AI ещё доказательств"
+                      tone="mixed"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="reason" className="text-xs font-medium">
+                      Почему {decision === "reject" ? "отклонено" : "принято"}
+                    </Label>
+                    <Textarea
+                      id="reason"
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      placeholder="Короткое обоснование решения — увидят коллеги в истории гипотезы"
+                      className="mt-1.5 min-h-[100px] text-sm"
+                    />
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <Label htmlFor="assign" className="text-xs font-medium">Кому передать</Label>
+                      <Input id="assign" value={assignTo} onChange={(e) => setAssignTo(e.target.value)} className="mt-1.5 h-9 text-sm" />
+                    </div>
+                    <div>
+                      <Label htmlFor="priority" className="text-xs font-medium">Приоритет</Label>
+                      <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
+                        <SelectTrigger id="priority" className="mt-1.5 h-9 text-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="critical">Critical</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 pt-2">
+                    <p className="text-[11px] text-muted-foreground">
+                      {decision ? "Решение готово к фиксации" : "Выберите вердикт слева, чтобы продолжить"}
+                    </p>
+                    <Button size="sm" disabled={!decision} className="h-9 text-xs">
+                      <Send className="mr-1.5 h-3.5 w-3.5" /> Зафиксировать решение
+                    </Button>
+                  </div>
+                </div>
               </div>
             </Card>
-          </div>
-        </section>
-
-        {/* === 5. WHY PRIORITY === */}
-        <section>
-          <SectionHeader title="Почему это приоритетно" subtitle="Оценка по 4 измерениям" />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <PriorityTile icon={Flame} title="Severity" score={severityScore} description="Тяжесть последствий для клиента и репутации" tone="negative" />
-            <PriorityTile icon={Repeat} title="Frequency" score={frequencyScore} description="Как часто проблема повторяется в отзывах" tone="mixed" />
-            <PriorityTile icon={Building2} title="Business impact" score={businessImpactScore} description="Влияние на retention, рейтинг площадок, конверсию" tone="ai" />
-            <PriorityTile icon={Zap} title="Urgency" score={urgencyScore} description="Скорость нарастания и риск эскалации" tone="negative" />
-          </div>
-        </section>
-
-        {/* === 6. ACTIONABLE === */}
-        <section>
-          <SectionHeader title="Что можно передать в работу" subtitle="Готовая формулировка и первый шаг" />
-          <Card className="overflow-hidden">
-            <div className="border-l-4 border-l-positive bg-positive-soft/30 p-5">
-              <div className="mb-2 flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-positive" />
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-positive-foreground">Гипотеза в формате «если…, то…»</span>
-              </div>
-              <p className="text-sm leading-relaxed text-foreground">
-                <span className="font-semibold">Если</span> {ifThen.condition}, <span className="font-semibold">то</span> {ifThen.outcome}.
-              </p>
-            </div>
-            <div className="grid gap-0 sm:grid-cols-3">
-              <HandoffField icon={Users} label="Кому передать" value={insight.owner.team} sub={insight.owner.name} />
-              <HandoffField icon={Target} label="Ожидаемый результат" value={insight.expectedEffect} sub="за 4–6 недель" />
-              <HandoffField icon={ArrowRight} label="Первый шаг" value={ifThen.firstStep} sub="ответственный — владелец гипотезы" last />
-            </div>
-          </Card>
-        </section>
-
-        {/* === 7. DECISION === */}
-        <section>
-          <SectionHeader title="Решение пользователя" subtitle="Зафиксируйте вердикт и передайте в работу" />
-          <Card className="p-5">
-            <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
-              <div className="space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Вердикт</p>
-                <div className="grid gap-2">
-                  <DecisionButton
-                    active={decision === "accept"}
-                    onClick={() => setDecision("accept")}
-                    icon={Check}
-                    title="Принять гипотезу"
-                    description="Передать в работу команде"
-                    tone="positive"
-                  />
-                  <DecisionButton
-                    active={decision === "reject"}
-                    onClick={() => setDecision("reject")}
-                    icon={X}
-                    title="Отклонить"
-                    description="Не подтверждается или не релевантно"
-                    tone="negative"
-                  />
-                  <DecisionButton
-                    active={decision === "more_data"}
-                    onClick={() => setDecision("more_data")}
-                    icon={HelpCircle}
-                    title="Нужны дополнительные данные"
-                    description="Запросить у AI ещё доказательств"
-                    tone="mixed"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="reason" className="text-xs font-medium">
-                    Почему {decision === "reject" ? "отклонено" : "принято"}
-                  </Label>
-                  <Textarea
-                    id="reason"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    placeholder="Короткое обоснование решения — увидят коллеги в истории гипотезы"
-                    className="mt-1.5 min-h-[100px] text-sm"
-                  />
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="assign" className="text-xs font-medium">Кому передать</Label>
-                    <Input id="assign" value={assignTo} onChange={(e) => setAssignTo(e.target.value)} className="mt-1.5 h-9 text-sm" />
-                  </div>
-                  <div>
-                    <Label htmlFor="priority" className="text-xs font-medium">Приоритет</Label>
-                    <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
-                      <SelectTrigger id="priority" className="mt-1.5 h-9 text-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="critical">Critical</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="low">Low</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between gap-3 pt-2">
-                  <p className="text-[11px] text-muted-foreground">
-                    {decision ? "Решение готово к фиксации" : "Выберите вердикт слева, чтобы продолжить"}
-                  </p>
-                  <Button size="sm" disabled={!decision} className="h-9 text-xs">
-                    <Send className="mr-1.5 h-3.5 w-3.5" /> Зафиксировать решение
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </section>
+          </TabsContent>
+        </Tabs>
 
         {/* Related insights footer */}
         <section className="pt-2">
