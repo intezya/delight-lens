@@ -212,4 +212,68 @@
       linear-gradient(to bottom, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px);
     background-size: 24px 24px;
   }
+
+  /* Motion primitives — subtle, fast, B2B-appropriate */
+  .anim-fade-in { animation: lv-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-rise { animation: lv-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-rise-sm { animation: lv-rise-sm 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-scale-in { animation: lv-scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  .stagger > * { animation: lv-rise-sm 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 60ms; }
+  .stagger > *:nth-child(3) { animation-delay: 120ms; }
+  .stagger > *:nth-child(4) { animation-delay: 180ms; }
+  .stagger > *:nth-child(5) { animation-delay: 240ms; }
+  .stagger > *:nth-child(6) { animation-delay: 300ms; }
+  .stagger > *:nth-child(7) { animation-delay: 360ms; }
+  .stagger > *:nth-child(8) { animation-delay: 420ms; }
+
+  .lift {
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.2s ease;
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elev-2);
+  }
+
+  .press { transition: transform 0.12s ease; }
+  .press:active { transform: scale(0.97); }
+}
+
+@keyframes lv-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lv-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lv-rise-sm {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lv-scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Smooth interactive transitions on common controls */
+@layer base {
+  a, button, [role="button"], [role="tab"] {
+    transition:
+      color 0.15s ease,
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      opacity 0.15s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-in, .anim-rise, .anim-rise-sm, .anim-scale-in,
+  .stagger > * { animation: none !important; }
+  .lift:hover { transform: none; }
 }

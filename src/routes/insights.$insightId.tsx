@@ -151,29 +151,33 @@ function InsightDetailPage() {
         </Button>
       }
     >
-      <div className="mx-auto max-w-[1400px] space-y-6 p-4 md:p-6">
+      <div className="mx-auto max-w-[1200px] space-y-10 p-4 md:p-8 lg:p-10">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <nav className="anim-fade-in flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/insights" className="hover:text-foreground">Insights</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="font-medium text-foreground">{insight.id.toUpperCase()}</span>
         </nav>
 
         {/* === HEADER === */}
-        <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/40 via-card to-card p-6 shadow-[var(--shadow-elev-2)]">
+        <Card className="anim-rise relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/40 via-card to-card p-8 shadow-[var(--shadow-elev-2)] md:p-10">
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-15" />
-          <div className="relative grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            <div>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="relative space-y-8">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
                 <AiBadge />
                 <StatusBadge status={insight.status} />
                 <PriorityBadge priority={insight.priority} />
                 {topic && <TopicChip name={topic.name} kind={topic.kind} />}
               </div>
-              <h1 className="display text-2xl font-semibold leading-tight tracking-tight md:text-[28px]">{insight.title}</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{insight.description}</p>
+              <h1 className="display text-3xl font-semibold leading-[1.15] tracking-tight md:text-[34px]">
+                {insight.title}
+              </h1>
+              <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
+                {insight.description}
+              </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <Users className="h-3.5 w-3.5" />
                   <span className="font-medium text-foreground">{insight.owner.name}</span> · {insight.owner.team}
@@ -189,7 +193,9 @@ function InsightDetailPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <Separator className="bg-border/60" />
+
+            <div className="stagger grid grid-cols-2 gap-4 lg:grid-cols-4">
               <MetricTile label="Confidence">
                 <ConfidenceBar value={insight.confidence} />
               </MetricTile>
@@ -206,19 +212,21 @@ function InsightDetailPage() {
           </div>
         </Card>
 
-        {/* === AI EXPLANATION (always visible — sets context) === */}
-        <Card className="border-l-4 border-l-ai p-5">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ai-soft text-ai-foreground">
-              <Sparkles className="h-4.5 w-4.5" />
+        {/* === AI EXPLANATION === */}
+        <Card className="anim-rise border-l-4 border-l-ai p-6 md:p-8" style={{ animationDelay: "80ms" }}>
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ai-soft text-ai-foreground">
+              <Sparkles className="h-5 w-5" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold tracking-tight">Почему система это предложила</h3>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/90">
-                AI обнаружил кластер из <span className="num font-semibold text-foreground">{clusterSize} отзывов</span> по теме «{topic?.name.toLowerCase()}»,
-                сгруппированных по повторяющемуся сценарию. Жалобы концентрируются в определённых сегментах и площадках, что указывает на системную причину, а не разовый случай.
-              </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="text-base font-semibold tracking-tight">Почему система это предложила</h3>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/90">
+                  AI обнаружил кластер из <span className="num font-semibold text-foreground">{clusterSize} отзывов</span> по теме «{topic?.name.toLowerCase()}»,
+                  сгруппированных по повторяющемуся сценарию. Жалобы концентрируются в определённых сегментах и площадках, что указывает на системную причину, а не разовый случай.
+                </p>
+              </div>
+              <div className="stagger grid gap-3 sm:grid-cols-3">
                 <ObservationItem icon={Repeat} label="Повторяющийся паттерн" value={`${repeatRate}% отзывов в кластере — повторные жалобы`} />
                 <ObservationItem icon={Flame} label="Концентрация" value={`${negShare}% — негатив внутри темы`} />
                 <ObservationItem icon={TrendingUp} label="Бизнес-сигнал" value={`Сила ${insight.signal}/100, confidence ${insight.confidence}%`} />
@@ -227,42 +235,42 @@ function InsightDetailPage() {
           </div>
         </Card>
 
-        {/* === TABS: разделяем плотную информацию === */}
-        <Tabs defaultValue="evidence" className="w-full">
-          <TabsList className="h-auto w-full justify-start gap-1 rounded-lg bg-muted/50 p-1">
-            <TabsTrigger value="evidence" className="gap-1.5 text-xs data-[state=active]:bg-card">
+        {/* === TABS === */}
+        <Tabs defaultValue="evidence" className="anim-rise w-full" style={{ animationDelay: "160ms" }}>
+          <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto rounded-lg bg-muted/50 p-1">
+            <TabsTrigger value="evidence" className="gap-1.5 px-4 py-2 text-xs data-[state=active]:bg-card">
               <Quote className="h-3.5 w-3.5" /> Доказательства
               <span className="ml-1 rounded-full bg-muted px-1.5 text-[10px] num">{clusterReviews.length}</span>
             </TabsTrigger>
-            <TabsTrigger value="data" className="gap-1.5 text-xs data-[state=active]:bg-card">
+            <TabsTrigger value="data" className="gap-1.5 px-4 py-2 text-xs data-[state=active]:bg-card">
               <TrendingUp className="h-3.5 w-3.5" /> Данные
             </TabsTrigger>
-            <TabsTrigger value="priority" className="gap-1.5 text-xs data-[state=active]:bg-card">
+            <TabsTrigger value="priority" className="gap-1.5 px-4 py-2 text-xs data-[state=active]:bg-card">
               <Flame className="h-3.5 w-3.5" /> Приоритет
             </TabsTrigger>
-            <TabsTrigger value="action" className="gap-1.5 text-xs data-[state=active]:bg-card">
+            <TabsTrigger value="action" className="gap-1.5 px-4 py-2 text-xs data-[state=active]:bg-card">
               <Lightbulb className="h-3.5 w-3.5" /> В работу
             </TabsTrigger>
-            <TabsTrigger value="decision" className="gap-1.5 text-xs data-[state=active]:bg-card">
+            <TabsTrigger value="decision" className="gap-1.5 px-4 py-2 text-xs data-[state=active]:bg-card">
               <Check className="h-3.5 w-3.5" /> Решение
             </TabsTrigger>
           </TabsList>
 
           {/* --- EVIDENCE --- */}
-          <TabsContent value="evidence" className="mt-5 space-y-4">
+          <TabsContent value="evidence" className="mt-8 space-y-6 anim-fade-in">
             <SectionHeader
               title="Конкретные отзывы"
               subtitle="На которых построена гипотеза"
               action={<Button variant="ghost" size="sm" className="h-7 text-xs">Все {clusterReviews.length} <ArrowRight className="ml-1 h-3 w-3" /></Button>}
             />
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="stagger grid gap-4 md:grid-cols-2">
               {evidence.map((r) => (
-                <Card key={r.id} className="group flex flex-col gap-2 border p-4 transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-1)]">
-                  <div className="flex items-start gap-2">
-                    <Quote className="mt-0.5 h-4 w-4 shrink-0 text-ai/60" />
+                <Card key={r.id} className="lift group flex flex-col gap-3 border p-5 hover:border-ai/40">
+                  <div className="flex items-start gap-2.5">
+                    <Quote className="mt-1 h-4 w-4 shrink-0 text-ai/60" />
                     <p className="text-sm leading-relaxed text-foreground">«{r.text}»</p>
                   </div>
-                  <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-2 text-[11px]">
+                  <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-3 text-[11px]">
                     <SentimentPill sentiment={r.sentiment} />
                     <SourceBadge source={r.source} />
                     <span className="text-muted-foreground">· {format(new Date(r.date), "d MMM yyyy", { locale: ru })}</span>
@@ -279,20 +287,20 @@ function InsightDetailPage() {
           </TabsContent>
 
           {/* --- DATA --- */}
-          <TabsContent value="data" className="mt-5 space-y-4">
+          <TabsContent value="data" className="mt-8 space-y-6 anim-fade-in">
             <SectionHeader title="Сводка по данным" subtitle="Объём кластера, динамика, вклад площадок" />
-            <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-              <Card className="p-5">
-                <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card className="p-6 md:p-7">
+                <div className="grid grid-cols-2 gap-6">
                   <SummaryStat label="Отзывов в кластере" value={clusterSize.toString()} hint="за 30 дней" />
                   <SummaryStat label="Доля негатива" value={`${negShare}%`} hint={<Delta value={6} invert />} />
                   <SummaryStat label="Повторяемость" value={`${repeatRate}%`} hint="повторные жалобы" />
                   <SummaryStat label="Δ за 30 дней" value="+24%" hint={<span className="text-negative">рост обращений</span>} />
                 </div>
-                <Separator className="my-4" />
+                <Separator className="my-6" />
                 <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Вклад площадок</p>
-                  <div className="space-y-2">
+                  <p className="mb-3 text-[10px] uppercase tracking-wider text-muted-foreground">Вклад площадок</p>
+                  <div className="space-y-3">
                     {sourceContribution.slice(0, 5).map((s) => {
                       const pct = Math.round((s.count / Math.max(1, totalContribution)) * 100);
                       return (
@@ -301,7 +309,10 @@ function InsightDetailPage() {
                             <SourceBadge source={s.source} />
                           </div>
                           <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                            <div className="absolute inset-y-0 left-0 rounded-full bg-ai/70" style={{ width: `${pct}%` }} />
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-full bg-ai/70 transition-[width] duration-700 ease-out"
+                              style={{ width: `${pct}%` }}
+                            />
                           </div>
                           <span className="num w-10 text-right text-[11px] font-medium tabular-nums text-muted-foreground">{pct}%</span>
                         </div>
@@ -311,12 +322,12 @@ function InsightDetailPage() {
                 </div>
               </Card>
 
-              <Card className="flex flex-col p-5">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-semibold">Динамика темы за 30 дней</p>
+              <Card className="flex flex-col p-6 md:p-7">
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-sm font-semibold">Динамика темы за 30 дней</p>
                   <span className="num text-[10px] text-muted-foreground">обращений / день</span>
                 </div>
-                <div className="h-[260px] flex-1">
+                <div className="h-[300px] flex-1">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={series} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                       <defs>
@@ -341,9 +352,9 @@ function InsightDetailPage() {
           </TabsContent>
 
           {/* --- PRIORITY --- */}
-          <TabsContent value="priority" className="mt-5 space-y-4">
+          <TabsContent value="priority" className="mt-8 space-y-6 anim-fade-in">
             <SectionHeader title="Почему это приоритетно" subtitle="Оценка по 4 измерениям" />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <PriorityTile icon={Flame} title="Severity" score={severityScore} description="Тяжесть последствий для клиента и репутации" tone="negative" />
               <PriorityTile icon={Repeat} title="Frequency" score={frequencyScore} description="Как часто проблема повторяется в отзывах" tone="mixed" />
               <PriorityTile icon={Building2} title="Business impact" score={businessImpactScore} description="Влияние на retention, рейтинг площадок, конверсию" tone="ai" />
@@ -352,15 +363,15 @@ function InsightDetailPage() {
           </TabsContent>
 
           {/* --- ACTIONABLE --- */}
-          <TabsContent value="action" className="mt-5 space-y-4">
+          <TabsContent value="action" className="mt-8 space-y-6 anim-fade-in">
             <SectionHeader title="Что можно передать в работу" subtitle="Готовая формулировка и первый шаг" />
             <Card className="overflow-hidden">
-              <div className="border-l-4 border-l-positive bg-positive-soft/30 p-5">
-                <div className="mb-2 flex items-center gap-2">
+              <div className="border-l-4 border-l-positive bg-positive-soft/30 p-6 md:p-8">
+                <div className="mb-3 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-positive" />
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-positive-foreground">Гипотеза в формате «если…, то…»</span>
                 </div>
-                <p className="text-sm leading-relaxed text-foreground">
+                <p className="text-base leading-relaxed text-foreground">
                   <span className="font-semibold">Если</span> {ifThen.condition}, <span className="font-semibold">то</span> {ifThen.outcome}.
                 </p>
               </div>
@@ -373,13 +384,13 @@ function InsightDetailPage() {
           </TabsContent>
 
           {/* --- DECISION --- */}
-          <TabsContent value="decision" className="mt-5 space-y-4">
+          <TabsContent value="decision" className="mt-8 space-y-6 anim-fade-in">
             <SectionHeader title="Решение пользователя" subtitle="Зафиксируйте вердикт и передайте в работу" />
-            <Card className="p-5">
-              <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
-                <div className="space-y-3">
+            <Card className="p-6 md:p-8">
+              <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+                <div className="space-y-4">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Вердикт</p>
-                  <div className="grid gap-2">
+                  <div className="stagger grid gap-3">
                     <DecisionButton
                       active={decision === "accept"}
                       onClick={() => setDecision("accept")}
@@ -407,7 +418,7 @@ function InsightDetailPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
                     <Label htmlFor="reason" className="text-xs font-medium">
                       Почему {decision === "reject" ? "отклонено" : "принято"}
@@ -417,18 +428,18 @@ function InsightDetailPage() {
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       placeholder="Короткое обоснование решения — увидят коллеги в истории гипотезы"
-                      className="mt-1.5 min-h-[100px] text-sm"
+                      className="mt-2 min-h-[120px] text-sm"
                     />
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label htmlFor="assign" className="text-xs font-medium">Кому передать</Label>
-                      <Input id="assign" value={assignTo} onChange={(e) => setAssignTo(e.target.value)} className="mt-1.5 h-9 text-sm" />
+                      <Input id="assign" value={assignTo} onChange={(e) => setAssignTo(e.target.value)} className="mt-2 h-9 text-sm" />
                     </div>
                     <div>
                       <Label htmlFor="priority" className="text-xs font-medium">Приоритет</Label>
                       <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
-                        <SelectTrigger id="priority" className="mt-1.5 h-9 text-sm"><SelectValue /></SelectTrigger>
+                        <SelectTrigger id="priority" className="mt-2 h-9 text-sm"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="critical">Critical</SelectItem>
                           <SelectItem value="high">High</SelectItem>
@@ -438,11 +449,11 @@ function InsightDetailPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-3 pt-2">
+                  <div className="flex items-center justify-between gap-3 pt-3">
                     <p className="text-[11px] text-muted-foreground">
                       {decision ? "Решение готово к фиксации" : "Выберите вердикт слева, чтобы продолжить"}
                     </p>
-                    <Button size="sm" disabled={!decision} className="h-9 text-xs">
+                    <Button size="sm" disabled={!decision} className="press h-9 text-xs">
                       <Send className="mr-1.5 h-3.5 w-3.5" /> Зафиксировать решение
                     </Button>
                   </div>
@@ -455,10 +466,10 @@ function InsightDetailPage() {
         {/* Related insights footer */}
         <section className="pt-2">
           <SectionHeader title="Связанные гипотезы" subtitle="По той же теме или похожему паттерну" />
-          <div className="grid gap-2 md:grid-cols-3">
+          <div className="stagger mt-4 grid gap-3 md:grid-cols-3">
             {INSIGHTS.filter((i) => i.id !== insight.id && i.topicId === insight.topicId).slice(0, 3).map((i) => (
               <Link key={i.id} to="/insights/$insightId" params={{ insightId: i.id }}>
-                <Card className="group flex items-start gap-3 p-3 transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-1)]">
+                <Card className="lift group flex items-start gap-3 p-4 hover:border-ai/40">
                   <MessageSquareQuote className="mt-0.5 h-4 w-4 shrink-0 text-ai/70" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium">{i.title}</p>
