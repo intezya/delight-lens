@@ -466,10 +466,10 @@ function InsightDetailPage() {
         {/* Related insights footer */}
         <section className="pt-2">
           <SectionHeader title="Связанные гипотезы" subtitle="По той же теме или похожему паттерну" />
-          <div className="grid gap-2 md:grid-cols-3">
+          <div className="stagger mt-4 grid gap-3 md:grid-cols-3">
             {INSIGHTS.filter((i) => i.id !== insight.id && i.topicId === insight.topicId).slice(0, 3).map((i) => (
               <Link key={i.id} to="/insights/$insightId" params={{ insightId: i.id }}>
-                <Card className="group flex items-start gap-3 p-3 transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-1)]">
+                <Card className="lift group flex items-start gap-3 p-4 hover:border-ai/40">
                   <MessageSquareQuote className="mt-0.5 h-4 w-4 shrink-0 text-ai/70" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium">{i.title}</p>
