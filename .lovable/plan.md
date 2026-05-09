@@ -1,117 +1,183 @@
+## Цель
 
-# AI Review Intelligence — Frontend Plan
+Сделать гипотезы в продукте «объяснимыми»: пользователь должен сразу понимать, **откуда** взялась цифра, **почему** возникла гипотеза, **на чём** она основана и **что может пойти не так**. Параллельно ввести иерархию «Тема → Подтема → Гипотеза» и пост-трекинг внедрения.
 
-Современный B2B SaaS интерфейс для анализа клиентских отзывов и AI-генерации гипотез. Mock-данные, без backend.
+Берём в работу 9 пунктов из «минимального MVP»:
+1. Раскрытие confidence
+2. Объяснение expected effect
+3. Блок «Почему гипотеза появилась»
+4. Доказательства-отзывы с подсветкой
+5. Риски гипотезы
+6. Иерархия «Тема → Подтема → Гипотеза»
+7. Статус «Нужны дополнительные данные»
+8. Команда-владелец и рекомендованное действие
+9. Post-tracking после внедрения
 
-## Структура навигации
+Пункты 9 (Timeline) и 10 (Комментарии) откладываем во вторую очередь, чтобы не размывать фокус.
 
-Левый sidebar (collapsible) + верхний бар с глобальными фильтрами (период, источник, бренд/категория, сегмент) и сохранёнными представлениями.
+---
 
-Разделы:
-- **Dashboard** — `/`
-- **Reviews** — `/reviews`
-- **Insights** — `/insights`
-- **Topics** — `/topics` + `/topics/$topicId`
-- **Impact** — `/impact`
-- **Settings** — `/settings`
+## 1. Расширение мок-модели (`src/lib/mock/data.ts`)
 
-## Визуальный язык
+Расширяем тип `Insight` новыми опциональными полями (для существующих гипотез заполним моками):
 
-- Чистый light-режим + опциональный dark, мягкая нейтральная палитра (slate/zinc) с акцентами:
-  - **Negative / risk** — приглушённый красно-коралловый
-  - **Positive / delight** — приглушённый изумрудный
-  - **Mixed** — амбер
-  - **AI / insight** — фиолетово-индиго акцент
-- Сильная типографика (крупные числа KPI, тонкие подписи, моно для метрик)
-- Карточки с мягкими тенями, тонкими бордерами, скруглением 12–16px
-- Recharts для графиков (line, area, bar, stacked, donut, heatmap)
-- Чёткое визуальное разделение: **Risks · Problems · Opportunities · Strengths**
+```ts
+type ConfidenceBreakdown = {
+  reviewsCount: number;
+  reviewsCountScore: number;     // вклад в %
+  repeatabilityScore: number;
+  sentimentScore: number;
+  sourceDiversityScore: number;
+  recencyScore: number;
+};
 
-## Экран 1 — Dashboard (`/`)
+type ExpectedEffect = {
+  type: "complaints_reduction" | "rating_uplift" | "positive_uplift" | "repeat_reduction";
+  range: { min: number; max: number };
+  unit: "%" | "★";
+  label: "низкий" | "средний" | "средний-высокий" | "высокий";
+  reason: string;
+};
 
-Заголовок + период-пикер + сравнение с предыдущим периодом.
+type EvidenceReview = {
+  reviewId: string;     // ссылка в REVIEWS
+  highlight: string;    // фрагмент для подсветки
+};
 
-**Ряд KPI-карточек (2 строки по 4–5):**
-- Всего отзывов (с дельтой)
-- Sentiment Index (—100…+100, спарклайн)
-- Инсайтов за период
-- Сильных инсайтов в работе
-- Конверсия insight → action (%)
-- Доля повторных проблем (%)
-- Δ Sentiment после внедрений
-- Средняя оценка по площадкам
+type ImplementationTracking = {
+  implementedAt: string;
+  before: { complaintsPerWeek: number; negativeShare: number };
+  after:  { complaintsPerWeek: number; negativeShare: number };
+  actualEffect: string; // напр. "-38%"
+};
+```
 
-**Аналитический грид:**
-- Динамика отзывов по времени (stacked area: pos/neg/mixed)
-- Динамика тональности (line + threshold)
-- Распределение тем (horizontal bar, top 10)
-- Вклад тем в негатив vs позитив (diverging bar)
-- Повторяющиеся проблемы (список с badge "повтор ×N")
-- Рост сильных сторон (mini cards с трендом)
-- Средняя оценка по площадкам (multi-line: Я.Маркет, Otzovik, 2GIS, Google)
-- Последние сильные AI-инсайты (3–4 карточки с CTA)
-- Аномалии / всплески по темам (alert-list со spike-индикатором)
+Новые поля в `Insight`:
+- `confidenceBreakdown: ConfidenceBreakdown`
+- `expectedEffectV2: ExpectedEffect` (старый строковый `expectedEffect` оставляем для совместимости с карточками списка)
+- `generationReason: string[]` — 3-5 буллетов
+- `evidenceReviews: EvidenceReview[]`
+- `risks: string[]`
+- `neededData?: string[]` — заполнено, если статус `needs_data`
+- `ownerTeam`, `recommendedAction`, `taskDescription`
+- `implementationTracking?: ImplementationTracking` — только для статусов `implemented`
+- `subtopicId?: string`
 
-## Экран 2 — Reviews (`/reviews`)
+Новый статус: `"needs_data"` добавляем в `InsightStatus`. Обновляем `StatusBadge` в `atoms.tsx`.
 
-- Toolbar: поиск, переключатель **Table / Cards**, группировка (тема/тональность/источник/период), кнопка фильтров
-- Боковая панель фильтров (collapsible): тональность, темы (multi), источник, период, приоритет, "только повторяющиеся", "связан с известной проблемой"
-- **Table view**: текст (truncate), дата, источник (с лого), sentiment-pill, темы (chips), сила сигнала (bar), повтор (badge), приоритет, связь
-- **Card view**: цитата крупно, метаданные внизу, цветная левая полоса по тональности
-- **Side drawer** при клике: полный текст, разбор AI (темы, аспекты, эмоции), похожие отзывы, связанные инсайты, действия (отметить, передать в инсайт)
-- Highlight повторяющихся сценариев — кластерный бейдж
+Иерархия подтем — отдельная константа:
 
-## Экран 3 — Insights (`/insights`)
+```ts
+export const SUBTOPICS = [
+  { id: "delivery_delay", topicId: "delay", name: "Срыв сроков доставки", reviewsCount: 42 },
+  { id: "courier_no_show", topicId: "delay", name: "Курьер не приехал", reviewsCount: 21 },
+  { id: "delivery_damage_pkg", topicId: "delivery-damage", name: "Повреждение упаковки", reviewsCount: 17 },
+  // ...по 1-3 подтемы на крупные темы
+];
+export function getSubtopicsByTopic(topicId: string) { ... }
+```
 
-- Доска с фильтрами по статусу: **New · Validated · In progress · Implemented · Rejected** (табы или kanban-toggle)
-- Карточка гипотезы:
-  - AI-бейдж + заголовок
-  - Описание, тема, тип влияния (icon: ↓neg / ↑pos / ↓repeat / ↑sat / ↑rating)
-  - Метрики: confidence (progress bar), сила сигнала, ожидаемый эффект, приоритет
-  - Footer: владелец/команда (avatar), дата, N связанных отзывов
-  - Actions: Confirm · Reject · Move to work · Mark implemented · View reviews · View impact
-- Detail view (drawer/route): полное обоснование, evidence (отзывы-источники), связанные действия, график "до/после"
+Хелперы: `getInsightsBySubtopic`, обновлённый `getInsightsByTopic`.
 
-## Экран 4 — Topic detail (`/topics/$topicId`)
+---
 
-Шапка с названием темы, классификацией (risk/opportunity/strength), summary AI.
+## 2. Новые UI-компоненты (`src/components/insight/`)
 
-- Динамика темы во времени (area + sentiment overlay)
-- Donut: pos/neg/mixed внутри темы
-- Repeat-patterns (список паттернов с частотой)
-- Связанные AI-гипотезы (мини-карточки)
-- Принятые действия + эффект (timeline)
-- Сегменты, где встречается чаще (bar by region/category)
-- Ключевые цитаты (карусель quote-cards)
-- Список связанных отзывов (компактная таблица)
+Создаём небольшие переиспользуемые блоки, чтобы детальная страница не превращалась в монолит:
 
-Также `/topics` — обзорный список всех тем с типом, объёмом, sentiment, трендом.
+- `ConfidenceBreakdown.tsx` — горизонтальный stacked-bar с легендой и tooltip-ами по факторам. Сверху — большое число `86%` и пояснение «Основана на 42 отзывах, повторяемости, росте за 2 недели и 3 источниках».
+- `ExpectedEffectCard.tsx` — диапазон `15–30%` визуально как «градусник», лейбл «средний-высокий», под ним курсивом `reason`.
+- `GenerationReason.tsx` — список с иконкой `Sparkles` и буллетами-чек-марками.
+- `EvidenceList.tsx` — карточки отзывов, где `highlight` подсвечен `<mark className="bg-ai-soft text-ai-foreground rounded px-1">…</mark>`. Источник + дата + sentiment-badge сбоку.
+- `RisksList.tsx` — иконка `AlertTriangle`, мягкий жёлтый фон (token `--warning-soft`).
+- `NeededDataPanel.tsx` — рендерится только при `status === "needs_data"`, мягкий синий фон, чек-лист пунктов с чекбоксами (визуальные, без логики).
+- `ImpactTracker.tsx` — две колонки «До / После» + большая дельта, мини-LineChart. Рендерится только при наличии `implementationTracking`.
+- `OwnerTeamCard.tsx` — команда, рекомендованное действие, кнопка «Создать задачу» (визуальная).
 
-## Экран 5 — Impact (`/impact`)
+Все компоненты используют семантические токены из `styles.css`, без хардкода цветов. Анимации: `.anim-rise` + `.stagger` уже доступны.
 
-- KPI: Δ sentiment overall, # внедрённых гипотез, средний эффект, ROI-стиль
-- Таблица гипотез в работе → действие → метрики до/после (sparkline до/после, дельта зелёным/красным)
-- Before/After графики по выбранной гипотезе (split view)
-- Снижение повторяемости (bar chart по темам)
-- Изменение средней оценки по площадкам (line с метками деплоев)
-- Таймлайн внедрений с маркерами на графике sentiment
+---
 
-## Экран 6 — Settings
+## 3. Переработка детальной страницы (`src/routes/insights.$insightId.tsx`)
 
-Источники (подключения), команда, теги/категории, AI-настройки (порог confidence), уведомления.
+Меняем структуру вкладок, чтобы информация раскладывалась логично по «слою принятия решения»:
 
-## Mock-данные
+```
+[Header: Тема → Подтема → Гипотеза + KPI Confidence/Signal/Effect]
+[AI Explanation: краткое summary под заголовком]
 
-Реалистичные RU-отзывы (примеры из брифа), 17 категорий из брифа, источники: Я.Маркет, Otzovik, 2GIS, Google Maps, Trustpilot, App Store. Сегменты: регион, категория товара, бренд. Временные ряды на 90 дней.
+Tabs:
+ ├─ Обзор          → ConfidenceBreakdown + ExpectedEffectCard + GenerationReason
+ ├─ Доказательства → EvidenceList + ссылки на полные отзывы
+ ├─ Риски и данные → RisksList + NeededDataPanel
+ ├─ Действие       → OwnerTeamCard + поля решения (Accept/Reject/More data)
+ └─ Эффект         → ImpactTracker (или плейсхолдер «Гипотеза ещё не внедрена»)
+```
 
-## Состояния
+KPI-карточка эффекта в шапке заменяется с «−25%» на диапазон «15–30%» с подписью «средний-высокий». Это снимает «галлюцинации точного числа».
 
-Empty, loading (skeletons), error, hover (подсветка строк/точек графика), tooltips на всех метриках с пояснением методики.
+Решение `Decision` мигрирует во вкладку «Действие» вместе с командой-владельцем.
 
-## Компоненты (переиспользуемые)
+---
 
-`KpiCard`, `SentimentPill`, `TopicChip`, `SignalBar`, `ConfidenceBar`, `InsightCard`, `ReviewRow`, `ReviewCard`, `ReviewDrawer`, `FilterPanel`, `GlobalFiltersBar`, `AppSidebar`, `PeriodPicker`, `TrendSparkline`, `BeforeAfterChart`, `AnomalyAlert`, `QuoteCard`, `EmptyState`, `SectionHeader`.
+## 4. Иерархия Тема → Подтема → Гипотеза
 
-## Технически
+`src/routes/topics.$topicId.tsx` обновляем:
+- В шапке темы: счётчики (отзывы, негатив, тренд).
+- Список подтем `SUBTOPICS` карточками с мини-метриками.
+- Клик по подтеме раскрывает (accordion) список гипотез внутри. Без отдельного роутинга — экономим время.
 
-TanStack Start routes, Tailwind v4 + shadcn (sidebar, card, tabs, table, drawer, dialog, badge, tooltip, select, popover, command), Recharts, lucide-react. Mock-данные в `src/lib/mock/`. Все цвета через semantic tokens в `styles.css` (sentiment-positive/negative/mixed, risk, opportunity, ai-accent).
+На главном списке тем (`src/routes/topics.tsx`) под мини-чартом добавляем строку «Подтемы: Срыв сроков · Курьер не приехал · …» (chip-list, до 3 шт + «+N»).
+
+---
+
+## 5. Карточка гипотезы в списках (`src/components/insight-card.tsx`)
+
+Минимальные правки, чтобы новые сигналы были видны и в списке:
+- Бейдж `needs_data` (новый статус).
+- Если `implementationTracking` — маленький бейдж «Эффект: −38%» в шапке.
+- В блоке «Ожидаемый эффект» вместо точного числа — диапазон `15–30% · средний-высокий`.
+
+---
+
+## Технические детали
+
+- Новые поля в `Insight` делаем опциональными, но в `INSIGHTS` заполняем для всех 8 моков → не ломаем существующие места использования.
+- Для evidence-подсветки пишем маленький утил `highlightText(text, fragment)` в `lib/utils.ts`, возвращающий массив React-нод.
+- `StatusBadge` (`atoms.tsx`): добавляем стиль для `needs_data` (амбер/info токен).
+- Все цвета — через токены: `--ai`, `--ai-soft`, `--warning`, `--warning-soft`, `--success`, `--info`. При отсутствии нужных токенов — добавляем в `src/styles.css` (oklch).
+- Никаких новых маршрутов; только дополнения существующих.
+
+---
+
+## Что НЕ делаем в этой итерации
+
+- Timeline событий и комментарии аналитиков (вторая очередь).
+- CRM-matching, авто-ответы, конструктор интеграций — по решению пользователя выкидываем из MVP.
+- Не трогаем глобальную навигацию и шапку — они уже переработаны.
+
+---
+
+## Файлы
+
+Новые:
+- `src/components/insight/ConfidenceBreakdown.tsx`
+- `src/components/insight/ExpectedEffectCard.tsx`
+- `src/components/insight/GenerationReason.tsx`
+- `src/components/insight/EvidenceList.tsx`
+- `src/components/insight/RisksList.tsx`
+- `src/components/insight/NeededDataPanel.tsx`
+- `src/components/insight/ImpactTracker.tsx`
+- `src/components/insight/OwnerTeamCard.tsx`
+
+Изменяемые:
+- `src/lib/mock/data.ts` — типы, новые поля, `SUBTOPICS`, хелперы.
+- `src/components/atoms.tsx` — `StatusBadge` для `needs_data`.
+- `src/components/insight-card.tsx` — новый бейдж эффекта/needs_data, диапазон.
+- `src/routes/insights.$insightId.tsx` — новая структура вкладок.
+- `src/routes/topics.$topicId.tsx` — подтемы и гипотезы.
+- `src/routes/topics.tsx` — chip-list подтем.
+- `src/lib/utils.ts` — `highlightText`.
+- `src/styles.css` — недостающие токены (warning/info), при необходимости.
+
+Подтверди план — и я начинаю реализацию.
