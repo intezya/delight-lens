@@ -8,7 +8,7 @@ import { InsightCard } from "@/components/insight-card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
 import { ArrowLeft, Quote, CheckCircle2, Clock, Layers, Sparkles, ArrowRight, TrendingUp } from "lucide-react";
-import { Link as RLink } from "@tanstack/react-router";
+
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
