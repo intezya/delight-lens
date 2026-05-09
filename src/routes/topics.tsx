@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
-import { TOPIC_DISTRIBUTION, INSIGHTS, getTopic } from "@/lib/mock/data";
+import { TOPIC_DISTRIBUTION, INSIGHTS, getSubtopicsByTopic } from "@/lib/mock/data";
 import { TopicChip, StatusBadge, AiBadge } from "@/components/atoms";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 import { ArrowRight, AlertOctagon, Lightbulb, Sparkle, Quote, Sparkles } from "lucide-react";
@@ -56,6 +56,7 @@ function TopicsPage() {
                   const posShare = total ? (t.positive / total) * 100 : 0;
                   const mixShare = total ? (t.mixed / total) * 100 : 0;
                   const topicInsights = INSIGHTS.filter(i => i.topicId === t.id);
+                  const subs = getSubtopicsByTopic(t.id);
                   return (
                     <Card
                       key={t.id}
@@ -95,6 +96,19 @@ function TopicsPage() {
                         </div>
                       </Link>
 
+                      {subs.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1.5 border-t pt-3">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Подтемы:</span>
+                          {subs.slice(0, 3).map(s => (
+                            <span key={s.id} className="rounded-md border bg-muted/40 px-1.5 py-0.5 text-[10px] text-foreground">
+                              {s.name} <span className="num text-muted-foreground">·{s.reviewsCount}</span>
+                            </span>
+                          ))}
+                          {subs.length > 3 && (
+                            <span className="text-[10px] text-muted-foreground">+{subs.length - 3}</span>
+                          )}
+                        </div>
+                      )}
                       {topicInsights.length > 0 && (
                         <div className="border-t pt-3">
                           <div className="mb-2 flex items-center gap-1.5">

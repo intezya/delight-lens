@@ -2,11 +2,13 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TOPICS, REVIEWS, INSIGHTS, IMPACT_CASES, TIMESERIES, getTopic } from "@/lib/mock/data";
-import { SentimentPill, TopicChip, SourceBadge, SignalBar, PriorityBadge, AiBadge, SectionHeader } from "@/components/atoms";
+import { TOPICS, REVIEWS, INSIGHTS, IMPACT_CASES, TIMESERIES, getSubtopicsByTopic } from "@/lib/mock/data";
+import { SentimentPill, TopicChip, SourceBadge, SignalBar, PriorityBadge, AiBadge, SectionHeader, StatusBadge } from "@/components/atoms";
 import { InsightCard } from "@/components/insight-card";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { ArrowLeft, Quote, CheckCircle2, Clock } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
+import { ArrowLeft, Quote, CheckCircle2, Clock, Layers, Sparkles, ArrowRight, TrendingUp } from "lucide-react";
+
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -42,6 +44,7 @@ function TopicDetailPage() {
   const mix = reviews.filter(r => r.sentiment === "mixed").length;
   const insights = INSIGHTS.filter(i => i.topicId === topic.id);
   const impacts = IMPACT_CASES.filter(c => c.topicId === topic.id);
+  const subtopics = getSubtopicsByTopic(topic.id);
 
   const segments = [
     { name: "Москва", value: 38 }, { name: "СПб", value: 24 }, { name: "Екатеринбург", value: 14 }, { name: "Казань", value: 12 }, { name: "Новосибирск", value: 8 }, { name: "Краснодар", value: 4 },
@@ -79,6 +82,67 @@ function TopicDetailPage() {
             </div>
           </div>
         </Card>
+
+        {/* Subtopics & hypotheses tree */}
+        {subtopics.length > 0 && (
+          <Card className="p-5">
+            <SectionHeader
+              title="Подтемы и гипотезы"
+              subtitle={`Тема разбита на ${subtopics.length} подтемы. Раскройте, чтобы увидеть гипотезы по каждой.`}
+              action={<span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground"><Layers className="h-3 w-3" /> AI-кластеризация</span>}
+            />
+            <Accordion type="multiple" className="space-y-2">
+              {subtopics.map((sub) => {
+                const subInsights = INSIGHTS.filter(i => i.subtopicId === sub.id);
+                const trendUp = sub.trend.startsWith("+");
+                return (
+                  <AccordionItem key={sub.id} value={sub.id} className="overflow-hidden rounded-lg border bg-card data-[state=open]:border-ai/40">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                      <div className="flex flex-1 items-center gap-3 pr-3 text-left">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-muted-foreground">
+                          {subInsights.length || 0}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold leading-tight">{sub.name}</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            {sub.reviewsCount} отзывов · <span className={trendUp ? "text-negative" : "text-positive"}>
+                              <TrendingUp className={`mr-0.5 inline h-3 w-3 ${trendUp ? "" : "rotate-180"}`} />{sub.trend}
+                            </span> за 30 дней
+                          </p>
+                        </div>
+                        <span className="num text-[10px] text-muted-foreground">
+                          {subInsights.length} {subInsights.length === 1 ? "гипотеза" : "гипотез"}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="border-t bg-muted/20 px-4 py-3">
+                      {subInsights.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">По этой подтеме гипотез пока нет.</p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {subInsights.map((ins) => (
+                            <Link
+                              key={ins.id}
+                              to="/insights/$insightId"
+                              params={{ insightId: ins.id }}
+                              className="flex items-center gap-2.5 rounded-md border bg-card px-3 py-2 text-sm transition hover:border-ai/40 hover:bg-ai-soft/20"
+                            >
+                              <Sparkles className="h-3.5 w-3.5 shrink-0 text-ai" />
+                              <span className="line-clamp-1 flex-1">{ins.title}</span>
+                              <span className="num text-[10px] text-muted-foreground">conf {ins.confidence}%</span>
+                              <StatusBadge status={ins.status} />
+                              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </Card>
+        )}
 
         {/* Charts */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

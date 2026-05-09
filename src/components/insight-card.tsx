@@ -56,8 +56,18 @@ export function InsightCard({ insight, compact }: { insight: Insight; compact?: 
       </div>
 
       <div className="rounded-lg border-l-2 border-ai bg-ai-soft/40 px-2.5 py-1.5">
-        <span className="text-[10px] uppercase tracking-wider text-ai-foreground/80">Ожидаемый эффект</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[10px] uppercase tracking-wider text-ai-foreground/80">Ожидаемый эффект</span>
+          {insight.expectedEffectV2 && (
+            <span className="rounded bg-card px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
+              {insight.expectedEffectV2.label}
+            </span>
+          )}
+        </div>
         <p className="mt-0.5 num text-xs font-medium text-ai-foreground">{insight.expectedEffect}</p>
+        {insight.implementationTracking && (
+          <p className="mt-1 num text-[10px] font-semibold text-positive">Факт: {insight.implementationTracking.actualEffect}</p>
+        )}
       </div>
 
       <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-[11px]">
