@@ -132,11 +132,41 @@ export const SOURCE_RATINGS = TIMESERIES.filter((_, i) => i % 6 === 0).map((d) =
   "Google Maps": +(4.5 + Math.cos(d.total / 14) * 0.15).toFixed(2),
 }));
 
+export type ConfidenceBreakdown = {
+  reviewsCount: number;
+  factors: {
+    label: string;
+    score: number; // contribution points
+    description: string;
+  }[];
+};
+
+export type ExpectedEffect = {
+  type: "complaints_reduction" | "rating_uplift" | "positive_uplift" | "repeat_reduction";
+  range: { min: number; max: number };
+  unit: "%" | "★";
+  label: "низкий" | "средний" | "средний-высокий" | "высокий";
+  reason: string;
+};
+
+export type EvidenceReview = {
+  reviewId: string;
+  highlight: string;
+};
+
+export type ImplementationTracking = {
+  implementedAt: string;
+  before: { complaintsPerWeek: number; negativeShare: number };
+  after: { complaintsPerWeek: number; negativeShare: number };
+  actualEffect: string;
+};
+
 export type Insight = {
   id: string;
   title: string;
   description: string;
   topicId: string;
+  subtopicId?: string;
   status: InsightStatus;
   impact: InsightImpact;
   confidence: number;
@@ -146,7 +176,54 @@ export type Insight = {
   owner: { name: string; team: string };
   createdAt: string;
   reviewIds: string[];
+  // New explainability fields
+  confidenceBreakdown: ConfidenceBreakdown;
+  expectedEffectV2: ExpectedEffect;
+  generationReason: string[];
+  evidenceReviews: EvidenceReview[];
+  risks: string[];
+  neededData?: string[];
+  ownerTeam: string;
+  recommendedAction: string;
+  taskDescription: string;
+  implementationTracking?: ImplementationTracking;
 };
+
+export type Subtopic = {
+  id: string;
+  topicId: string;
+  name: string;
+  reviewsCount: number;
+  trend: string; // e.g. "+18%"
+};
+
+export const SUBTOPICS: Subtopic[] = [
+  { id: "delivery_delay", topicId: "delay", name: "Срыв сроков доставки", reviewsCount: 42, trend: "+23%" },
+  { id: "courier_no_show", topicId: "delay", name: "Курьер не приехал", reviewsCount: 21, trend: "+8%" },
+  { id: "delivery_reschedule", topicId: "delay", name: "Перенос без предупреждения", reviewsCount: 14, trend: "+12%" },
+  { id: "package_damage", topicId: "delivery-damage", name: "Повреждение упаковки", reviewsCount: 17, trend: "+4%" },
+  { id: "showroom_as_new", topicId: "defective", name: "Витринный товар как новый", reviewsCount: 14, trend: "+18%" },
+  { id: "broken_on_arrival", topicId: "defective", name: "Брак при получении", reviewsCount: 11, trend: "+6%" },
+  { id: "warranty_sla", topicId: "warranty", name: "Просрочка SLA по гарантии", reviewsCount: 13, trend: "+9%" },
+  { id: "warranty_refusal", topicId: "warranty", name: "Отказ в гарантии", reviewsCount: 7, trend: "−3%" },
+  { id: "double_charge", topicId: "payment", name: "Двойное списание", reviewsCount: 9, trend: "+11%" },
+  { id: "loyalty_bonuses", topicId: "loyalty-bonus", name: "Реальные бонусы", reviewsCount: 32, trend: "+14%" },
+  { id: "fake_serial", topicId: "fake", name: "Серийник не пробивается", reviewsCount: 9, trend: "+22%" },
+  { id: "queue_pickup", topicId: "service-quality", name: "Очереди в самовывозе", reviewsCount: 4, trend: "+1%" },
+  { id: "courier_unboxing", topicId: "positive", name: "Распаковка при клиенте", reviewsCount: 18, trend: "+7%" },
+];
+
+export function getSubtopicsByTopic(topicId: string) {
+  return SUBTOPICS.filter((s) => s.topicId === topicId);
+}
+export function getSubtopic(id: string) {
+  return SUBTOPICS.find((s) => s.id === id);
+}
+
+// Helpers used by insight mocks
+function cb(reviewsCount: number, factors: ConfidenceBreakdown["factors"]): ConfidenceBreakdown {
+  return { reviewsCount, factors };
+}
 
 export const INSIGHTS: Insight[] = [
   {
@@ -154,120 +231,387 @@ export const INSIGHTS: Insight[] = [
     title: "Витринный товар продаётся как новый",
     description: "AI выявил 14 повторяющихся жалоб на B2C-продажу витринных образцов под видом нового товара. Концентрация на категории «Электроника» в Москве и СПб.",
     topicId: "defective",
+    subtopicId: "showroom_as_new",
     status: "validated",
     impact: "down_neg",
     confidence: 92,
     signal: 88,
-    expectedEffect: "−18% негатива в категории за 4 недели",
+    expectedEffect: "−15…25% негатива в категории",
     priority: "critical",
     owner: { name: "Мария В.", team: "Retail Ops" },
     createdAt: dayOffsetISO(6),
     reviewIds: ["r-1", "r-10"],
+    confidenceBreakdown: cb(38, [
+      { label: "Объём отзывов", score: 28, description: "38 отзывов за 30 дней — устойчивый сигнал" },
+      { label: "Повторяемость", score: 22, description: "В 76% жалоб одинаковая формулировка про «витринный»" },
+      { label: "Тональность", score: 18, description: "94% жалоб — резко негативные" },
+      { label: "Разные источники", score: 14, description: "Жалобы в Я.Маркет, 2GIS и Otzovik" },
+      { label: "Свежесть", score: 10, description: "Рост обращений в последние 2 недели" },
+    ]),
+    expectedEffectV2: {
+      type: "complaints_reduction",
+      range: { min: 15, max: 25 },
+      unit: "%",
+      label: "средний-высокий",
+      reason: "Тема встречается в 22% отзывов категории «Электроника» и растёт 3 недели подряд",
+    },
+    generationReason: [
+      "Найдено 38 похожих отзывов за 30 дней",
+      "В 76% сообщений упоминается «витринный» / «вскрытая упаковка»",
+      "Концентрация в Москве и СПб — 71% жалоб",
+      "Жалобы повторяются в 3 источниках: Я.Маркет, 2GIS, Otzovik",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-1", highlight: "Привезли витринный товар, на корпусе царапины, упаковка вскрыта" },
+      { reviewId: "r-10", highlight: "Продают бракованный товар" },
+      { reviewId: "r-4", highlight: "упаковка была вскрыта, на коробке вмятины" },
+    ],
+    risks: [
+      "Часть жалоб может относиться к повреждениям при транспортировке, а не к витринным образцам",
+      "Концентрация в Москве и СПб может быть смещением выборки",
+      "Нет данных от службы приёмки о статусе товара",
+    ],
+    ownerTeam: "Retail Ops",
+    recommendedAction: "Передать команде складского контроля",
+    taskDescription: "Ввести фотофиксацию состояния товара перед отгрузкой и обязательную маркировку витринных образцов",
   },
   {
     id: "i-2",
     title: "Срыв сроков доставки кратно растёт по выходным",
     description: "Кластер из 17 отзывов о переносе доставки 3+ раз. Корреляция с пятницей и предпраздничными днями — слот переполнения склада.",
     topicId: "delay",
+    subtopicId: "delivery_delay",
     status: "in_progress",
     impact: "down_repeat",
     confidence: 86,
     signal: 79,
-    expectedEffect: "−25% повторных жалоб на сроки",
+    expectedEffect: "−15…30% повторных жалоб",
     priority: "high",
     owner: { name: "Дмитрий П.", team: "Logistics" },
     createdAt: dayOffsetISO(11),
     reviewIds: ["r-9"],
+    confidenceBreakdown: cb(42, [
+      { label: "Объём отзывов", score: 25, description: "42 отзыва по теме доставки за 30 дней" },
+      { label: "Повторяемость", score: 20, description: "У 67% — перенос 3+ раз" },
+      { label: "Тональность", score: 18, description: "88% жалоб негативные" },
+      { label: "Разные источники", score: 12, description: "Я.Маркет, 2GIS и App Store" },
+      { label: "Свежесть", score: 11, description: "Рост на 23% за последние 2 недели" },
+    ]),
+    expectedEffectV2: {
+      type: "repeat_reduction",
+      range: { min: 15, max: 30 },
+      unit: "%",
+      label: "средний-высокий",
+      reason: "Проблема встречается в 18% отзывов о доставке и растёт последние 3 недели",
+    },
+    generationReason: [
+      "За последние 30 дней найдено 42 отзыва по теме доставки",
+      "Доля жалоб на перенос сроков выросла на 23%",
+      "Большинство жалоб связано с выходными и праздничными днями",
+      "Жалобы повторяются в 3 источниках: Я.Маркет, 2GIS, App Store",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-9", highlight: "доставку переносили четыре раза" },
+      { reviewId: "r-2", highlight: "Сроки сорваны, поддержка отвечает шаблонами" },
+    ],
+    risks: [
+      "Часть жалоб может относиться не к доставке, а к работе склада",
+      "Пик может быть связан с праздниками, а не с системной проблемой",
+      "Недостаточно данных по фактическим отменам заказов",
+    ],
+    ownerTeam: "Logistics",
+    recommendedAction: "Передать команде доставки",
+    taskDescription: "Проверить причины переносов заказов в выходные и предпраздничные дни, расширить слоты выходного дня",
   },
   {
     id: "i-3",
     title: "Программа лояльности — главный driver позитива",
     description: "В 76 положительных отзывах упоминаются «реальные бонусы» и «накопления с 2014». Можно усилить коммуникацию и конвертировать в NPS.",
     topicId: "loyalty-bonus",
+    subtopicId: "loyalty_bonuses",
     status: "new",
     impact: "up_pos",
     confidence: 81,
     signal: 76,
-    expectedEffect: "+12% позитивных упоминаний",
+    expectedEffect: "+8…15% позитивных упоминаний",
     priority: "medium",
     owner: { name: "Ольга С.", team: "Marketing" },
     createdAt: dayOffsetISO(3),
     reviewIds: ["r-7", "r-16"],
+    confidenceBreakdown: cb(76, [
+      { label: "Объём отзывов", score: 30, description: "76 положительных упоминаний за период" },
+      { label: "Повторяемость", score: 18, description: "Устойчивая лексика «реальные бонусы»" },
+      { label: "Тональность", score: 17, description: "100% упоминаний позитивные" },
+      { label: "Разные источники", score: 9, description: "Я.Маркет и Trustpilot" },
+      { label: "Свежесть", score: 7, description: "Стабильный позитивный тренд" },
+    ]),
+    expectedEffectV2: {
+      type: "positive_uplift",
+      range: { min: 8, max: 15 },
+      unit: "%",
+      label: "средний",
+      reason: "Аудитория уже благодарит — коммуникация усилит уже существующий сигнал",
+    },
+    generationReason: [
+      "Найдено 76 положительных упоминаний программы лояльности",
+      "В 41% отзывов — формулировка «реальные бонусы»",
+      "Доля упоминаний выросла на 14% за месяц",
+      "Сигнал устойчиво положительный во всех каналах",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-7", highlight: "Реальные бонусы за покупку, копятся, можно тратить" },
+      { reviewId: "r-16", highlight: "Бонусная программа работает, ничего не пропадает" },
+    ],
+    risks: [
+      "Усиленная коммуникация может вызвать рост ожиданий и негатив, если изменятся условия",
+      "Не все каналы маркетинга подходят для такой темы",
+    ],
+    ownerTeam: "Marketing",
+    recommendedAction: "Передать в маркетинг для усиления коммуникации",
+    taskDescription: "Включить тезисы о бонусах в email-рассылки и оформление заказа, запустить A/B-тест",
   },
   {
     id: "i-4",
     title: "Гарантийный отдел: SLA нарушен в 38% обращений",
     description: "AI сгруппировал 13 жалоб с одинаковым сценарием: «звонишь — обещают перезвонить — не перезванивают». Среднее время до ответа — 9 дней.",
     topicId: "warranty",
+    subtopicId: "warranty_sla",
     status: "in_progress",
     impact: "down_neg",
     confidence: 89,
     signal: 84,
-    expectedEffect: "−22% негатива по гарантии",
+    expectedEffect: "−15…22% негатива по гарантии",
     priority: "critical",
     owner: { name: "Иван Н.", team: "Customer Care" },
     createdAt: dayOffsetISO(14),
     reviewIds: ["r-3", "r-20"],
+    confidenceBreakdown: cb(34, [
+      { label: "Объём отзывов", score: 26, description: "34 жалобы по теме гарантии" },
+      { label: "Повторяемость", score: 24, description: "В 72% — одинаковый сценарий" },
+      { label: "Тональность", score: 20, description: "91% — резко негативные" },
+      { label: "Разные источники", score: 11, description: "Otzovik, 2GIS, Я.Маркет" },
+      { label: "Свежесть", score: 8, description: "Стабильный поток жалоб" },
+    ]),
+    expectedEffectV2: {
+      type: "complaints_reduction",
+      range: { min: 15, max: 22 },
+      unit: "%",
+      label: "средний-высокий",
+      reason: "Сценарий одинаковый и повторяется — точечное исправление SLA даст эффект",
+    },
+    generationReason: [
+      "Найдено 34 похожих отзыва за 30 дней",
+      "В 72% повторяется сценарий «обещают перезвонить — не перезванивают»",
+      "Среднее время до ответа в кластере — 9 дней",
+      "Жалобы стабильно поступают в 3 источниках",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-3", highlight: "Кинули с гарантией, испортили товар при ремонте и отказали в замене" },
+      { reviewId: "r-20", highlight: "Звонишь — обещают перезвонить. Не перезванивают" },
+    ],
+    risks: [
+      "Часть случаев может быть связана с поведением клиентов, а не с SLA",
+      "Нет данных из CRM по реальной длительности обработки",
+    ],
+    ownerTeam: "Customer Care",
+    recommendedAction: "Передать в Customer Care",
+    taskDescription: "Ввести SLA 48 часов на первый ответ по гарантии и автоэскалейт при просрочке",
   },
   {
     id: "i-5",
     title: "Двойное списание при ошибке оплаты",
     description: "9 одинаковых сценариев: оплата не проходит, деньги списываются, заказ не оформляется. Ждут возврат 14 дней.",
     topicId: "payment",
-    status: "validated",
+    subtopicId: "double_charge",
+    status: "needs_data",
     impact: "down_neg",
-    confidence: 94,
+    confidence: 71,
     signal: 73,
-    expectedEffect: "−30% жалоб на оплату",
+    expectedEffect: "−10…20% жалоб на оплату",
     priority: "high",
     owner: { name: "Сергей М.", team: "Payments" },
     createdAt: dayOffsetISO(8),
     reviewIds: ["r-12"],
+    confidenceBreakdown: cb(9, [
+      { label: "Объём отзывов", score: 14, description: "9 жалоб — кластер небольшой, но плотный" },
+      { label: "Повторяемость", score: 22, description: "Идентичный сценарий во всех 9 случаях" },
+      { label: "Тональность", score: 18, description: "100% — резко негативные" },
+      { label: "Разные источники", score: 9, description: "Я.Маркет и App Store" },
+      { label: "Свежесть", score: 8, description: "Все жалобы за последние 14 дней" },
+    ]),
+    expectedEffectV2: {
+      type: "complaints_reduction",
+      range: { min: 10, max: 20 },
+      unit: "%",
+      label: "средний",
+      reason: "Объём кластера небольшой — для уверенной оценки нужны данные платёжного шлюза",
+    },
+    generationReason: [
+      "9 жалоб с одинаковым сценарием за 14 дней",
+      "Все упоминают двойное списание и долгий возврат",
+      "Концентрация в App Store — возможна проблема в мобильной оплате",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-12", highlight: "деньги списались, заказ не оформился" },
+    ],
+    risks: [
+      "Кластер маленький — возможно, разовые сбои шлюза",
+      "Без логов платёжного шлюза нельзя подтвердить причину",
+    ],
+    neededData: [
+      "Логи платёжного шлюза за последние 30 дней",
+      "Данные по успешным/неуспешным транзакциям с разбивкой по способам оплаты",
+      "Среднее время возврата средств",
+    ],
+    ownerTeam: "Payments",
+    recommendedAction: "Запросить данные у Payments перед передачей в работу",
+    taskDescription: "Проанализировать логи платёжного шлюза за 30 дней и сопоставить с жалобами",
   },
   {
     id: "i-6",
     title: "Курьеры с распаковкой — рост позитива",
     description: "Упоминание «распаковали при мне» сильно коррелирует с 5★. Можно стандартизировать как чек-лист курьера.",
     topicId: "positive",
+    subtopicId: "courier_unboxing",
     status: "implemented",
     impact: "up_rating",
     confidence: 78,
     signal: 61,
-    expectedEffect: "+0.3★ средняя оценка",
+    expectedEffect: "+0.2…0.4★ средняя оценка",
     priority: "medium",
     owner: { name: "Екатерина Р.", team: "Last Mile" },
     createdAt: dayOffsetISO(28),
     reviewIds: ["r-13"],
+    confidenceBreakdown: cb(28, [
+      { label: "Объём отзывов", score: 22, description: "28 положительных упоминаний практики" },
+      { label: "Повторяемость", score: 18, description: "Устойчивая фраза «распаковали при мне»" },
+      { label: "Тональность", score: 18, description: "100% позитивные упоминания" },
+      { label: "Разные источники", score: 10, description: "Я.Маркет, 2GIS, Google Maps" },
+      { label: "Свежесть", score: 10, description: "Свежий тренд после пилота курьеров" },
+    ]),
+    expectedEffectV2: {
+      type: "rating_uplift",
+      range: { min: 0.2, max: 0.4 },
+      unit: "★",
+      label: "средний",
+      reason: "Распаковка при клиенте устойчиво коррелирует с 5★ в кластере",
+    },
+    generationReason: [
+      "В 28 отзывах с 5★ встречается фраза «распаковали при мне»",
+      "Корреляция с оценкой 5★ — 0.74",
+      "Тренд устойчиво растёт после пилота",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-13", highlight: "курьер вежливый, всё распаковали при мне" },
+    ],
+    risks: [
+      "Не все категории товаров позволяют распаковку при клиенте",
+      "Может увеличить время на одну доставку",
+    ],
+    ownerTeam: "Last Mile",
+    recommendedAction: "Стандартизировать как чек-лист курьера",
+    taskDescription: "Обновить инструкцию last-mile, обучить 50 курьеров пилота",
+    implementationTracking: {
+      implementedAt: dayOffsetISO(28),
+      before: { complaintsPerWeek: 34, negativeShare: 72 },
+      after: { complaintsPerWeek: 21, negativeShare: 51 },
+      actualEffect: "+0.4★",
+    },
   },
   {
     id: "i-7",
     title: "Подозрение на серый канал поставок",
     description: "Кластер «серийник не пробивается» — 9 отзывов за 30 дней. Концентрация в категории «Аудио».",
     topicId: "fake",
-    status: "new",
+    subtopicId: "fake_serial",
+    status: "needs_data",
     impact: "down_neg",
     confidence: 71,
     signal: 84,
-    expectedEffect: "−15% жалоб на подделки",
+    expectedEffect: "−10…15% жалоб на подделки",
     priority: "critical",
     owner: { name: "Алексей К.", team: "Quality" },
     createdAt: dayOffsetISO(2),
     reviewIds: ["r-8"],
+    confidenceBreakdown: cb(9, [
+      { label: "Объём отзывов", score: 14, description: "Кластер небольшой, но критичный" },
+      { label: "Повторяемость", score: 22, description: "Одинаковая формулировка про серийный номер" },
+      { label: "Тональность", score: 19, description: "100% резко негативные" },
+      { label: "Разные источники", score: 9, description: "Я.Маркет и Otzovik" },
+      { label: "Свежесть", score: 7, description: "Все жалобы за 30 дней" },
+    ]),
+    expectedEffectV2: {
+      type: "complaints_reduction",
+      range: { min: 10, max: 15 },
+      unit: "%",
+      label: "средний",
+      reason: "Сценарий устойчивый, но без данных от поставщиков точная оценка невозможна",
+    },
+    generationReason: [
+      "9 отзывов с упоминанием непробиваемого серийного номера",
+      "Концентрация в категории Аудио",
+      "Один поставщик упоминается чаще остальных",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-8", highlight: "серийник не пробивается на сайте производителя" },
+    ],
+    risks: [
+      "Часть случаев может быть связана с задержкой регистрации серийников",
+      "Нет данных от производителей о статусе серийников",
+    ],
+    neededData: [
+      "Список поставщиков с долей возвратов по «серийнику»",
+      "API проверки серийных номеров от 2 ключевых производителей",
+      "Разбивка возвратов по партиям",
+    ],
+    ownerTeam: "Quality",
+    recommendedAction: "Запросить данные у поставщиков и QA",
+    taskDescription: "Согласовать пилот по проверке серийников через API на категории Аудио",
   },
   {
     id: "i-8",
     title: "Очереди на самовывозе в час пик",
     description: "Смешанные отзывы с темой «час очереди» — 4 повтора. Решение: дополнительный сотрудник 18:00–20:00.",
     topicId: "service-quality",
+    subtopicId: "queue_pickup",
     status: "rejected",
     impact: "up_sat",
     confidence: 64,
     signal: 44,
-    expectedEffect: "+5% удовлетворённости",
+    expectedEffect: "+3…7% удовлетворённости",
     priority: "low",
     owner: { name: "Анна Б.", team: "Retail Ops" },
     createdAt: dayOffsetISO(20),
     reviewIds: ["r-19"],
+    confidenceBreakdown: cb(4, [
+      { label: "Объём отзывов", score: 8, description: "Всего 4 отзыва — слабый сигнал" },
+      { label: "Повторяемость", score: 20, description: "Одинаковая формулировка" },
+      { label: "Тональность", score: 14, description: "Смешанная" },
+      { label: "Разные источники", score: 12, description: "2GIS и Google Maps" },
+      { label: "Свежесть", score: 10, description: "Все за последние 3 недели" },
+    ]),
+    expectedEffectV2: {
+      type: "positive_uplift",
+      range: { min: 3, max: 7 },
+      unit: "%",
+      label: "низкий",
+      reason: "Малый кластер — эффект ограничен",
+    },
+    generationReason: [
+      "4 отзыва о часовых очередях в самовывозе",
+      "Концентрация в одной точке",
+      "Время — вечерний пик 18:00–20:00",
+    ],
+    evidenceReviews: [
+      { reviewId: "r-19", highlight: "Очередь в самовывозе — час" },
+    ],
+    risks: [
+      "Маленький кластер — статистически слабый",
+      "Возможно, проблема разовая",
+    ],
+    ownerTeam: "Retail Ops",
+    recommendedAction: "Не передавать в работу — недостаточно сигнала",
+    taskDescription: "Возврат к теме при росте кластера до 10+ отзывов",
   },
 ];
 
