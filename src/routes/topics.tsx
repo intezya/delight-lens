@@ -56,6 +56,7 @@ function TopicsPage() {
                   const posShare = total ? (t.positive / total) * 100 : 0;
                   const mixShare = total ? (t.mixed / total) * 100 : 0;
                   const topicInsights = INSIGHTS.filter(i => i.topicId === t.id);
+                  const subs = getSubtopicsByTopic(t.id);
                   return (
                     <Card
                       key={t.id}
