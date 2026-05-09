@@ -44,6 +44,7 @@ function TopicDetailPage() {
   const mix = reviews.filter(r => r.sentiment === "mixed").length;
   const insights = INSIGHTS.filter(i => i.topicId === topic.id);
   const impacts = IMPACT_CASES.filter(c => c.topicId === topic.id);
+  const subtopics = getSubtopicsByTopic(topic.id);
 
   const segments = [
     { name: "Москва", value: 38 }, { name: "СПб", value: 24 }, { name: "Екатеринбург", value: 14 }, { name: "Казань", value: 12 }, { name: "Новосибирск", value: 8 }, { name: "Краснодар", value: 4 },
