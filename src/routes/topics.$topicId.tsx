@@ -83,6 +83,67 @@ function TopicDetailPage() {
           </div>
         </Card>
 
+        {/* Subtopics & hypotheses tree */}
+        {subtopics.length > 0 && (
+          <Card className="p-5">
+            <SectionHeader
+              title="Подтемы и гипотезы"
+              subtitle={`Тема разбита на ${subtopics.length} подтемы. Раскройте, чтобы увидеть гипотезы по каждой.`}
+              action={<span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground"><Layers className="h-3 w-3" /> AI-кластеризация</span>}
+            />
+            <Accordion type="multiple" className="space-y-2">
+              {subtopics.map((sub) => {
+                const subInsights = INSIGHTS.filter(i => i.subtopicId === sub.id);
+                const trendUp = sub.trend.startsWith("+");
+                return (
+                  <AccordionItem key={sub.id} value={sub.id} className="overflow-hidden rounded-lg border bg-card data-[state=open]:border-ai/40">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                      <div className="flex flex-1 items-center gap-3 pr-3 text-left">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-muted-foreground">
+                          {subInsights.length || 0}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold leading-tight">{sub.name}</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">
+                            {sub.reviewsCount} отзывов · <span className={trendUp ? "text-negative" : "text-positive"}>
+                              <TrendingUp className={`mr-0.5 inline h-3 w-3 ${trendUp ? "" : "rotate-180"}`} />{sub.trend}
+                            </span> за 30 дней
+                          </p>
+                        </div>
+                        <span className="num text-[10px] text-muted-foreground">
+                          {subInsights.length} {subInsights.length === 1 ? "гипотеза" : "гипотез"}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="border-t bg-muted/20 px-4 py-3">
+                      {subInsights.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">По этой подтеме гипотез пока нет.</p>
+                      ) : (
+                        <div className="space-y-1.5">
+                          {subInsights.map((ins) => (
+                            <Link
+                              key={ins.id}
+                              to="/insights/$insightId"
+                              params={{ insightId: ins.id }}
+                              className="flex items-center gap-2.5 rounded-md border bg-card px-3 py-2 text-sm transition hover:border-ai/40 hover:bg-ai-soft/20"
+                            >
+                              <Sparkles className="h-3.5 w-3.5 shrink-0 text-ai" />
+                              <span className="line-clamp-1 flex-1">{ins.title}</span>
+                              <span className="num text-[10px] text-muted-foreground">conf {ins.confidence}%</span>
+                              <StatusBadge status={ins.status} />
+                              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </Card>
+        )}
+
         {/* Charts */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card className="col-span-2 p-4">
