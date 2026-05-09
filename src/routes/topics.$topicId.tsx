@@ -2,11 +2,13 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TOPICS, REVIEWS, INSIGHTS, IMPACT_CASES, TIMESERIES, getTopic } from "@/lib/mock/data";
-import { SentimentPill, TopicChip, SourceBadge, SignalBar, PriorityBadge, AiBadge, SectionHeader } from "@/components/atoms";
+import { TOPICS, REVIEWS, INSIGHTS, IMPACT_CASES, TIMESERIES, getSubtopicsByTopic } from "@/lib/mock/data";
+import { SentimentPill, TopicChip, SourceBadge, SignalBar, PriorityBadge, AiBadge, SectionHeader, StatusBadge } from "@/components/atoms";
 import { InsightCard } from "@/components/insight-card";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, Line, LineChart } from "recharts";
-import { ArrowLeft, Quote, CheckCircle2, Clock } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
+import { ArrowLeft, Quote, CheckCircle2, Clock, Layers, Sparkles, ArrowRight, TrendingUp } from "lucide-react";
+import { Link as RLink } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
