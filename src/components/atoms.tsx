@@ -87,6 +87,7 @@ export function StatusBadge({ status }: { status: InsightStatus }) {
     in_progress: { label: "In progress", cls: "bg-mixed-soft text-mixed-foreground" },
     implemented: { label: "Implemented", cls: "bg-positive text-white" },
     rejected: { label: "Rejected", cls: "bg-muted text-muted-foreground line-through" },
+    needs_data: { label: "Нужны данные", cls: "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200" },
   };
   const m = map[status];
   return <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>;
