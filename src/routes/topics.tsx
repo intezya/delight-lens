@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
-import { TOPIC_DISTRIBUTION, INSIGHTS, getTopic } from "@/lib/mock/data";
+import { TOPIC_DISTRIBUTION, INSIGHTS, getSubtopicsByTopic } from "@/lib/mock/data";
 import { TopicChip, StatusBadge, AiBadge } from "@/components/atoms";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 import { ArrowRight, AlertOctagon, Lightbulb, Sparkle, Quote, Sparkles } from "lucide-react";
