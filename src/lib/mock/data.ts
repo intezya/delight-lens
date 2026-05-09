@@ -1,7 +1,7 @@
 // Mock data for AI Review Intelligence
 export type Sentiment = "positive" | "negative" | "mixed";
 export type TopicKind = "risk" | "opportunity" | "strength";
-export type InsightStatus = "new" | "validated" | "in_progress" | "implemented" | "rejected";
+export type InsightStatus = "new" | "validated" | "in_progress" | "implemented" | "rejected" | "needs_data";
 export type InsightImpact = "down_neg" | "up_pos" | "down_repeat" | "up_sat" | "up_rating";
 export type Source = "Я.Маркет" | "Otzovik" | "2GIS" | "Google Maps" | "Trustpilot" | "App Store";
 export type Priority = "low" | "medium" | "high" | "critical";
