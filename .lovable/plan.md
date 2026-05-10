@@ -1,183 +1,103 @@
-## Цель
+# План: ключевые улучшения по итогам ревью
 
-Сделать гипотезы в продукте «объяснимыми»: пользователь должен сразу понимать, **откуда** взялась цифра, **почему** возникла гипотеза, **на чём** она основана и **что может пойти не так**. Параллельно ввести иерархию «Тема → Подтема → Гипотеза» и пост-трекинг внедрения.
+Беру в работу те самые 10 приоритетных пунктов, которые вы выделили в конце. Остальные (P2 — методика внедрения, кнопка «Сформировать исследование», внешний контекст и т.д.) оставлю на следующую итерацию, чтобы не размывать фокус.
 
-Берём в работу 9 пунктов из «минимального MVP»:
-1. Раскрытие confidence
-2. Объяснение expected effect
-3. Блок «Почему гипотеза появилась»
-4. Доказательства-отзывы с подсветкой
-5. Риски гипотезы
-6. Иерархия «Тема → Подтема → Гипотеза»
-7. Статус «Нужны дополнительные данные»
-8. Команда-владелец и рекомендованное действие
-9. Post-tracking после внедрения
+## 1. Очистить header
+- Удалить нефункциональный `GlobalFilters` из `app-shell.tsx`.
+- В шапке оставить: логотип/название, breadcrumbs (см. п.9), кнопку профиля. Никаких поисков и фильтров, которые ничего не делают.
 
-Пункты 9 (Timeline) и 10 (Комментарии) откладываем во вторую очередь, чтобы не размывать фокус.
+## 2. Полная русификация
+- Пройтись по `app-sidebar.tsx`, `app-shell.tsx`, всем route-файлам, `insight-card.tsx`, компонентам `insight/*`.
+- Глоссарий:
+  - Confidence → «Уверенность системы»
+  - Expected effect → «Ожидаемый эффект»
+  - AI / AI-анализ → единообразно «AI-анализ» (оставляем, но с пояснением в onboarding)
+  - RetailOps, B2C → заменить на названия команд: «Команда логистики», «Команда клиентского опыта» и т.п. Поправить в `data.ts`.
+  - Sarcasm → «Возможный сарказм»
+- Удалить англоязычные подписи на кнопках/чипах/тултипах.
 
----
+## 3. Ссылки на исходные отзывы
+- В типе `Review` уже/будет поле `sourceUrl` (Яндекс.Маркет/Otzovik mock URLs) — добавить в `data.ts` для всех отзывов.
+- В `EvidenceList.tsx` и `review-drawer.tsx` показать кнопку **«Открыть на Яндекс.Маркете»** (внешняя ссылка с иконкой `ExternalLink`).
+- В карточке гипотезы — рядом с источниками тоже ссылки.
 
-## 1. Расширение мок-модели (`src/lib/mock/data.ts`)
+## 4. Тултипы к метрикам
+- Использовать существующий `Tooltip` из shadcn.
+- Сделать утилитарный компонент `<InfoHint text="..." />` (иконка `Info` + tooltip).
+- Поставить рядом с: Уверенность системы, Ожидаемый эффект, Сарказм, Приоритет, Вклад источников, Доля негатива, Передать команде, Отклонить, Нужны данные.
+- Тексты — прикладные, по примеру из брифа.
 
-Расширяем тип `Insight` новыми опциональными полями (для существующих гипотез заполним моками):
+## 5. Гипотеза как главный блок
+- В `insights.$insightId.tsx` сверху страницы (после breadcrumbs) добавить выделенную карточку **«Гипотеза»** с формулировкой *«Если ... то ... потому что ...»*.
+- Большой шрифт, акцентная рамка/фон, иконка лампочки. Никаких метрик внутри — только суть.
+- Добавить в `data.ts` поле `hypothesisStatement: { ifPart, thenPart, becausePart }` для каждой гипотезы.
 
-```ts
-type ConfidenceBreakdown = {
-  reviewsCount: number;
-  reviewsCountScore: number;     // вклад в %
-  repeatabilityScore: number;
-  sentimentScore: number;
-  sourceDiversityScore: number;
-  recencyScore: number;
-};
+## 6. Убрать/задизейблить неработающие кнопки
+- Аудит всех кнопок: что не имеет обработчика — либо удалить, либо `disabled` + tooltip «Скоро».
+- Кандидаты на удаление: «Экспорт», иконки share без логики, фильтры без логики.
+- Реальные действия (Передать в работу / Нужны данные / Отклонить) оставить с toast-фидбеком.
 
-type ExpectedEffect = {
-  type: "complaints_reduction" | "rating_uplift" | "positive_uplift" | "repeat_reduction";
-  range: { min: number; max: number };
-  unit: "%" | "★";
-  label: "низкий" | "средний" | "средний-высокий" | "высокий";
-  reason: string;
-};
+## 7. Упростить карточки гипотез
+- `insight-card.tsx` переписать. Оставить только:
+  - Название проблемы
+  - Чип команды
+  - Кол-во отзывов
+  - Уверенность системы
+  - Ожидаемый эффект
+  - CTA «Открыть»
+- Вся карточка кликабельна (обернуть в `<Link>`), hover-state — приподнятие + рамка-акцент. Убрать длинные описания.
 
-type EvidenceReview = {
-  reviewId: string;     // ссылка в REVIEWS
-  highlight: string;    // фрагмент для подсветки
-};
+## 8. Линейная страница гипотезы (вертикально, сверху вниз)
+- Перестроить `insights.$insightId.tsx`. Вместо 5 табов — одна вертикальная лента секций:
+  1. Breadcrumbs + заголовок
+  2. **Гипотеза** (п.5)
+  3. Почему система её предложила (`GenerationReason`)
+  4. Доказательства: отзывы (`EvidenceList`)
+  5. Метрики и уверенность (`ConfidenceBreakdown`)
+  6. Ожидаемый эффект (`ExpectedEffectCard`)
+  7. Риски (`RisksList`)
+  8. **Что делать дальше** (новый блок, п.10)
+  9. История (collapsible, опционально)
+- Действия — справа в **sticky-панели** (на десктопе) или внизу страницы (моб): «Передать в работу», «Нужны данные», «Отклонить». Не в табах.
 
-type ImplementationTracking = {
-  implementedAt: string;
-  before: { complaintsPerWeek: number; negativeShare: number };
-  after:  { complaintsPerWeek: number; negativeShare: number };
-  actualEffect: string; // напр. "-38%"
-};
-```
+## 9. Onboarding «Как пользоваться»
+- Welcome-модалка при первом визите (флаг в `localStorage`):
+  - Краткое описание платформы (для аналитиков и продактов)
+  - 5 шагов: тема → гипотеза → доказательства → уверенность/риски → передача команде
+- Кнопка «?» в шапке открывает ту же модалку повторно.
+- Также: на дашборде compact-checklist «С чего начать».
 
-Новые поля в `Insight`:
-- `confidenceBreakdown: ConfidenceBreakdown`
-- `expectedEffectV2: ExpectedEffect` (старый строковый `expectedEffect` оставляем для совместимости с карточками списка)
-- `generationReason: string[]` — 3-5 буллетов
-- `evidenceReviews: EvidenceReview[]`
-- `risks: string[]`
-- `neededData?: string[]` — заполнено, если статус `needs_data`
-- `ownerTeam`, `recommendedAction`, `taskDescription`
-- `implementationTracking?: ImplementationTracking` — только для статусов `implemented`
-- `subtopicId?: string`
+## 10. «Что делать дальше» в гипотезе
+- Новый компонент `NextSteps.tsx`. Чек-лист из 3-5 шагов (mock в `data.ts`, поле `nextSteps: string[]`).
+- Плюс лёгкий блок «Как проверить гипотезу» с форматом/длительностью/метрикой успеха (упрощённая версия п.16 из P1).
 
-Новый статус: `"needs_data"` добавляем в `InsightStatus`. Обновляем `StatusBadge` в `atoms.tsx`.
-
-Иерархия подтем — отдельная константа:
-
-```ts
-export const SUBTOPICS = [
-  { id: "delivery_delay", topicId: "delay", name: "Срыв сроков доставки", reviewsCount: 42 },
-  { id: "courier_no_show", topicId: "delay", name: "Курьер не приехал", reviewsCount: 21 },
-  { id: "delivery_damage_pkg", topicId: "delivery-damage", name: "Повреждение упаковки", reviewsCount: 17 },
-  // ...по 1-3 подтемы на крупные темы
-];
-export function getSubtopicsByTopic(topicId: string) { ... }
-```
-
-Хелперы: `getInsightsBySubtopic`, обновлённый `getInsightsByTopic`.
-
----
-
-## 2. Новые UI-компоненты (`src/components/insight/`)
-
-Создаём небольшие переиспользуемые блоки, чтобы детальная страница не превращалась в монолит:
-
-- `ConfidenceBreakdown.tsx` — горизонтальный stacked-bar с легендой и tooltip-ами по факторам. Сверху — большое число `86%` и пояснение «Основана на 42 отзывах, повторяемости, росте за 2 недели и 3 источниках».
-- `ExpectedEffectCard.tsx` — диапазон `15–30%` визуально как «градусник», лейбл «средний-высокий», под ним курсивом `reason`.
-- `GenerationReason.tsx` — список с иконкой `Sparkles` и буллетами-чек-марками.
-- `EvidenceList.tsx` — карточки отзывов, где `highlight` подсвечен `<mark className="bg-ai-soft text-ai-foreground rounded px-1">…</mark>`. Источник + дата + sentiment-badge сбоку.
-- `RisksList.tsx` — иконка `AlertTriangle`, мягкий жёлтый фон (token `--warning-soft`).
-- `NeededDataPanel.tsx` — рендерится только при `status === "needs_data"`, мягкий синий фон, чек-лист пунктов с чекбоксами (визуальные, без логики).
-- `ImpactTracker.tsx` — две колонки «До / После» + большая дельта, мини-LineChart. Рендерится только при наличии `implementationTracking`.
-- `OwnerTeamCard.tsx` — команда, рекомендованное действие, кнопка «Создать задачу» (визуальная).
-
-Все компоненты используют семантические токены из `styles.css`, без хардкода цветов. Анимации: `.anim-rise` + `.stagger` уже доступны.
-
----
-
-## 3. Переработка детальной страницы (`src/routes/insights.$insightId.tsx`)
-
-Меняем структуру вкладок, чтобы информация раскладывалась логично по «слою принятия решения»:
-
-```
-[Header: Тема → Подтема → Гипотеза + KPI Confidence/Signal/Effect]
-[AI Explanation: краткое summary под заголовком]
-
-Tabs:
- ├─ Обзор          → ConfidenceBreakdown + ExpectedEffectCard + GenerationReason
- ├─ Доказательства → EvidenceList + ссылки на полные отзывы
- ├─ Риски и данные → RisksList + NeededDataPanel
- ├─ Действие       → OwnerTeamCard + поля решения (Accept/Reject/More data)
- └─ Эффект         → ImpactTracker (или плейсхолдер «Гипотеза ещё не внедрена»)
-```
-
-KPI-карточка эффекта в шапке заменяется с «−25%» на диапазон «15–30%» с подписью «средний-высокий». Это снимает «галлюцинации точного числа».
-
-Решение `Decision` мигрирует во вкладку «Действие» вместе с командой-владельцем.
-
----
-
-## 4. Иерархия Тема → Подтема → Гипотеза
-
-`src/routes/topics.$topicId.tsx` обновляем:
-- В шапке темы: счётчики (отзывы, негатив, тренд).
-- Список подтем `SUBTOPICS` карточками с мини-метриками.
-- Клик по подтеме раскрывает (accordion) список гипотез внутри. Без отдельного роутинга — экономим время.
-
-На главном списке тем (`src/routes/topics.tsx`) под мини-чартом добавляем строку «Подтемы: Срыв сроков · Курьер не приехал · …» (chip-list, до 3 шт + «+N»).
-
----
-
-## 5. Карточка гипотезы в списках (`src/components/insight-card.tsx`)
-
-Минимальные правки, чтобы новые сигналы были видны и в списке:
-- Бейдж `needs_data` (новый статус).
-- Если `implementationTracking` — маленький бейдж «Эффект: −38%» в шапке.
-- В блоке «Ожидаемый эффект» вместо точного числа — диапазон `15–30% · средний-высокий`.
-
----
+## Бонусом (низкая стоимость, высокая отдача)
+- **Sidebar / навигация (п.11)**: фикс ширины, убрать визуальные скачки иконок — посмотреть `app-sidebar.tsx`.
+- **Breadcrumbs (п.12)**: единый компонент `<Breadcrumbs />` на всех внутренних страницах. Дашборд → Гипотезы → Конкретная.
 
 ## Технические детали
-
-- Новые поля в `Insight` делаем опциональными, но в `INSIGHTS` заполняем для всех 8 моков → не ломаем существующие места использования.
-- Для evidence-подсветки пишем маленький утил `highlightText(text, fragment)` в `lib/utils.ts`, возвращающий массив React-нод.
-- `StatusBadge` (`atoms.tsx`): добавляем стиль для `needs_data` (амбер/info токен).
-- Все цвета — через токены: `--ai`, `--ai-soft`, `--warning`, `--warning-soft`, `--success`, `--info`. При отсутствии нужных токенов — добавляем в `src/styles.css` (oklch).
-- Никаких новых маршрутов; только дополнения существующих.
-
----
+- Новые файлы:
+  - `src/components/insight/HypothesisStatement.tsx`
+  - `src/components/insight/NextSteps.tsx`
+  - `src/components/insight/StickyActions.tsx`
+  - `src/components/info-hint.tsx`
+  - `src/components/onboarding-modal.tsx`
+  - `src/components/breadcrumbs.tsx`
+- Изменения:
+  - `src/lib/mock/data.ts` — `sourceUrl`, `hypothesisStatement`, `nextSteps`, переименование команд
+  - `src/components/app-shell.tsx` — убрать GlobalFilters, добавить Help-кнопку и breadcrumbs slot
+  - `src/components/app-sidebar.tsx` — фикс ширины/выравнивания
+  - `src/components/insight-card.tsx` — упрощение
+  - `src/components/insight/EvidenceList.tsx` — ссылки на источник
+  - `src/components/review-drawer.tsx` — ссылка на источник
+  - `src/routes/insights.$insightId.tsx` — линейная структура + sticky actions
+  - `src/routes/index.tsx` — onboarding checklist
+- Удалить (если не используются больше): `src/components/global-filters.tsx`.
 
 ## Что НЕ делаем в этой итерации
+- Кнопка «Сформировать исследование» (P2 #17)
+- Блок «Внешний контекст» (P2 #18)
+- Полная «методика внедрения» с оценкой стоимости (P1 #16) — только урезанный вариант в NextSteps
+- Contact/responsible person (P2 #20) — оставим существующий `OwnerTeamCard`
 
-- Timeline событий и комментарии аналитиков (вторая очередь).
-- CRM-matching, авто-ответы, конструктор интеграций — по решению пользователя выкидываем из MVP.
-- Не трогаем глобальную навигацию и шапку — они уже переработаны.
-
----
-
-## Файлы
-
-Новые:
-- `src/components/insight/ConfidenceBreakdown.tsx`
-- `src/components/insight/ExpectedEffectCard.tsx`
-- `src/components/insight/GenerationReason.tsx`
-- `src/components/insight/EvidenceList.tsx`
-- `src/components/insight/RisksList.tsx`
-- `src/components/insight/NeededDataPanel.tsx`
-- `src/components/insight/ImpactTracker.tsx`
-- `src/components/insight/OwnerTeamCard.tsx`
-
-Изменяемые:
-- `src/lib/mock/data.ts` — типы, новые поля, `SUBTOPICS`, хелперы.
-- `src/components/atoms.tsx` — `StatusBadge` для `needs_data`.
-- `src/components/insight-card.tsx` — новый бейдж эффекта/needs_data, диапазон.
-- `src/routes/insights.$insightId.tsx` — новая структура вкладок.
-- `src/routes/topics.$topicId.tsx` — подтемы и гипотезы.
-- `src/routes/topics.tsx` — chip-list подтем.
-- `src/lib/utils.ts` — `highlightText`.
-- `src/styles.css` — недостающие токены (warning/info), при необходимости.
-
-Подтверди план — и я начинаю реализацию.
+Подтвердите план — и я начинаю реализовывать.
