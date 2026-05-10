@@ -107,7 +107,7 @@ function InsightsPage() {
               {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(col => (
                 <div key={col} className="flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3">
                   <div className="flex items-center justify-between sticky top-0">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider">{col.replace("_", " ")}</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">{KANBAN_LABELS[col]}</h4>
                     <span className="num rounded bg-card px-1.5 text-[10px] font-medium">{counts[col]}</span>
                   </div>
                   <div className="space-y-3">
