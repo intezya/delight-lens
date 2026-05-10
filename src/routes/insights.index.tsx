@@ -5,8 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { INSIGHTS, type InsightStatus } from "@/lib/mock/data";
 import { InsightCard } from "@/components/insight-card";
-import { Button } from "@/components/ui/button";
-import { Sparkles, LayoutGrid, Columns3 } from "lucide-react";
+import { LayoutGrid, Columns3 } from "lucide-react";
 import { AiBadge } from "@/components/atoms";
 
 export const Route = createFileRoute("/insights/")({
