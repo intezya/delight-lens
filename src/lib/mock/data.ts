@@ -174,6 +174,19 @@ export type ImplementationTracking = {
   actualEffect: string;
 };
 
+export type HypothesisStatement = {
+  ifPart: string;
+  thenPart: string;
+  becausePart: string;
+};
+
+export type ValidationPlan = {
+  format: string;
+  duration: string;
+  metric: string;
+  teams: string[];
+};
+
 export type Insight = {
   id: string;
   title: string;
@@ -200,7 +213,25 @@ export type Insight = {
   recommendedAction: string;
   taskDescription: string;
   implementationTracking?: ImplementationTracking;
+  // New (optional, fallback by helper)
+  hypothesisStatement?: HypothesisStatement;
+  nextSteps?: string[];
+  validationPlan?: ValidationPlan;
 };
+
+// Map english team names to friendly Russian labels
+const TEAM_RU: Record<string, string> = {
+  "Retail Ops": "Команда складского контроля",
+  "Logistics": "Команда доставки",
+  "Marketing": "Команда маркетинга",
+  "Customer Care": "Команда клиентского сервиса",
+  "Payments": "Команда платежей",
+  "Last Mile": "Команда последней мили",
+  "Quality": "Команда контроля качества",
+};
+export function localizeTeam(team: string): string {
+  return TEAM_RU[team] ?? team;
+}
 
 export type Subtopic = {
   id: string;
