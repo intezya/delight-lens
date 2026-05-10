@@ -2,7 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { type Review, getTopic, REVIEWS, INSIGHTS } from "@/lib/mock/data";
 import { SentimentPill, SourceBadge, TopicChip, SignalBar, PriorityBadge, AiBadge } from "./atoms";
 import { Button } from "@/components/ui/button";
-import { Star, Repeat, Link2, Sparkles, Quote, Flag } from "lucide-react";
+import { Star, Repeat, Link2, Sparkles, Quote, Flag, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
