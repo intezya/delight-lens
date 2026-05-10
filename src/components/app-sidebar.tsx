@@ -76,14 +76,14 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>Аккаунт</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={path === "/settings"} tooltip="Settings">
+                <SidebarMenuButton asChild isActive={path === "/settings"} tooltip="Настройки">
                   <Link to="/settings">
                     <Settings className="h-4 w-4" />
-                    <span>Settings</span>
+                    <span>Настройки</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
