@@ -37,6 +37,7 @@ export type Review = {
   text: string;
   date: string;
   source: Source;
+  sourceUrl: string;
   sentiment: Sentiment;
   rating: number;
   topics: string[];
@@ -47,6 +48,15 @@ export type Review = {
   region: string;
   category: string;
   author: string;
+};
+
+const SOURCE_URL_BASE: Record<Source, string> = {
+  "Я.Маркет": "https://market.yandex.ru/shop--voicelens/123/reviews?reviewId=",
+  "Otzovik": "https://otzovik.com/review_",
+  "2GIS": "https://2gis.ru/firm/voicelens/tab/reviews/firmId-",
+  "Google Maps": "https://www.google.com/maps/contrib/reviews/",
+  "Trustpilot": "https://www.trustpilot.com/reviews/",
+  "App Store": "https://apps.apple.com/ru/app/id000/reviews?reviewId=",
 };
 
 const reviewSeeds: Array<Partial<Review> & { text: string; sentiment: Sentiment; topics: string[] }> = [
