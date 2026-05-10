@@ -49,7 +49,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupLabel>Рабочее пространство</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {NAV.map((item) => {
