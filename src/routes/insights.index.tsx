@@ -65,7 +65,7 @@ function InsightsPage() {
             </div>
             <div className="flex gap-3">
               <div className="rounded-lg border bg-card px-4 py-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg confidence</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Средняя уверенность</p>
                 <p className="num display text-2xl font-semibold">{Math.round(INSIGHTS.reduce((s, i) => s + i.confidence, 0) / INSIGHTS.length)}%</p>
               </div>
               <div className="rounded-lg border bg-card px-4 py-3">
