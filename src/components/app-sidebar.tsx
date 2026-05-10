@@ -98,7 +98,7 @@ export function AppSidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">МВ</div>
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-xs font-medium">Мария Воронина</span>
-              <span className="truncate text-[10px] text-muted-foreground">Product Analyst</span>
+              <span className="truncate text-[10px] text-muted-foreground">Продуктовый аналитик</span>
             </div>
           </div>
         ) : (
