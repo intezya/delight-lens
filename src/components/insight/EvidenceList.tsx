@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Quote } from "lucide-react";
+import { ExternalLink, Quote } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { SentimentPill, SourceBadge } from "@/components/atoms";
@@ -40,7 +40,16 @@ export function EvidenceList({ items }: { items: EvidenceReview[] }) {
               <SentimentPill sentiment={r.sentiment} />
               <SourceBadge source={r.source} />
               <span className="text-muted-foreground">· {format(new Date(r.date), "d MMM yyyy", { locale: ru })}</span>
-              <span className="ml-auto text-muted-foreground">{r.author}</span>
+              <span className="text-muted-foreground">· {r.author}</span>
+              <a
+                href={r.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto inline-flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-[10.5px] font-medium text-foreground transition hover:border-ai/40 hover:text-ai"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Открыть на {r.source}
+              </a>
             </div>
           </Card>
         );
