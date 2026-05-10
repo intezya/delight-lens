@@ -37,6 +37,7 @@ export type Review = {
   text: string;
   date: string;
   source: Source;
+  sourceUrl: string;
   sentiment: Sentiment;
   rating: number;
   topics: string[];
@@ -47,6 +48,15 @@ export type Review = {
   region: string;
   category: string;
   author: string;
+};
+
+const SOURCE_URL_BASE: Record<Source, string> = {
+  "Я.Маркет": "https://market.yandex.ru/shop--voicelens/123/reviews?reviewId=",
+  "Otzovik": "https://otzovik.com/review_",
+  "2GIS": "https://2gis.ru/firm/voicelens/tab/reviews/firmId-",
+  "Google Maps": "https://www.google.com/maps/contrib/reviews/",
+  "Trustpilot": "https://www.trustpilot.com/reviews/",
+  "App Store": "https://apps.apple.com/ru/app/id000/reviews?reviewId=",
 };
 
 const reviewSeeds: Array<Partial<Review> & { text: string; sentiment: Sentiment; topics: string[] }> = [
@@ -85,11 +95,14 @@ function dayOffsetISO(daysAgo: number): string {
 export const REVIEWS: Review[] = Array.from({ length: 64 }).map((_, i) => {
   const seed = reviewSeeds[i % reviewSeeds.length];
   const daysAgo = Math.floor((i * 1.4) % 89);
+  const source = SOURCES[i % SOURCES.length];
+  const id = `r-${i + 1}`;
   return {
-    id: `r-${i + 1}`,
+    id,
     text: seed.text,
     date: dayOffsetISO(daysAgo),
-    source: SOURCES[i % SOURCES.length],
+    source,
+    sourceUrl: `${SOURCE_URL_BASE[source]}${id}`,
     sentiment: seed.sentiment,
     rating: seed.rating ?? 3,
     topics: seed.topics,
@@ -161,6 +174,19 @@ export type ImplementationTracking = {
   actualEffect: string;
 };
 
+export type HypothesisStatement = {
+  ifPart: string;
+  thenPart: string;
+  becausePart: string;
+};
+
+export type ValidationPlan = {
+  format: string;
+  duration: string;
+  metric: string;
+  teams: string[];
+};
+
 export type Insight = {
   id: string;
   title: string;
@@ -187,7 +213,25 @@ export type Insight = {
   recommendedAction: string;
   taskDescription: string;
   implementationTracking?: ImplementationTracking;
+  // New (optional, fallback by helper)
+  hypothesisStatement?: HypothesisStatement;
+  nextSteps?: string[];
+  validationPlan?: ValidationPlan;
 };
+
+// Map english team names to friendly Russian labels
+const TEAM_RU: Record<string, string> = {
+  "Retail Ops": "Команда складского контроля",
+  "Logistics": "Команда доставки",
+  "Marketing": "Команда маркетинга",
+  "Customer Care": "Команда клиентского сервиса",
+  "Payments": "Команда платежей",
+  "Last Mile": "Команда последней мили",
+  "Quality": "Команда контроля качества",
+};
+export function localizeTeam(team: string): string {
+  return TEAM_RU[team] ?? team;
+}
 
 export type Subtopic = {
   id: string;
@@ -647,9 +691,123 @@ export function getReview(id: string) {
   return REVIEWS.find((r) => r.id === id);
 }
 
+// Hypothesis statements + next steps + validation plans (kept separately to avoid touching every insight inline)
+const INSIGHT_EXTRAS: Record<string, { hypothesisStatement: HypothesisStatement; nextSteps: string[]; validationPlan: ValidationPlan }> = {
+  "i-1": {
+    hypothesisStatement: {
+      ifPart: "ввести обязательную фотофиксацию состояния товара перед отгрузкой и явную маркировку витринных образцов",
+      thenPart: "снизится количество жалоб на витринный товар, проданный как новый",
+      becausePart: "76% жалоб содержат одинаковую формулировку про «витринный» — клиенты не получают предупреждения о состоянии товара",
+    },
+    nextSteps: [
+      "Согласовать с командой склада регламент фотофиксации",
+      "Подготовить шаблон карточки товара с пометкой «витринный»",
+      "Запустить пилот в 5 точках Москвы и СПб",
+      "Через 4 недели сравнить долю жалоб с базовым периодом",
+    ],
+    validationPlan: { format: "Пилот в 5 магазинах", duration: "4 недели", metric: "−15% жалоб на витринный товар", teams: ["Склад", "Контроль качества", "Розница"] },
+  },
+  "i-2": {
+    hypothesisStatement: {
+      ifPart: "расширить число слотов доставки в выходные и предпраздничные дни",
+      thenPart: "снизится число повторных жалоб на перенос сроков",
+      becausePart: "67% переносов случается в выходные — слоты переполняются и заказы автоматически переносятся",
+    },
+    nextSteps: [
+      "Сверить данные о фактической загрузке слотов с командой логистики",
+      "Договориться с подрядчиком о доп. курьерах в пятницу–субботу",
+      "Запустить расширенные слоты в одном городе",
+      "Через 2 недели сравнить долю повторных переносов",
+    ],
+    validationPlan: { format: "Пилот в одном городе", duration: "2 недели", metric: "−25% повторных переносов", teams: ["Логистика", "Подрядчик доставки"] },
+  },
+  "i-3": {
+    hypothesisStatement: {
+      ifPart: "добавить упоминание «реальных бонусов» в email-рассылки и шаги оформления заказа",
+      thenPart: "вырастет доля положительных упоминаний программы лояльности",
+      becausePart: "клиенты уже хвалят программу — усиление коммуникации укрепляет существующий положительный сигнал",
+    },
+    nextSteps: [
+      "Согласовать формулировки с маркетингом и юристами",
+      "Подготовить A/B-тест email-рассылки",
+      "Замерить рост NPS в когорте через 6 недель",
+    ],
+    validationPlan: { format: "A/B-тест email + чекаут", duration: "6 недель", metric: "+10% NPS в когорте", teams: ["Маркетинг", "CRM"] },
+  },
+  "i-4": {
+    hypothesisStatement: {
+      ifPart: "ввести SLA 48 часов на первый ответ по гарантии и автоматический эскалейт при просрочке",
+      thenPart: "снизится количество негативных отзывов про гарантию",
+      becausePart: "72% жалоб повторяют сценарий «обещают перезвонить — не перезванивают» при среднем времени ответа 9 дней",
+    },
+    nextSteps: [
+      "Включить SLA 48ч в скрипты Customer Care",
+      "Настроить автоэскалейт в Helpdesk при просрочке",
+      "Через 4 недели сравнить долю жалоб про гарантию",
+    ],
+    validationPlan: { format: "Изменение SLA в одной команде", duration: "4 недели", metric: "−20% жалоб на гарантию", teams: ["Клиентский сервис", "QA"] },
+  },
+  "i-5": {
+    hypothesisStatement: {
+      ifPart: "проанализировать логи платёжного шлюза и устранить причину двойных списаний",
+      thenPart: "снизится количество жалоб на оплату и долгий возврат",
+      becausePart: "9 жалоб с одинаковым сценарием за 14 дней — нужны данные шлюза, чтобы подтвердить причину",
+    },
+    nextSteps: [
+      "Запросить логи платёжного шлюза за 30 дней",
+      "Сопоставить логи с конкретными жалобами",
+      "Сформулировать конкретную техническую гипотезу",
+      "Заложить пилотный фикс в спринт",
+    ],
+    validationPlan: { format: "Технический аудит шлюза", duration: "1 неделя", metric: "Подтверждена/опровергнута причина двойных списаний", teams: ["Платежи", "Backend"] },
+  },
+  "i-6": {
+    hypothesisStatement: {
+      ifPart: "стандартизировать практику «распаковка при клиенте» как обязательный пункт чек-листа курьера",
+      thenPart: "вырастет средняя оценка last-mile",
+      becausePart: "в кластере отзывов фраза «распаковали при мне» коррелирует с оценкой 5★ (0.74)",
+    },
+    nextSteps: [
+      "Обновить инструкцию last-mile",
+      "Обучить курьеров на пилоте",
+      "Через 4 недели сравнить средний рейтинг",
+    ],
+    validationPlan: { format: "Пилот с 50 курьерами", duration: "4 недели", metric: "+0.3★ к средней оценке", teams: ["Last Mile"] },
+  },
+  "i-7": {
+    hypothesisStatement: {
+      ifPart: "включить проверку серийных номеров через API производителя на категории Аудио",
+      thenPart: "снизится число жалоб «серийник не пробивается» и риск серого канала",
+      becausePart: "9 одинаковых жалоб за 30 дней с концентрацией в одной категории — высокий риск, но мало данных",
+    },
+    nextSteps: [
+      "Запросить у поставщиков долю возвратов по серийнику",
+      "Подключить API проверки от 2 ключевых производителей",
+      "Запустить выборочную проверку 100 SKU",
+    ],
+    validationPlan: { format: "Проверка серийников через API", duration: "3 недели", metric: "Подтверждена/опровергнута гипотеза серого канала", teams: ["QA", "Закупки"] },
+  },
+  "i-8": {
+    hypothesisStatement: {
+      ifPart: "добавить дополнительного сотрудника на самовывоз с 18:00 до 20:00",
+      thenPart: "снизится время ожидания и вырастет удовлетворённость самовывозом",
+      becausePart: "4 отзыва о часовых очередях концентрируются в вечерний пик в одной точке",
+    },
+    nextSteps: [
+      "Согласовать график с управляющим точкой",
+      "Замерить очередь до и после",
+    ],
+    validationPlan: { format: "Эксперимент в одной точке", duration: "2 недели", metric: "−30% времени ожидания", teams: ["Розница"] },
+  },
+};
+
 export function getInsight(id: string) {
-  return INSIGHTS.find((i) => i.id === id);
+  const i = INSIGHTS.find((i) => i.id === id);
+  if (!i) return undefined;
+  const extras = INSIGHT_EXTRAS[id];
+  return extras ? { ...i, ...extras } : i;
 }
+
 
 export const KPI = {
   totalReviews: REVIEWS.length * 28, // simulate scale

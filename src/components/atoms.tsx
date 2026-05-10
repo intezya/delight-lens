@@ -71,10 +71,10 @@ export function ConfidenceBar({ value }: { value: number }) {
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
   const map: Record<Priority, { label: string; cls: string }> = {
-    critical: { label: "Critical", cls: "bg-negative text-white" },
-    high: { label: "High", cls: "bg-negative-soft text-negative-foreground" },
-    medium: { label: "Medium", cls: "bg-mixed-soft text-mixed-foreground" },
-    low: { label: "Low", cls: "bg-muted text-muted-foreground" },
+    critical: { label: "Критичный", cls: "bg-negative text-white" },
+    high: { label: "Высокий", cls: "bg-negative-soft text-negative-foreground" },
+    medium: { label: "Средний", cls: "bg-mixed-soft text-mixed-foreground" },
+    low: { label: "Низкий", cls: "bg-muted text-muted-foreground" },
   };
   const m = map[priority];
   return <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>;
@@ -82,11 +82,11 @@ export function PriorityBadge({ priority }: { priority: Priority }) {
 
 export function StatusBadge({ status }: { status: InsightStatus }) {
   const map: Record<InsightStatus, { label: string; cls: string }> = {
-    new: { label: "New", cls: "bg-ai-soft text-ai-foreground" },
-    validated: { label: "Validated", cls: "bg-positive-soft text-positive-foreground" },
-    in_progress: { label: "In progress", cls: "bg-mixed-soft text-mixed-foreground" },
-    implemented: { label: "Implemented", cls: "bg-positive text-white" },
-    rejected: { label: "Rejected", cls: "bg-muted text-muted-foreground line-through" },
+    new: { label: "Новая", cls: "bg-ai-soft text-ai-foreground" },
+    validated: { label: "Подтверждена", cls: "bg-positive-soft text-positive-foreground" },
+    in_progress: { label: "В работе", cls: "bg-mixed-soft text-mixed-foreground" },
+    implemented: { label: "Внедрена", cls: "bg-positive text-white" },
+    rejected: { label: "Отклонена", cls: "bg-muted text-muted-foreground line-through" },
     needs_data: { label: "Нужны данные", cls: "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200" },
   };
   const m = map[status];
@@ -123,7 +123,7 @@ export function Delta({ value, suffix = "%", invert = false }: { value: number; 
   );
 }
 
-export function SectionHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+export function SectionHeader({ title, subtitle, action }: { title: React.ReactNode; subtitle?: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>

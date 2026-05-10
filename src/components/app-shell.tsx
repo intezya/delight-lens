@@ -1,10 +1,11 @@
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
-import { Bell, HelpCircle, Calendar } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { OnboardingModal, useOnboarding } from "./onboarding-modal";
 
 export function AppShell({ children, title, subtitle, actions }: { children: React.ReactNode; title: string; subtitle?: string; actions?: React.ReactNode }) {
+  const { open, close, reopen } = useOnboarding();
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -19,26 +20,23 @@ export function AppShell({ children, title, subtitle, actions }: { children: Rea
               </div>
             </div>
             <div className="ml-auto flex items-center gap-1.5">
-              <Select defaultValue="30d">
-                <SelectTrigger className="h-8 w-[150px] text-xs">
-                  <Calendar className="mr-1.5 h-3.5 w-3.5" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">Последние 7 дней</SelectItem>
-                  <SelectItem value="30d">Последние 30 дней</SelectItem>
-                  <SelectItem value="90d">Последние 90 дней</SelectItem>
-                  <SelectItem value="ytd">С начала года</SelectItem>
-                </SelectContent>
-              </Select>
               {actions}
-              <Button variant="ghost" size="icon" className="h-8 w-8"><Bell className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8"><HelpCircle className="h-4 w-4" /></Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={reopen}
+                className="h-8 gap-1.5 px-2 text-xs"
+                aria-label="Как пользоваться"
+              >
+                <HelpCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Как пользоваться</span>
+              </Button>
             </div>
           </header>
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </SidebarInset>
       </div>
+      <OnboardingModal open={open} onClose={close} />
     </SidebarProvider>
   );
 }

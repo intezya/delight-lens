@@ -16,11 +16,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const NAV = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/reviews", label: "Reviews", icon: MessageSquareQuote, badge: "1.7k" },
-  { to: "/insights", label: "Insights", icon: Sparkles, badge: "AI" },
-  { to: "/topics", label: "Topics", icon: Tags },
-  { to: "/impact", label: "Impact", icon: TrendingUp },
+  { to: "/", label: "Дашборд", icon: LayoutDashboard, exact: true },
+  { to: "/reviews", label: "Отзывы", icon: MessageSquareQuote, badge: "1.7k" },
+  { to: "/insights", label: "Гипотезы", icon: Sparkles, badge: "AI" },
+  { to: "/topics", label: "Темы", icon: Tags },
+  { to: "/impact", label: "Эффект", icon: TrendingUp },
 ] as const;
 
 export function AppSidebar() {
@@ -49,7 +49,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarGroupLabel>Рабочее пространство</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {NAV.map((item) => {
@@ -76,14 +76,14 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>Аккаунт</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={path === "/settings"} tooltip="Settings">
+                <SidebarMenuButton asChild isActive={path === "/settings"} tooltip="Настройки">
                   <Link to="/settings">
                     <Settings className="h-4 w-4" />
-                    <span>Settings</span>
+                    <span>Настройки</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -98,7 +98,7 @@ export function AppSidebar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold">МВ</div>
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-xs font-medium">Мария Воронина</span>
-              <span className="truncate text-[10px] text-muted-foreground">Product Analyst</span>
+              <span className="truncate text-[10px] text-muted-foreground">Продуктовый аналитик</span>
             </div>
           </div>
         ) : (

@@ -2,7 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { type Review, getTopic, REVIEWS, INSIGHTS } from "@/lib/mock/data";
 import { SentimentPill, SourceBadge, TopicChip, SignalBar, PriorityBadge, AiBadge } from "./atoms";
 import { Button } from "@/components/ui/button";
-import { Star, Repeat, Link2, Sparkles, Quote, Flag } from "lucide-react";
+import { Star, Repeat, Link2, Sparkles, Quote, Flag, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
@@ -120,9 +120,13 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
           )}
 
           <div className="flex flex-wrap items-center gap-2 border-t pt-4">
-            <Button size="sm" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Создать гипотезу</Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs"><Flag className="mr-1.5 h-3.5 w-3.5" /> В работу</Button>
-            <Button size="sm" variant="ghost" className="ml-auto h-8 text-xs">Скрыть</Button>
+            <Button asChild size="sm" className="h-8 text-xs">
+              <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Открыть на {review.source}
+              </a>
+            </Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Создать гипотезу</Button>
+            <Button size="sm" variant="ghost" className="h-8 text-xs"><Flag className="mr-1.5 h-3.5 w-3.5" /> В работу</Button>
           </div>
         </div>
       </SheetContent>

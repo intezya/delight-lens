@@ -5,8 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { INSIGHTS, type InsightStatus } from "@/lib/mock/data";
 import { InsightCard } from "@/components/insight-card";
-import { Button } from "@/components/ui/button";
-import { Sparkles, LayoutGrid, Columns3 } from "lucide-react";
+import { LayoutGrid, Columns3 } from "lucide-react";
 import { AiBadge } from "@/components/atoms";
 
 export const Route = createFileRoute("/insights/")({
@@ -21,12 +20,21 @@ export const Route = createFileRoute("/insights/")({
 
 const STATUSES: { key: InsightStatus | "all"; label: string }[] = [
   { key: "all", label: "Все" },
-  { key: "new", label: "New" },
-  { key: "validated", label: "Validated" },
-  { key: "in_progress", label: "In progress" },
-  { key: "implemented", label: "Implemented" },
-  { key: "rejected", label: "Rejected" },
+  { key: "new", label: "Новые" },
+  { key: "validated", label: "Подтверждены" },
+  { key: "in_progress", label: "В работе" },
+  { key: "implemented", label: "Внедрены" },
+  { key: "rejected", label: "Отклонены" },
 ];
+
+const KANBAN_LABELS: Record<InsightStatus, string> = {
+  new: "Новые",
+  validated: "Подтверждены",
+  in_progress: "В работе",
+  implemented: "Внедрены",
+  rejected: "Отклонены",
+  needs_data: "Нужны данные",
+};
 
 function InsightsPage() {
   const [status, setStatus] = useState<InsightStatus | "all">("all");
@@ -41,9 +49,8 @@ function InsightsPage() {
 
   return (
     <AppShell
-      title="AI-инсайты и гипотезы"
+      title="Гипотезы AI"
       subtitle={`${INSIGHTS.length} активных гипотез · сгенерированы AI на основе ваших отзывов`}
-      actions={<Button size="sm" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Сгенерировать</Button>}
     >
       <div className="space-y-4 p-4 md:p-6">
         <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/60 via-card to-card p-5">
@@ -56,7 +63,7 @@ function InsightsPage() {
             </div>
             <div className="flex gap-3">
               <div className="rounded-lg border bg-card px-4 py-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Avg confidence</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Средняя уверенность</p>
                 <p className="num display text-2xl font-semibold">{Math.round(INSIGHTS.reduce((s, i) => s + i.confidence, 0) / INSIGHTS.length)}%</p>
               </div>
               <div className="rounded-lg border bg-card px-4 py-3">
@@ -98,7 +105,7 @@ function InsightsPage() {
               {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(col => (
                 <div key={col} className="flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3">
                   <div className="flex items-center justify-between sticky top-0">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider">{col.replace("_", " ")}</h4>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider">{KANBAN_LABELS[col]}</h4>
                     <span className="num rounded bg-card px-1.5 text-[10px] font-medium">{counts[col]}</span>
                   </div>
                   <div className="space-y-3">
