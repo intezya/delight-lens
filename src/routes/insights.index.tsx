@@ -21,12 +21,21 @@ export const Route = createFileRoute("/insights/")({
 
 const STATUSES: { key: InsightStatus | "all"; label: string }[] = [
   { key: "all", label: "Все" },
-  { key: "new", label: "New" },
-  { key: "validated", label: "Validated" },
-  { key: "in_progress", label: "In progress" },
-  { key: "implemented", label: "Implemented" },
-  { key: "rejected", label: "Rejected" },
+  { key: "new", label: "Новые" },
+  { key: "validated", label: "Подтверждены" },
+  { key: "in_progress", label: "В работе" },
+  { key: "implemented", label: "Внедрены" },
+  { key: "rejected", label: "Отклонены" },
 ];
+
+const KANBAN_LABELS: Record<InsightStatus, string> = {
+  new: "Новые",
+  validated: "Подтверждены",
+  in_progress: "В работе",
+  implemented: "Внедрены",
+  rejected: "Отклонены",
+  needs_data: "Нужны данные",
+};
 
 function InsightsPage() {
   const [status, setStatus] = useState<InsightStatus | "all">("all");
