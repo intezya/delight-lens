@@ -50,9 +50,8 @@ function InsightsPage() {
 
   return (
     <AppShell
-      title="AI-инсайты и гипотезы"
+      title="Гипотезы AI"
       subtitle={`${INSIGHTS.length} активных гипотез · сгенерированы AI на основе ваших отзывов`}
-      actions={<Button size="sm" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Сгенерировать</Button>}
     >
       <div className="space-y-4 p-4 md:p-6">
         <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/60 via-card to-card p-5">
