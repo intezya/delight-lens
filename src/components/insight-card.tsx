@@ -1,97 +1,82 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AiBadge, ConfidenceBar, ImpactIcon, PriorityBadge, SignalBar, StatusBadge, TopicChip } from "./atoms";
-import { getTopic, type Insight } from "@/lib/mock/data";
-import { Check, X, ArrowRight, MessageSquare } from "lucide-react";
+import { ConfidenceBar, PriorityBadge, StatusBadge, TopicChip } from "./atoms";
+import { InfoHint } from "./info-hint";
+import { getTopic, localizeTeam, type Insight } from "@/lib/mock/data";
+import { ArrowRight, MessageSquare, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { Link } from "@tanstack/react-router";
 
-export function InsightCard({ insight, compact }: { insight: Insight; compact?: boolean }) {
+export function InsightCard({ insight }: { insight: Insight; compact?: boolean }) {
   const topic = getTopic(insight.topicId);
   const [relativeTime, setRelativeTime] = useState<string>("");
   useEffect(() => {
     setRelativeTime(formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }));
   }, [insight.createdAt]);
+
+  const effect = insight.expectedEffectV2;
+  const sign = effect.type === "complaints_reduction" || effect.type === "repeat_reduction" ? "−" : "+";
+  const effectShort = `${sign}${effect.range.min}–${effect.range.max}${effect.unit}`;
+
   return (
-    <Card className="group flex flex-col gap-3 border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:border-ai/40 hover:shadow-[var(--shadow-elev-2)]">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <AiBadge />
-          <StatusBadge status={insight.status} />
-          <PriorityBadge priority={insight.priority} />
-        </div>
-        <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
-          {relativeTime}
-        </span>
-      </div>
-
-      <div>
-        <Link
-          to="/insights/$insightId"
-          params={{ insightId: insight.id }}
-          className="group/title inline-flex items-start gap-1 text-sm font-semibold leading-snug tracking-tight hover:text-ai transition-colors"
-        >
-          <h4 className="leading-snug">{insight.title}</h4>
-          <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 opacity-0 -translate-x-1 transition-all group-hover/title:opacity-100 group-hover/title:translate-x-0" />
-        </Link>
-        {!compact && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-3">{insight.description}</p>}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        {topic && <TopicChip name={topic.name} kind={topic.kind} />}
-        <ImpactIcon impact={insight.impact} />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/30 p-2.5">
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Confidence</span>
-          <ConfidenceBar value={insight.confidence} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Сила сигнала</span>
-          <SignalBar value={insight.signal} />
-        </div>
-      </div>
-
-      <div className="rounded-lg border-l-2 border-ai bg-ai-soft/40 px-2.5 py-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[10px] uppercase tracking-wider text-ai-foreground/80">Ожидаемый эффект</span>
-          {insight.expectedEffectV2 && (
-            <span className="rounded bg-card px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground">
-              {insight.expectedEffectV2.label}
-            </span>
-          )}
-        </div>
-        <p className="mt-0.5 num text-xs font-medium text-ai-foreground">{insight.expectedEffect}</p>
-        {insight.implementationTracking && (
-          <p className="mt-1 num text-[10px] font-semibold text-positive">Факт: {insight.implementationTracking.actualEffect}</p>
-        )}
-      </div>
-
-      <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-[11px]">
-        <div className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[9px] font-semibold">
-            {insight.owner.name.split(" ").map(s => s[0]).join("")}
+    <Link
+      to="/insights/$insightId"
+      params={{ insightId: insight.id }}
+      className="group block focus:outline-none focus:ring-2 focus:ring-ring rounded-xl"
+    >
+      <Card className="lift relative flex h-full flex-col gap-3 border bg-card p-4 transition group-hover:border-ai/40 group-hover:shadow-[var(--shadow-elev-2)]">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <StatusBadge status={insight.status} />
+            <PriorityBadge priority={insight.priority} />
+          </div>
+          <span className="text-[10px] text-muted-foreground" suppressHydrationWarning>
+            {relativeTime}
           </span>
-          <span className="font-medium text-foreground">{insight.owner.name}</span>
-          <span className="text-muted-foreground">· {insight.owner.team}</span>
         </div>
-        <span className="inline-flex items-center gap-1 text-muted-foreground">
-          <MessageSquare className="h-3 w-3" /> {insight.reviewIds.length}
-        </span>
-      </div>
 
-      {!compact && (
-        <div className="-mb-1 flex flex-wrap items-center gap-1.5">
-          <Button size="sm" className="h-7 text-[11px]"><Check className="mr-1 h-3 w-3" /> Принять</Button>
-          <Button size="sm" variant="outline" className="h-7 text-[11px]"><X className="mr-1 h-3 w-3" /> Отклонить</Button>
-          <Button asChild size="sm" variant="ghost" className="ml-auto h-7 text-[11px]">
-            <Link to="/insights/$insightId" params={{ insightId: insight.id }}>Детали <ArrowRight className="ml-1 h-3 w-3" /></Link>
-          </Button>
+        <h4 className="text-[15px] font-semibold leading-snug tracking-tight transition-colors group-hover:text-ai">
+          {insight.title}
+        </h4>
+
+        {topic && (
+          <div>
+            <TopicChip name={topic.name} kind={topic.kind} />
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/30 p-2.5">
+          <div className="flex flex-col gap-1">
+            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+              Уверенность системы
+              <InfoHint text="Насколько надёжен сигнал — рассчитывается на основе количества отзывов, повторяемости, разнообразия источников и свежести." />
+            </span>
+            <ConfidenceBar value={insight.confidence} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+              Ожидаемый эффект
+              <InfoHint text="Прогнозируемое изменение метрики, если гипотеза будет реализована. Оценка системы на основе частоты и динамики проблемы." />
+            </span>
+            <p className="num text-sm font-semibold text-ai-foreground">{effectShort}</p>
+          </div>
         </div>
-      )}
-    </Card>
+
+        <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-[11px]">
+          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+            <Users className="h-3 w-3" /> {localizeTeam(insight.ownerTeam)}
+          </span>
+          <span className="inline-flex items-center gap-2 text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <MessageSquare className="h-3 w-3" /> {insight.confidenceBreakdown.reviewsCount}
+            </span>
+            <span className="inline-flex items-center gap-1 font-medium text-foreground transition group-hover:text-ai">
+              Открыть <ArrowRight className="h-3 w-3 transition group-hover:translate-x-0.5" />
+            </span>
+          </span>
+        </div>
+      </Card>
+    </Link>
   );
 }
