@@ -95,11 +95,14 @@ function dayOffsetISO(daysAgo: number): string {
 export const REVIEWS: Review[] = Array.from({ length: 64 }).map((_, i) => {
   const seed = reviewSeeds[i % reviewSeeds.length];
   const daysAgo = Math.floor((i * 1.4) % 89);
+  const source = SOURCES[i % SOURCES.length];
+  const id = `r-${i + 1}`;
   return {
-    id: `r-${i + 1}`,
+    id,
     text: seed.text,
     date: dayOffsetISO(daysAgo),
-    source: SOURCES[i % SOURCES.length],
+    source,
+    sourceUrl: `${SOURCE_URL_BASE[source]}${id}`,
     sentiment: seed.sentiment,
     rating: seed.rating ?? 3,
     topics: seed.topics,
