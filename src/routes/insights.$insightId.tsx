@@ -171,7 +171,7 @@ function InsightDetailPage() {
                 <span className="inline-flex items-center gap-1.5">
                   Уверенность системы
                   <InfoHint text="Сколько баллов из 100 даёт каждый фактор. Сумма формирует общий процент уверенности — он показывает, насколько надёжен сигнал в отзывах." />
-                </span> as unknown as string
+                </span>
               }
               subtitle="Из чего складывается процент уверенности AI"
             />
@@ -185,7 +185,7 @@ function InsightDetailPage() {
                 <span className="inline-flex items-center gap-1.5">
                   Ожидаемый эффект
                   <InfoHint text="Прогнозируемое изменение метрики, если гипотеза будет реализована. Оценка системы на основе частоты проблемы, динамики и похожих кейсов." />
-                </span> as unknown as string
+                </span>
               }
               subtitle="Диапазон, в котором AI ожидает результат"
             />
