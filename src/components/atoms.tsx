@@ -123,7 +123,7 @@ export function Delta({ value, suffix = "%", invert = false }: { value: number; 
   );
 }
 
-export function SectionHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+export function SectionHeader({ title, subtitle, action }: { title: React.ReactNode; subtitle?: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>
