@@ -34,8 +34,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
-        <Link to="/" className="flex items-center gap-2.5 px-2 py-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--ai)] to-[var(--ai-foreground)] text-white shadow-[var(--shadow-elev-2)]">
+        <Link to="/" className="motion-nav-link flex items-center gap-2.5 px-2 py-2">
+          <div className="anim-scale-in flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--ai)] to-[var(--ai-foreground)] text-white shadow-[var(--shadow-elev-2)]">
             <Sparkle className="h-4 w-4" />
           </div>
           {!collapsed && (
@@ -58,7 +58,7 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
-                      <Link to={item.to}>
+                      <Link to={item.to} className="motion-nav-link">
                         <Icon className="h-4 w-4" />
                         <span>{item.label}</span>
                         {"badge" in item && item.badge && !collapsed && (
@@ -81,7 +81,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={path === "/settings"} tooltip="Настройки">
-                  <Link to="/settings">
+                  <Link to="/settings" className="motion-nav-link">
                     <Settings className="h-4 w-4" />
                     <span>Настройки</span>
                   </Link>

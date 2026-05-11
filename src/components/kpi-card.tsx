@@ -27,7 +27,7 @@ export function KpiCard({ label, value, hint, delta, invertDelta, deltaSuffix, s
   const sparkColor = tone === "positive" ? "var(--positive)" : tone === "negative" ? "var(--negative)" : tone === "ai" ? "var(--ai)" : "var(--muted-foreground)";
 
   return (
-    <Card className={cn("relative overflow-hidden border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]")}>
+    <Card className={cn("motion-surface relative overflow-hidden border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]")}>
       <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br", toneCls)} />
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">

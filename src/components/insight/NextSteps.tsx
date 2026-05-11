@@ -5,7 +5,7 @@ import type { ValidationPlan } from "@/lib/mock/data";
 export function NextSteps({ steps, plan }: { steps: string[]; plan?: ValidationPlan }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-      <Card className="p-6 md:p-7">
+      <Card className="motion-surface p-6 md:p-7">
         <div className="mb-4 flex items-center gap-2">
           <ListChecks className="h-4 w-4 text-ai" />
           <h3 className="text-sm font-semibold tracking-tight">Что делать дальше</h3>
@@ -15,7 +15,7 @@ export function NextSteps({ steps, plan }: { steps: string[]; plan?: ValidationP
         </p>
         <ol className="stagger space-y-2.5">
           {steps.map((s, idx) => (
-            <li key={s} className="flex items-start gap-3 rounded-lg border bg-muted/30 px-3 py-2.5">
+            <li key={s} className="motion-row flex items-start gap-3 rounded-lg border bg-muted/30 px-3 py-2.5">
               <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ai-soft text-[11px] font-semibold text-ai-foreground">
                 {idx + 1}
               </span>
@@ -27,7 +27,7 @@ export function NextSteps({ steps, plan }: { steps: string[]; plan?: ValidationP
       </Card>
 
       {plan && (
-        <Card className="border-ai/30 bg-ai-soft/20 p-6 md:p-7">
+        <Card className="motion-surface border-ai/30 bg-ai-soft/20 p-6 md:p-7">
           <div className="mb-4 flex items-center gap-2">
             <Beaker className="h-4 w-4 text-ai" />
             <h3 className="text-sm font-semibold tracking-tight">Как проверить гипотезу</h3>

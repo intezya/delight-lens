@@ -49,7 +49,7 @@ export function StickyActions({
 
   return (
     <>
-      <Card className="sticky top-16 space-y-4 p-5 shadow-[var(--shadow-elev-2)]">
+      <Card className="motion-surface sticky top-16 space-y-4 p-5 shadow-[var(--shadow-elev-2)]">
         <div>
           <h3 className="text-sm font-semibold tracking-tight">Что сделать с гипотезой</h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -58,7 +58,7 @@ export function StickyActions({
           </p>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="stagger space-y-1.5">
           {ACTIONS.map((a) => (
             <ActionRow
               key={a.id}

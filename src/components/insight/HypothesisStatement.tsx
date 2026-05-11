@@ -8,7 +8,7 @@ import type { HypothesisStatement } from "@/lib/mock/data";
  */
 export function HypothesisStatementCard({ statement }: { statement: HypothesisStatement }) {
   return (
-    <Card className="anim-rise relative overflow-hidden border-ai/40 bg-gradient-to-br from-ai-soft/50 via-card to-card p-7 shadow-[var(--shadow-elev-2)] md:p-10">
+    <Card className="anim-rise motion-surface relative overflow-hidden border-ai/40 bg-gradient-to-br from-ai-soft/50 via-card to-card p-7 shadow-[var(--shadow-elev-2)] md:p-10">
       <div className="grid-bg pointer-events-none absolute inset-0 opacity-15" />
       <div className="relative">
         <div className="mb-4 flex items-center gap-2">

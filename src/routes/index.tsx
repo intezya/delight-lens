@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
+import { DashboardSkeleton } from "@/components/skeletons/dashboard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,9 @@ import { useState, type ElementType } from "react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
+  pendingComponent: DashboardSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "Dashboard — Voicelens Review Intelligence" },
@@ -50,7 +54,7 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
       ? <>За неделю негатив по доставке вырос на <span className="text-negative">+18%</span>, готовы <span className="text-ai">2 новые гипотезы</span> к проверке.</>
       : <>За 30 дней негатив по доставке вырос на <span className="text-negative">+42%</span>, готовы <span className="text-ai">3 новые гипотезы</span> к работе.</>;
   return (
-    <Card className="relative overflow-hidden border-ai/20 bg-gradient-to-br from-ai-soft/40 via-card to-card p-5 shadow-[var(--shadow-elev-2)]">
+    <Card className="motion-surface relative overflow-hidden border-ai/20 bg-gradient-to-br from-ai-soft/40 via-card to-card p-5 shadow-[var(--shadow-elev-2)]">
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-ai/10 blur-3xl" />
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-2.5">
@@ -92,7 +96,7 @@ function HealthStrip() {
     { label: "Δ Sentiment после внедрений", value: `+${KPI.sentimentAfter}`, suffix: "", delta: 6, tone: "positive" },
   ] as const;
   return (
-    <Card className="grid grid-cols-2 divide-y divide-border md:grid-cols-4 md:divide-x md:divide-y-0">
+    <Card className="motion-surface grid grid-cols-2 divide-y divide-border md:grid-cols-4 md:divide-x md:divide-y-0">
       {items.map((it) => (
         <div key={it.label} className="flex flex-col gap-1 p-4">
           <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{it.label}</span>
@@ -173,7 +177,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
     : { className: "block min-w-0 flex-1 space-y-1" };
 
   return (
-    <div className={cn("group rounded-lg border border-l-[3px] bg-card transition hover:shadow-[var(--shadow-elev-1)]", sevTone)}>
+    <div className={cn("motion-surface group rounded-lg border border-l-[3px] bg-card transition hover:shadow-[var(--shadow-elev-1)]", sevTone)}>
       <div className="flex w-full items-start gap-3 p-3.5 text-left">
         <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", iconCls)} />
         <TitleWrap {...titleProps}>
@@ -198,7 +202,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       </div>
 
       {open && (
-        <div className="flex flex-wrap items-center gap-2 border-t bg-background/40 px-3.5 py-2.5">
+        <div className="motion-expand flex flex-wrap items-center gap-2 border-t bg-background/40 px-3.5 py-2.5">
           {item.insightId && (
             <Button asChild size="sm" variant="default" className="h-7 text-[11px]">
               <Link to="/insights/$insightId" params={{ insightId: item.insightId }}>
@@ -223,13 +227,13 @@ function AttentionCard({ item }: { item: AttentionItem }) {
 
 function AttentionFeed() {
   return (
-    <Card className="p-4">
+    <Card className="motion-surface p-4">
       <SectionHeader
         title="Требует вашего внимания"
         subtitle="Приоритизированные сигналы AI · 5 пунктов"
         action={<Button asChild variant="ghost" size="sm" className="h-7 text-xs"><Link to="/insights">Все гипотезы <ChevronRight className="ml-0.5 h-3 w-3" /></Link></Button>}
       />
-      <div className="space-y-2">
+      <div className="stagger space-y-2">
         {ATTENTION.map(it => <AttentionCard key={it.id} item={it} />)}
       </div>
     </Card>
@@ -241,9 +245,9 @@ function AttentionFeed() {
 
 function TrendChart() {
   return (
-    <Card className="p-4">
+    <Card className="motion-surface p-4">
       <SectionHeader title="Динамика тональности" subtitle="Объём по тональности · 90 дней" />
-      <div className="h-[240px]">
+      <div className="motion-chart h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={TIMESERIES}>
             <defs>
@@ -277,9 +281,9 @@ function DivergingChart() {
     id: t.id,
   }));
   return (
-    <Card className="p-4">
+    <Card className="motion-surface p-4">
       <SectionHeader title="Вклад тем" subtitle="Слева негатив · справа позитив" />
-      <div className="h-[240px]">
+      <div className="motion-chart h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" stackOffset="sign" margin={{ left: 8 }}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" horizontal={false} />
@@ -316,7 +320,7 @@ function DashboardPage() {
         </Button>
       }
     >
-      <div className="space-y-5 p-4 md:p-6">
+      <div className="motion-page space-y-5 p-4 md:p-6">
         <AiBrief period={period} onChange={setPeriod} />
 
         <HealthStrip />
@@ -331,7 +335,7 @@ function DashboardPage() {
           </div>
         </div>
 
-        <Card className="p-4">
+        <Card className="motion-surface p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold tracking-tight">Эффект внедрённых решений вынесен на отдельную вкладку</h3>
@@ -346,4 +350,3 @@ function DashboardPage() {
     </AppShell>
   );
 }
-

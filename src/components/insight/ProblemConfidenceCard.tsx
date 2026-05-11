@@ -17,7 +17,7 @@ export function ProblemConfidenceCard({ confidence }: { confidence: ProblemConfi
   const m = meta[confidence.level];
   const Icon = m.Icon;
   return (
-    <Card className={`anim-rise flex items-start gap-4 border p-5 ${m.tone}`}>
+    <Card className={`anim-rise motion-surface flex items-start gap-4 border p-5 ${m.tone}`}>
       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-background/60 ${m.cls}`}>
         <Icon className="h-5 w-5" />
       </div>

@@ -43,7 +43,7 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
           </div>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="motion-drawer-stack mt-6 space-y-6">
           <blockquote className="relative rounded-xl border-l-2 border-foreground/30 bg-muted/40 p-4 pl-6">
             <Quote className="absolute left-2 top-3 h-3 w-3 text-muted-foreground/50" />
             <p className="text-sm leading-relaxed">{review.text}</p>
@@ -90,7 +90,7 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
               <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Связанные AI-инсайты</h4>
               <div className="space-y-2">
                 {relatedInsights.map((i) => (
-                  <div key={i.id} className="flex items-start gap-2 rounded-lg border border-ai/20 bg-ai-soft/30 p-2.5">
+                  <div key={i.id} className="motion-row flex items-start gap-2 rounded-lg border border-ai/20 bg-ai-soft/30 p-2.5">
                     <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ai" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-xs font-medium">{i.title}</p>
@@ -107,7 +107,7 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
               <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Похожие отзывы</h4>
               <div className="space-y-2">
                 {similar.map((r) => (
-                  <div key={r.id} className="rounded-lg border bg-card p-2.5">
+                  <div key={r.id} className="motion-row rounded-lg border bg-card p-2.5">
                     <div className="mb-1 flex items-center gap-1.5">
                       <SentimentPill sentiment={r.sentiment} />
                       <SourceBadge source={r.source} />

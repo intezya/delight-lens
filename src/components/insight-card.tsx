@@ -36,7 +36,7 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
       params={{ insightId: insight.id }}
       className="group block focus:outline-none focus:ring-2 focus:ring-ring rounded-xl"
     >
-      <Card className="lift relative flex h-full flex-col gap-3 border bg-card p-4 transition group-hover:border-ai/40 group-hover:shadow-[var(--shadow-elev-2)]">
+      <Card className="lift motion-surface relative flex h-full flex-col gap-3 border bg-card p-4 transition group-hover:border-ai/40 group-hover:shadow-[var(--shadow-elev-2)]">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
             <StatusBadge status={insight.status} />
@@ -104,4 +104,3 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
     </Link>
   );
 }
-

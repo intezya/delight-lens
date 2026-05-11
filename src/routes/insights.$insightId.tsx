@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { InsightDetailSkeleton } from "@/components/skeletons/insight-detail";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +45,9 @@ import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
 export const Route = createFileRoute("/insights/$insightId")({
+  pendingComponent: InsightDetailSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: ({ params }) => ({
     meta: [
       { title: `Гипотеза ${params.insightId} — Voicelens` },
@@ -100,7 +104,7 @@ function InsightDetailPage() {
         </Button>
       }
     >
-      <div className="mx-auto grid max-w-[1280px] gap-8 p-4 md:p-8 lg:grid-cols-[1fr_320px] lg:p-10">
+      <div className="motion-page mx-auto grid max-w-[1280px] gap-8 p-4 md:p-8 lg:grid-cols-[1fr_320px] lg:p-10">
         {/* === MAIN COLUMN === */}
         <div className="min-w-0 space-y-8">
           {/* Breadcrumbs */}
@@ -200,13 +204,13 @@ function InsightDetailPage() {
               </div>
 
               {activeAlt.nextActions.length > 0 && (
-                <Card className="p-5 md:p-6">
+                <Card className="motion-surface p-5 md:p-6">
                   <h3 className="mb-3 text-sm font-semibold tracking-tight">
                     Следующие исследовательские шаги
                   </h3>
                   <ol className="stagger space-y-2">
                     {activeAlt.nextActions.map((s, idx) => (
-                      <li key={s} className="flex items-start gap-3 rounded-md border bg-muted/30 px-3 py-2.5">
+                      <li key={s} className="motion-row flex items-start gap-3 rounded-md border bg-muted/30 px-3 py-2.5">
                         <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ai-soft text-[11px] font-semibold text-ai-foreground">
                           {idx + 1}
                         </span>

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { ReviewsSkeleton } from "@/components/skeletons/reviews";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,9 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
 export const Route = createFileRoute("/reviews")({
+  pendingComponent: ReviewsSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "Reviews — Voicelens" },
@@ -50,28 +54,28 @@ function ReviewsPage() {
 
   return (
     <AppShell title="Отзывы" subtitle={`${filtered.length} из ${REVIEWS.length} отзывов · фильтры активны`}>
-      <div className="space-y-4 p-4 md:p-6">
+      <div className="motion-page space-y-4 p-4 md:p-6">
         {/* Sentiment tabs counter */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <button onClick={() => setSentiment("all")} className={`rounded-xl border p-3 text-left transition ${sentiment === "all" ? "border-foreground/40 bg-card shadow-[var(--shadow-elev-1)]" : "border-border bg-card hover:bg-muted/40"}`}>
+        <div className="stagger grid grid-cols-2 gap-3 md:grid-cols-4">
+          <button onClick={() => setSentiment("all")} className={`motion-surface press rounded-xl border p-3 text-left transition ${sentiment === "all" ? "border-foreground/40 bg-card shadow-[var(--shadow-elev-1)]" : "border-border bg-card hover:bg-muted/40"}`}>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Все отзывы</p>
             <p className="num mt-1 display text-2xl font-semibold">{counts.all}</p>
           </button>
-          <button onClick={() => setSentiment("positive")} className={`rounded-xl border p-3 text-left transition ${sentiment === "positive" ? "border-positive/50 bg-positive-soft/40" : "border-border bg-card hover:bg-positive-soft/30"}`}>
+          <button onClick={() => setSentiment("positive")} className={`motion-surface press rounded-xl border p-3 text-left transition ${sentiment === "positive" ? "border-positive/50 bg-positive-soft/40" : "border-border bg-card hover:bg-positive-soft/30"}`}>
             <p className="text-[10px] uppercase tracking-wider text-positive-foreground">Позитив</p>
             <p className="num mt-1 display text-2xl font-semibold text-positive-foreground">{counts.pos}</p>
           </button>
-          <button onClick={() => setSentiment("mixed")} className={`rounded-xl border p-3 text-left transition ${sentiment === "mixed" ? "border-mixed/50 bg-mixed-soft/40" : "border-border bg-card hover:bg-mixed-soft/30"}`}>
+          <button onClick={() => setSentiment("mixed")} className={`motion-surface press rounded-xl border p-3 text-left transition ${sentiment === "mixed" ? "border-mixed/50 bg-mixed-soft/40" : "border-border bg-card hover:bg-mixed-soft/30"}`}>
             <p className="text-[10px] uppercase tracking-wider text-mixed-foreground">Смешанный</p>
             <p className="num mt-1 display text-2xl font-semibold text-mixed-foreground">{counts.mix}</p>
           </button>
-          <button onClick={() => setSentiment("negative")} className={`rounded-xl border p-3 text-left transition ${sentiment === "negative" ? "border-negative/50 bg-negative-soft/40" : "border-border bg-card hover:bg-negative-soft/30"}`}>
+          <button onClick={() => setSentiment("negative")} className={`motion-surface press rounded-xl border p-3 text-left transition ${sentiment === "negative" ? "border-negative/50 bg-negative-soft/40" : "border-border bg-card hover:bg-negative-soft/30"}`}>
             <p className="text-[10px] uppercase tracking-wider text-negative-foreground">Негатив</p>
             <p className="num mt-1 display text-2xl font-semibold text-negative-foreground">{counts.neg}</p>
           </button>
         </div>
 
-        <Card className="overflow-hidden">
+        <Card className="motion-surface overflow-hidden">
           <div className="flex flex-wrap items-center gap-2 border-b p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -124,7 +128,7 @@ function ReviewsPage() {
                 </thead>
                 <tbody>
                   {filtered.map(r => (
-                    <tr key={r.id} onClick={() => openReview(r)} className="cursor-pointer border-b transition hover:bg-muted/30">
+                    <tr key={r.id} onClick={() => openReview(r)} className="motion-row cursor-pointer border-b transition hover:bg-muted/30">
                       <td className="max-w-[420px] px-4 py-3">
                         <div className="flex items-center gap-2">
                           {r.repeatCount > 5 && (
@@ -156,9 +160,9 @@ function ReviewsPage() {
               </table>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="stagger grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map(r => (
-                <button key={r.id} onClick={() => openReview(r)} className="group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-card p-4 text-left shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]">
+                <button key={r.id} onClick={() => openReview(r)} className="motion-surface press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-card p-4 text-left shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]">
                   <span className={`absolute inset-y-0 left-0 w-1 ${r.sentiment === "positive" ? "bg-positive" : r.sentiment === "negative" ? "bg-negative" : "bg-mixed"}`} />
                   <div className="flex flex-wrap items-center gap-1.5">
                     <SentimentPill sentiment={r.sentiment} />

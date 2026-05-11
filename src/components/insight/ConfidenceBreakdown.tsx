@@ -7,7 +7,7 @@ const COLORS = ["bg-ai", "bg-positive", "bg-mixed", "bg-negative", "bg-foregroun
 export function ConfidenceBreakdown({ value, breakdown }: { value: number; breakdown: CB }) {
   const total = breakdown.factors.reduce((s, f) => s + f.score, 0) || 1;
   return (
-    <Card className="p-6 md:p-7">
+    <Card className="motion-surface p-6 md:p-7">
       <div className="flex items-start gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ai-soft text-ai-foreground">
           <Sparkles className="h-5 w-5" />
@@ -37,9 +37,9 @@ export function ConfidenceBreakdown({ value, breakdown }: { value: number; break
         ))}
       </div>
 
-      <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+      <ul className="stagger mt-5 grid gap-3 sm:grid-cols-2">
         {breakdown.factors.map((f, i) => (
-          <li key={f.label} className="flex items-start gap-2.5 rounded-lg border bg-muted/30 p-3">
+          <li key={f.label} className="motion-row flex items-start gap-2.5 rounded-lg border bg-muted/30 p-3">
             <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${COLORS[i % COLORS.length]}`} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">

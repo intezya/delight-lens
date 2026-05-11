@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
+import { TopicsSkeleton } from "@/components/skeletons/topics";
 import { Card } from "@/components/ui/card";
 import { TOPIC_DISTRIBUTION, INSIGHTS, getSubtopicsByTopic } from "@/lib/mock/data";
 import { TopicChip, StatusBadge, AiBadge } from "@/components/atoms";
@@ -7,6 +8,9 @@ import { Area, AreaChart, ResponsiveContainer } from "recharts";
 import { ArrowRight, AlertOctagon, Lightbulb, Sparkle, Quote, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/topics")({
+  pendingComponent: TopicsSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "Topics — Voicelens" },
@@ -35,7 +39,7 @@ function TopicsPage() {
 
   return (
     <AppShell title="Темы" subtitle={`${TOPIC_DISTRIBUTION.length} тем за период · автоматическая классификация AI`}>
-      <div className="space-y-8 p-4 md:p-6 max-w-[1400px] mx-auto">
+      <div className="motion-page space-y-8 p-4 md:p-6 max-w-[1400px] mx-auto">
         {(["risk", "opportunity", "strength"] as const).map(kind => {
           const meta = sectionMeta[kind];
           const Icon = meta.icon;
@@ -49,7 +53,7 @@ function TopicsPage() {
                   <p className="mt-0.5 text-xs text-muted-foreground">{meta.subtitle} · {grouped[kind].length} тем</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="stagger grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {grouped[kind].map((t, idx) => {
                   const total = t.total;
                   const negShare = total ? (t.negative / total) * 100 : 0;
@@ -60,7 +64,7 @@ function TopicsPage() {
                   return (
                     <Card
                       key={t.id}
-                      className="group flex flex-col gap-4 p-5 shadow-[var(--shadow-elev-1)] transition hover:border-foreground/30 hover:shadow-[var(--shadow-elev-2)]"
+                      className="motion-surface group flex flex-col gap-4 p-5 shadow-[var(--shadow-elev-1)] transition hover:border-foreground/30 hover:shadow-[var(--shadow-elev-2)]"
                     >
                       <Link to="/topics/$topicId" params={{ topicId: t.id }} className="flex flex-col gap-3">
                         <div className="flex items-start justify-between gap-2">
@@ -123,7 +127,7 @@ function TopicsPage() {
                                 key={ins.id}
                                 to="/insights/$insightId"
                                 params={{ insightId: ins.id }}
-                                className="flex items-center gap-2 rounded-md border bg-muted/20 px-2.5 py-1.5 text-xs transition hover:border-ai/40 hover:bg-ai-soft/30"
+                            className="motion-row flex items-center gap-2 rounded-md border bg-muted/20 px-2.5 py-1.5 text-xs transition hover:border-ai/40 hover:bg-ai-soft/30"
                               >
                                 <Sparkles className="h-3 w-3 shrink-0 text-ai" />
                                 <span className="line-clamp-1 flex-1">{ins.title}</span>
