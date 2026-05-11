@@ -299,80 +299,12 @@ function DivergingChart() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Impact section
-
-function ImpactRow({ c }: { c: typeof IMPACT_CASES[number] }) {
-  const insight = getInsight(c.insightId);
-  const dSent = c.after.sentiment - c.before.sentiment;
-  const dRating = +(c.after.rating - c.before.rating).toFixed(1);
-  const dCompl = Math.round(((c.after.complaints - c.before.complaints) / c.before.complaints) * 100);
-  const trend = [c.before, ...Array.from({ length: 5 }).map((_, i) => ({
-    sentiment: c.before.sentiment + ((c.after.sentiment - c.before.sentiment) * (i + 1)) / 5,
-  })), c.after].map((p, i) => ({ i, v: p.sentiment }));
-
-  return (
-    <div className="flex flex-col gap-3 rounded-lg border bg-card p-3.5 md:flex-row md:items-center md:gap-5">
-      <div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-positive" />
-        <span className="rounded-md bg-positive-soft px-1.5 py-0.5 text-[10px] font-semibold text-positive-foreground">Implemented</span>
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{c.action}</p>
-        {insight && (
-          <Link to="/insights/$insightId" params={{ insightId: insight.id }} className="text-[11px] text-muted-foreground hover:text-foreground">
-            из гипотезы «{insight.title}» →
-          </Link>
-        )}
-      </div>
-      <div className="flex items-center gap-5 md:gap-6">
-        <Metric label="Sentiment" value={`${c.after.sentiment > 0 ? "+" : ""}${c.after.sentiment}`} delta={dSent} />
-        <Metric label="Рейтинг" value={c.after.rating.toFixed(1)} delta={Math.round(dRating * 100)} suffix="" />
-        <Metric label="Жалобы" value={c.after.complaints.toString()} delta={dCompl} invert />
-      </div>
-      <div className="h-10 w-24 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={trend}>
-            <Line dataKey="v" stroke="var(--positive)" strokeWidth={1.8} dot={false} type="monotone" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function Metric({ label, value, delta, suffix = "%", invert }: { label: string; value: string; delta: number; suffix?: string; invert?: boolean }) {
-  return (
-    <div className="flex flex-col items-end gap-0.5">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
-      <div className="flex items-baseline gap-1.5">
-        <span className="num text-sm font-semibold tabular-nums">{value}</span>
-        <Delta value={delta} suffix={suffix} invert={invert} />
-      </div>
-    </div>
-  );
-}
-
-function ImpactBlock() {
-  return (
-    <Card className="p-4">
-      <SectionHeader
-        title="Эффект внедрённых решений"
-        subtitle="Метрики до и после · последние 30 дней"
-        action={<Button asChild variant="ghost" size="sm" className="h-7 text-xs"><Link to="/impact">Подробно <ChevronRight className="ml-0.5 h-3 w-3" /></Link></Button>}
-      />
-      <div className="space-y-2">
-        {IMPACT_CASES.map(c => <ImpactRow key={c.id} c={c} />)}
-      </div>
-    </Card>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
 // Page
 
 function DashboardPage() {
   const newCount = INSIGHTS.filter(i => i.status === "new").length;
   const repeatCount = REVIEWS.filter(r => r.repeatCount > 5).length;
+  const [period, setPeriod] = useState<Period>("24h");
 
   return (
     <AppShell
@@ -385,7 +317,7 @@ function DashboardPage() {
       }
     >
       <div className="space-y-5 p-4 md:p-6">
-        <AiBrief />
+        <AiBrief period={period} onChange={setPeriod} />
 
         <HealthStrip />
 
@@ -399,8 +331,19 @@ function DashboardPage() {
           </div>
         </div>
 
-        <ImpactBlock />
+        <Card className="p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold tracking-tight">Эффект внедрённых решений вынесен на отдельную вкладку</h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">Главный дашборд показывает только то, что требует внимания {periodLabel(period)}.</p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+              <Link to="/impact">Открыть «Эффект» <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            </Button>
+          </div>
+        </Card>
       </div>
     </AppShell>
   );
 }
+
