@@ -68,12 +68,18 @@
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   --shadow-elev-1: 0 1px 2px 0 oklch(0.2 0.04 260 / 0.04), 0 1px 3px 0 oklch(0.2 0.04 260 / 0.06);
-  --shadow-elev-2: 0 4px 12px -2px oklch(0.2 0.04 260 / 0.08), 0 2px 4px -1px oklch(0.2 0.04 260 / 0.04);
-  --shadow-elev-3: 0 12px 32px -8px oklch(0.2 0.04 260 / 0.12), 0 4px 8px -2px oklch(0.2 0.04 260 / 0.06);
+  --shadow-elev-2:
+    0 4px 12px -2px oklch(0.2 0.04 260 / 0.08), 0 2px 4px -1px oklch(0.2 0.04 260 / 0.04);
+  --shadow-elev-3:
+    0 12px 32px -8px oklch(0.2 0.04 260 / 0.12), 0 4px 8px -2px oklch(0.2 0.04 260 / 0.06);
 }
 
 :root {
   --radius: 0.875rem;
+  --motion-fast: 160ms;
+  --motion-base: 240ms;
+  --motion-layout: 300ms;
+  --ease-productive: cubic-bezier(0.22, 1, 0.36, 1);
 
   --background: oklch(0.992 0.002 260);
   --foreground: oklch(0.18 0.03 260);
@@ -114,7 +120,7 @@
 
   --chart-1: oklch(0.32 0.04 260); /* primary slate */
   --chart-2: oklch(0.58 0.11 165); /* positive */
-  --chart-3: oklch(0.58 0.16 25);  /* negative */
+  --chart-3: oklch(0.58 0.16 25); /* negative */
   --chart-4: oklch(0.62 0.03 258); /* neutral steel */
   --chart-5: oklch(0.78 0.02 258); /* light slate */
 
@@ -183,7 +189,8 @@
     border-color: var(--color-border);
   }
 
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -192,7 +199,8 @@
     text-rendering: optimizeLegibility;
   }
 
-  .font-mono, .tabular {
+  .font-mono,
+  .tabular {
     font-variant-numeric: tabular-nums;
   }
 }
@@ -208,26 +216,60 @@
   }
   .grid-bg {
     background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--border) 60%, transparent) 1px, transparent 1px);
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--border) 60%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--border) 60%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 24px 24px;
   }
 
   /* Motion primitives — subtle, fast, B2B-appropriate */
-  .anim-fade-in { animation: lv-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .anim-rise { animation: lv-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .anim-rise-sm { animation: lv-rise-sm 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .anim-scale-in { animation: lv-scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .anim-fade-in {
+    animation: lv-fade-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-rise {
+    animation: lv-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-rise-sm {
+    animation: lv-rise-sm 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-scale-in {
+    animation: lv-scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 
-  .stagger > * { animation: lv-rise-sm 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .stagger > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger > *:nth-child(2) { animation-delay: 60ms; }
-  .stagger > *:nth-child(3) { animation-delay: 120ms; }
-  .stagger > *:nth-child(4) { animation-delay: 180ms; }
-  .stagger > *:nth-child(5) { animation-delay: 240ms; }
-  .stagger > *:nth-child(6) { animation-delay: 300ms; }
-  .stagger > *:nth-child(7) { animation-delay: 360ms; }
-  .stagger > *:nth-child(8) { animation-delay: 420ms; }
+  .stagger > * {
+    animation: lv-rise-sm 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 360ms;
+  }
+  .stagger > *:nth-child(8) {
+    animation-delay: 420ms;
+  }
 
   .lift {
     transition:
@@ -240,30 +282,227 @@
     box-shadow: var(--shadow-elev-2);
   }
 
-  .press { transition: transform 0.12s ease; }
-  .press:active { transform: scale(0.97); }
+  .sidebar-gap-motion,
+  .sidebar-panel-motion,
+  .sidebar-inset-motion {
+    transition-duration: var(--motion-layout);
+    transition-timing-function: var(--ease-productive);
+  }
+
+  .sidebar-panel-motion {
+    will-change: width, left, right;
+  }
+
+  .sidebar-inner-motion {
+    transition:
+      background-color var(--motion-fast) ease,
+      border-color var(--motion-fast) ease,
+      box-shadow var(--motion-base) var(--ease-productive);
+  }
+
+  .sidebar-trigger-motion .sidebar-trigger-icon {
+    transition: transform var(--motion-base) var(--ease-productive);
+  }
+
+  .sidebar-trigger-motion[data-state="collapsed"] .sidebar-trigger-icon {
+    transform: rotate(180deg);
+  }
+
+  .sidebar-collapse-gap {
+    transition: gap var(--motion-base) var(--ease-productive);
+  }
+
+  .sidebar-menu-button-motion {
+    transition:
+      width var(--motion-layout) var(--ease-productive),
+      height var(--motion-layout) var(--ease-productive),
+      padding var(--motion-layout) var(--ease-productive),
+      gap var(--motion-base) var(--ease-productive),
+      background-color var(--motion-fast) ease,
+      color var(--motion-fast) ease;
+  }
+
+  .sidebar-copy-motion {
+    max-width: 13rem;
+    opacity: 1;
+    overflow: hidden;
+    transform: translateX(0);
+    white-space: nowrap;
+    transition:
+      max-width var(--motion-layout) var(--ease-productive),
+      opacity 180ms ease,
+      transform var(--motion-base) var(--ease-productive);
+  }
+
+  .sidebar-menu-badge-motion {
+    max-width: 3rem;
+    transition:
+      max-width 260ms var(--ease-productive),
+      margin-left 260ms var(--ease-productive),
+      opacity var(--motion-fast) ease,
+      padding 260ms var(--ease-productive),
+      transform var(--motion-base) var(--ease-productive);
+  }
+
+  [data-state="collapsed"] .sidebar-collapse-gap,
+  [data-state="collapsed"] .sidebar-menu-button-motion {
+    gap: 0;
+    justify-content: center;
+  }
+
+  [data-state="collapsed"] .sidebar-copy-motion {
+    max-width: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-6px);
+  }
+
+  [data-state="collapsed"] .sidebar-menu-badge-motion {
+    margin-left: 0;
+    max-width: 0;
+    opacity: 0;
+    padding-left: 0;
+    padding-right: 0;
+    transform: translateX(-4px) scale(0.92);
+  }
+
+  .guide-dialog-overlay[data-state="open"] {
+    animation: guide-overlay-in 220ms ease-out both;
+    backdrop-filter: blur(8px);
+  }
+
+  .guide-dialog-overlay[data-state="closed"] {
+    animation: guide-overlay-out 160ms ease-in both;
+    backdrop-filter: blur(0);
+  }
+
+  .guide-dialog-content[data-state="open"] {
+    animation: guide-float-in 340ms var(--ease-productive) both;
+  }
+
+  .guide-dialog-content[data-state="closed"] {
+    animation: guide-float-out 220ms ease-in both;
+  }
+
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > * {
+    animation: guide-step-in 280ms var(--ease-productive) backwards;
+  }
+
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(1) {
+    animation-delay: 70ms;
+  }
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(2) {
+    animation-delay: 110ms;
+  }
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(3) {
+    animation-delay: 150ms;
+  }
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(4) {
+    animation-delay: 190ms;
+  }
+  .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(5) {
+    animation-delay: 230ms;
+  }
+
+  .press {
+    transition: transform 0.12s ease;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
 }
 
 @keyframes lv-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes lv-rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes lv-rise-sm {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes lv-scale-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes guide-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes guide-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes guide-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes guide-float-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.985);
+  }
+}
+@keyframes guide-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Smooth interactive transitions on common controls */
 @layer base {
-  a, button, [role="button"], [role="tab"] {
+  a,
+  button,
+  [role="button"],
+  [role="tab"] {
     transition:
       color 0.15s ease,
       background-color 0.18s ease,
@@ -273,7 +512,28 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-fade-in, .anim-rise, .anim-rise-sm, .anim-scale-in,
-  .stagger > * { animation: none !important; }
-  .lift:hover { transform: none; }
+  .anim-fade-in,
+  .anim-rise,
+  .anim-rise-sm,
+  .anim-scale-in,
+  .stagger > *,
+  .guide-dialog-overlay,
+  .guide-dialog-content,
+  .guide-dialog-steps > * {
+    animation: none !important;
+  }
+  .sidebar-gap-motion,
+  .sidebar-panel-motion,
+  .sidebar-inset-motion,
+  .sidebar-inner-motion,
+  .sidebar-trigger-icon,
+  .sidebar-collapse-gap,
+  .sidebar-menu-button-motion,
+  .sidebar-copy-motion,
+  .sidebar-menu-badge-motion {
+    transition: none !important;
+  }
+  .lift:hover {
+    transform: none;
+  }
 }
