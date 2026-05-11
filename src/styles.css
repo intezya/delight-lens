@@ -78,8 +78,10 @@
   --radius: 0.875rem;
   --motion-fast: 160ms;
   --motion-base: 240ms;
+  --motion-page: 380ms;
   --motion-layout: 300ms;
   --ease-productive: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-press: cubic-bezier(0.2, 0, 0, 1);
 
   --background: oklch(0.992 0.002 260);
   --foreground: oklch(0.18 0.03 260);
@@ -242,6 +244,34 @@
   .anim-scale-in {
     animation: lv-scale-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
+  .anim-drop {
+    animation: lv-drop var(--motion-page) var(--ease-productive) both;
+  }
+
+  .motion-page {
+    animation: lv-page-in var(--motion-page) var(--ease-productive) both;
+  }
+  .motion-page > * {
+    animation: lv-rise-sm 0.34s var(--ease-productive) backwards;
+  }
+  .motion-page > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .motion-page > *:nth-child(2) {
+    animation-delay: 45ms;
+  }
+  .motion-page > *:nth-child(3) {
+    animation-delay: 90ms;
+  }
+  .motion-page > *:nth-child(4) {
+    animation-delay: 135ms;
+  }
+  .motion-page > *:nth-child(5) {
+    animation-delay: 180ms;
+  }
+  .motion-page > *:nth-child(6) {
+    animation-delay: 225ms;
+  }
 
   .stagger > * {
     animation: lv-rise-sm 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -280,6 +310,74 @@
   .lift:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-elev-2);
+  }
+
+  .motion-surface {
+    will-change: transform;
+    transition:
+      transform var(--motion-base) var(--ease-productive),
+      box-shadow var(--motion-base) var(--ease-productive),
+      border-color var(--motion-fast) ease,
+      background-color var(--motion-fast) ease;
+  }
+  .motion-surface:hover,
+  .motion-surface:focus-within {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elev-2);
+  }
+  .motion-surface:active {
+    transform: translateY(0) scale(0.99);
+    transition-duration: 90ms;
+  }
+
+  .motion-row {
+    transition:
+      transform var(--motion-fast) var(--ease-productive),
+      background-color var(--motion-fast) ease;
+  }
+  .motion-row:hover {
+    transform: translateX(2px);
+  }
+
+  .motion-expand {
+    animation: lv-expand-fade 0.24s var(--ease-productive) backwards;
+    transform-origin: top;
+  }
+
+  .motion-chart {
+    animation: lv-chart-in 0.46s var(--ease-productive) backwards;
+    transform-origin: bottom;
+  }
+
+  .motion-drawer-stack > * {
+    animation: lv-rise-sm 0.32s var(--ease-productive) backwards;
+  }
+  .motion-drawer-stack > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .motion-drawer-stack > *:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .motion-drawer-stack > *:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .motion-drawer-stack > *:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .motion-drawer-stack > *:nth-child(5) {
+    animation-delay: 160ms;
+  }
+
+  .motion-nav-link svg,
+  .motion-chip {
+    transition: transform var(--motion-fast) var(--ease-productive);
+  }
+  .motion-nav-link:hover svg,
+  .motion-nav-link:focus-visible svg {
+    transform: translateX(1px) scale(1.06);
+  }
+  .motion-chip:hover {
+    transform: translateY(-1px);
   }
 
   .sidebar-gap-motion,
@@ -496,6 +594,46 @@
     transform: translateY(0);
   }
 }
+@keyframes lv-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes lv-page-in {
+  from {
+    opacity: 0.85;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes lv-expand-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+@keyframes lv-chart-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scaleY(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
 
 /* Smooth interactive transitions on common controls */
 @layer base {
@@ -516,6 +654,12 @@
   .anim-rise,
   .anim-rise-sm,
   .anim-scale-in,
+  .anim-drop,
+  .motion-page,
+  .motion-page > *,
+  .motion-expand,
+  .motion-chart,
+  .motion-drawer-stack > *,
   .stagger > *,
   .guide-dialog-overlay,
   .guide-dialog-content,
@@ -535,5 +679,21 @@
   }
   .lift:hover {
     transform: none;
+  }
+  .motion-surface:hover,
+  .motion-surface:focus-within,
+  .motion-row:hover,
+  .motion-nav-link:hover svg,
+  .motion-nav-link:focus-visible svg,
+  .motion-chip:hover {
+    transform: none;
+  }
+  .lift,
+  .press,
+  .motion-surface,
+  .motion-row,
+  .motion-nav-link svg,
+  .motion-chip {
+    transition: none !important;
   }
 }

@@ -14,7 +14,7 @@ export function OwnerTeamCard({
   taskDescription: string;
 }) {
   return (
-    <Card className="p-6 md:p-7">
+    <Card className="motion-surface p-6 md:p-7">
       <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-start">
         <div className="space-y-4">
           <div>

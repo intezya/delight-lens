@@ -18,7 +18,7 @@ export function AlternativeHypotheses({
   onSelect: (id: string) => void;
 }) {
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="motion-surface p-5 md:p-6">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <GitBranch className="h-4 w-4 text-ai" />
@@ -35,7 +35,7 @@ export function AlternativeHypotheses({
         Каждая требует разных проверок и данных.
       </p>
 
-      <div className="grid gap-2.5 md:grid-cols-2">
+      <div className="stagger grid gap-2.5 md:grid-cols-2">
         {alternatives.map((a, idx) => {
           const active = a.id === activeId;
           return (
@@ -44,7 +44,7 @@ export function AlternativeHypotheses({
               type="button"
               onClick={() => onSelect(a.id)}
               className={cn(
-                "lift group flex flex-col gap-2 rounded-lg border p-3.5 text-left transition",
+                "lift motion-surface press group flex flex-col gap-2 rounded-lg border p-3.5 text-left transition",
                 active
                   ? "border-ai bg-ai-soft/40 shadow-[var(--shadow-elev-1)]"
                   : "border-border bg-card hover:border-ai/40 hover:bg-ai-soft/15",
@@ -67,7 +67,7 @@ export function AlternativeHypotheses({
               <div className="mt-1 flex items-center gap-2">
                 <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-muted">
                   <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-ai/70"
+                    className="absolute inset-y-0 left-0 rounded-full bg-ai/70 transition-[width] duration-500"
                     style={{ width: `${a.solutionConfidence}%` }}
                   />
                 </div>

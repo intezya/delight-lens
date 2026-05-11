@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
+import { ImpactSkeleton } from "@/components/skeletons/impact";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { IMPACT_CASES, INSIGHTS, getTopic, getInsight, TIMESERIES, SOURCE_RATINGS } from "@/lib/mock/data";
@@ -11,6 +12,9 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
 export const Route = createFileRoute("/impact")({
+  pendingComponent: ImpactSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "Impact — Voicelens" },
@@ -38,7 +42,7 @@ function ImpactPage() {
 
   return (
     <AppShell title="Эффект изменений" subtitle="Как внедрённые решения повлияли на метрики">
-      <div className="space-y-5 p-4 md:p-6">
+      <div className="motion-page space-y-5 p-4 md:p-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <KpiCard label="Δ Sentiment overall" value={`+${totalDelta}`} delta={12} hint="Сумма изменений по всем гипотезам" tone="positive" />
           <KpiCard label="Внедрено гипотез" value={IMPACT_CASES.length} delta={50} hint="За последние 90 дней" tone="ai" />
@@ -47,7 +51,7 @@ function ImpactPage() {
         </div>
 
         {/* Featured before/after */}
-        <Card className="p-5">
+        <Card className="motion-surface p-5">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="mb-1 flex items-center gap-2"><AiBadge /><TopicChip name={getTopic(featured.topicId)?.name ?? ""} kind={getTopic(featured.topicId)?.kind} /></div>
@@ -59,7 +63,7 @@ function ImpactPage() {
               <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Жалоб</p><p className="num display text-xl font-semibold">{featured.before.complaints} <span className="text-muted-foreground/50">→</span> <span className="text-positive">{featured.after.complaints}</span></p></div>
             </div>
           </div>
-          <div className="h-[260px]">
+          <div className="motion-chart h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={beforeAfter}>
                 <defs>
@@ -84,7 +88,7 @@ function ImpactPage() {
         </Card>
 
         {/* Cases table */}
-        <Card className="overflow-hidden">
+        <Card className="motion-surface overflow-hidden">
           <div className="border-b p-3"><SectionHeader title="Все внедрения" subtitle="Гипотеза → действие → метрики до/после" /></div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -105,7 +109,7 @@ function ImpactPage() {
                   const topic = getTopic(c.topicId);
                   const dSent = c.after.sentiment - c.before.sentiment;
                   return (
-                    <tr key={c.id} className="border-b">
+                    <tr key={c.id} className="motion-row border-b">
                       <td className="px-4 py-3 font-medium"><div className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-positive" /><span className="line-clamp-1">{ins?.title}</span></div></td>
                       <td className="px-2 py-3 text-muted-foreground">{c.action}</td>
                       <td className="px-2 py-3">{topic && <TopicChip name={topic.name} kind={topic.kind} />}</td>
@@ -122,9 +126,9 @@ function ImpactPage() {
         </Card>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card className="p-4">
+          <Card className="motion-surface p-4">
             <SectionHeader title="Снижение повторяемости" subtitle="По темам с принятыми гипотезами" />
-            <div className="h-[220px]">
+            <div className="motion-chart h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={IMPACT_CASES.map(c => ({ name: getTopic(c.topicId)?.name?.slice(0, 16) ?? "", before: c.before.complaints, after: c.after.complaints }))}>
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
@@ -138,9 +142,9 @@ function ImpactPage() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="motion-surface p-4">
             <SectionHeader title="Изменение средней оценки" subtitle="Маркеры — деплои" />
-            <div className="h-[220px]">
+            <div className="motion-chart h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={SOURCE_RATINGS}>
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
@@ -159,7 +163,7 @@ function ImpactPage() {
           </Card>
         </div>
 
-        <Card className="p-4">
+        <Card className="motion-surface p-4">
           <SectionHeader title="Таймлайн внедрений" subtitle="Деплои на графике общего sentiment" />
           <div className="space-y-3">
             {IMPACT_CASES.map((c, i) => (

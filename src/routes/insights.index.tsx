@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { InsightsSkeleton } from "@/components/skeletons/insights";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { INSIGHTS, type InsightStatus } from "@/lib/mock/data";
@@ -9,6 +10,9 @@ import { LayoutGrid, Columns3 } from "lucide-react";
 import { AiBadge } from "@/components/atoms";
 
 export const Route = createFileRoute("/insights/")({
+  pendingComponent: InsightsSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "AI Insights — Voicelens" },
@@ -52,8 +56,8 @@ function InsightsPage() {
       title="Гипотезы AI"
       subtitle={`${INSIGHTS.length} активных гипотез · сгенерированы AI на основе ваших отзывов`}
     >
-      <div className="space-y-4 p-4 md:p-6">
-        <Card className="relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/60 via-card to-card p-5">
+      <div className="motion-page space-y-4 p-4 md:p-6">
+        <Card className="motion-surface relative overflow-hidden border-ai/30 bg-gradient-to-br from-ai-soft/60 via-card to-card p-5">
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-20" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
@@ -96,14 +100,14 @@ function InsightsPage() {
         </div>
 
         {layout === "grid" ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="stagger grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map(i => <InsightCard key={i.id} insight={i} />)}
           </div>
         ) : (
           <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
             <div className="flex gap-4 min-w-max">
               {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(col => (
-                <div key={col} className="flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3">
+                <div key={col} className="motion-surface flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3">
                   <div className="flex items-center justify-between sticky top-0">
                     <h4 className="text-xs font-semibold uppercase tracking-wider">{KANBAN_LABELS[col]}</h4>
                     <span className="num rounded bg-card px-1.5 text-[10px] font-medium">{counts[col]}</span>

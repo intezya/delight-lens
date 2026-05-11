@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
+import { SettingsSkeleton } from "@/components/skeletons/settings";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,9 @@ import { SectionHeader } from "@/components/atoms";
 import { CheckCircle2, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/settings")({
+  pendingComponent: SettingsSkeleton,
+  pendingMs: 120,
+  pendingMinMs: 180,
   head: () => ({
     meta: [
       { title: "Settings — Voicelens" },
@@ -39,12 +43,12 @@ const TEAM = [
 function SettingsPage() {
   return (
     <AppShell title="Настройки" subtitle="Источники, команда, AI и уведомления">
-      <div className="grid grid-cols-1 gap-4 p-4 md:p-6 lg:grid-cols-3">
-        <Card className="p-5 lg:col-span-2">
+      <div className="motion-page grid grid-cols-1 gap-4 p-4 md:p-6 lg:grid-cols-3">
+        <Card className="motion-surface p-5 lg:col-span-2">
           <SectionHeader title="Источники отзывов" subtitle="Подключённые площадки парсинга" action={<Button size="sm" className="h-8 text-xs"><Plus className="mr-1 h-3.5 w-3.5" /> Добавить</Button>} />
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {SOURCES.map(s => (
-              <div key={s.name} className="flex items-center justify-between rounded-lg border bg-card p-3">
+              <div key={s.name} className="motion-row flex items-center justify-between rounded-lg border bg-card p-3">
                 <div>
                   <p className="text-sm font-medium">{s.name}</p>
                   <p className="num text-[11px] text-muted-foreground">{s.count}</p>
@@ -59,7 +63,7 @@ function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="motion-surface p-5">
           <SectionHeader title="AI-настройки" subtitle="Параметры генерации гипотез" />
           <div className="space-y-5">
             <div>
@@ -78,7 +82,7 @@ function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="p-5 lg:col-span-2">
+        <Card className="motion-surface p-5 lg:col-span-2">
           <SectionHeader title="Команда" subtitle="Назначение владельцев и доступы" action={<Button size="sm" variant="outline" className="h-8 text-xs"><Plus className="mr-1 h-3.5 w-3.5" /> Пригласить</Button>} />
           <div className="overflow-hidden rounded-lg border">
             <table className="w-full text-xs">
@@ -99,7 +103,7 @@ function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="motion-surface p-5">
           <SectionHeader title="Уведомления" subtitle="Что и куда присылать" />
           <div className="space-y-4">
             <div>

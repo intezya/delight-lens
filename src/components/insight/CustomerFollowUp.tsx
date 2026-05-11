@@ -37,7 +37,7 @@ export function CustomerFollowUp() {
   const [text, setText] = useState(TEMPLATE);
 
   return (
-    <Card className="border-ai/30 bg-ai-soft/15 p-5 md:p-6">
+    <Card className="motion-surface border-ai/30 bg-ai-soft/15 p-5 md:p-6">
       <div className="mb-2 flex items-center gap-2">
         <MessageCircle className="h-4 w-4 text-ai" />
         <h3 className="text-sm font-semibold tracking-tight">Связаться с клиентами</h3>
@@ -51,9 +51,9 @@ export function CustomerFollowUp() {
         <span>Это не публичный ответ — он не заменяет проверку проблемы и не публикуется на площадке.</span>
       </div>
 
-      <ul className="space-y-1.5">
+      <ul className="stagger space-y-1.5">
         {STEPS.map((s, i) => (
-          <li key={s} className="flex items-start gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted/30">
+          <li key={s} className="motion-row flex items-start gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted/30">
             <Checkbox id={`fu-${i}`} className="mt-0.5" />
             <label htmlFor={`fu-${i}`} className="flex-1 cursor-pointer text-xs leading-snug">{s}</label>
           </li>

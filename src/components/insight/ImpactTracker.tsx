@@ -17,7 +17,7 @@ export function ImpactTracker({ tracking, predicted }: { tracking: Implementatio
     return { i, v: Math.round(v + Math.sin(i) * 1.5) };
   });
   return (
-    <Card className="overflow-hidden p-0">
+    <Card className="motion-surface overflow-hidden p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-positive-soft/30 px-6 py-4">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-positive" />
@@ -36,7 +36,7 @@ export function ImpactTracker({ tracking, predicted }: { tracking: Implementatio
         </div>
         <div className="p-5">
           <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">Динамика жалоб</p>
-          <div className="h-[120px]">
+          <div className="motion-chart h-[120px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>

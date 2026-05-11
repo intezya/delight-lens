@@ -18,7 +18,7 @@ export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
   const maxPct = Math.min(100, (effect.range.max / cap) * 100);
 
   return (
-    <Card className="p-6 md:p-7">
+    <Card className="motion-surface p-6 md:p-7">
       <div className="flex items-start gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ai-soft text-ai-foreground">
           <Gauge className="h-5 w-5" />
@@ -43,7 +43,7 @@ export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
       <div className="mt-6 space-y-2">
         <div className="relative h-3 overflow-hidden rounded-full bg-muted">
           <div
-            className="absolute inset-y-0 rounded-full bg-gradient-to-r from-ai/60 to-ai"
+            className="absolute inset-y-0 rounded-full bg-gradient-to-r from-ai/60 to-ai transition-[left,width] duration-500"
             style={{ left: `${minPct}%`, width: `${Math.max(2, maxPct - minPct)}%` }}
           />
           <div
