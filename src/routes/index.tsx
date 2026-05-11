@@ -3,16 +3,17 @@ import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  KPI, TIMESERIES, TOPIC_DISTRIBUTION, REVIEWS, INSIGHTS, ANOMALIES, IMPACT_CASES, getTopic, getInsight,
+  KPI, TIMESERIES, TOPIC_DISTRIBUTION, REVIEWS, INSIGHTS, ANOMALIES, getTopic,
 } from "@/lib/mock/data";
-import { SectionHeader, AiBadge, StatusBadge, Delta, TopicChip } from "@/components/atoms";
+import { SectionHeader, AiBadge, Delta, TopicChip } from "@/components/atoms";
+import { PeriodToggle, periodLabel, type Period } from "@/components/period-toggle";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid,
-  ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, ReferenceLine, Cell, Line, LineChart,
+  ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, ReferenceLine, Cell,
 } from "recharts";
 import {
   Sparkles, ArrowRight, AlertTriangle, Repeat, TrendingUp, MessageSquare,
-  ChevronRight, CheckCircle2, ChevronDown,
+  ChevronRight, ChevronDown,
 } from "lucide-react";
 import { useState, type ElementType } from "react";
 import { cn } from "@/lib/utils";
