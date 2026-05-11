@@ -469,21 +469,21 @@
 @keyframes guide-float-in {
   from {
     opacity: 0;
-    transform: translate(-50%, calc(-50% + 28px)) scale(0.97);
+    transform: translateY(28px) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 @keyframes guide-float-out {
   from {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(0) scale(1);
   }
   to {
     opacity: 0;
-    transform: translate(-50%, calc(-50% - 18px)) scale(0.985);
+    transform: translateY(-18px) scale(0.985);
   }
 }
 @keyframes guide-step-in {
