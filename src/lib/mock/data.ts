@@ -726,8 +726,6 @@ export function getReview(id: string) {
   return REVIEWS.find((r) => r.id === id);
 }
 
-// Hypothesis statements + next steps + validation plans (kept separately to avoid touching every insight inline)
-const INSIGHT_EXTRAS: Record<string, { hypothesisStatement: HypothesisStatement; nextSteps: string[]; validationPlan: ValidationPlan }> = {
 // Подтверждённость проблем + альтернативные гипотезы (P0 — фидбек Yasya)
 const PROBLEM_CONFIDENCE: Record<string, ProblemConfidence> = {
   "i-1": { level: "high", reviewsCount: 38, description: "76% жалоб содержат одинаковую формулировку «витринный» в 3 разных источниках" },
