@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,10 @@ import {
   TopicChip,
 } from "@/components/atoms";
 import { InfoHint } from "@/components/info-hint";
-import { HypothesisStatementCard } from "@/components/insight/HypothesisStatement";
+import { ProblemConfidenceCard } from "@/components/insight/ProblemConfidenceCard";
+import { AlternativeHypotheses } from "@/components/insight/AlternativeHypotheses";
+import { WhatToCheck } from "@/components/insight/WhatToCheck";
+import { CustomerFollowUp } from "@/components/insight/CustomerFollowUp";
 import { ConfidenceBreakdown } from "@/components/insight/ConfidenceBreakdown";
 import { ExpectedEffectCard } from "@/components/insight/ExpectedEffectCard";
 import { GenerationReason } from "@/components/insight/GenerationReason";
@@ -20,7 +23,6 @@ import { RisksList } from "@/components/insight/RisksList";
 import { NeededDataPanel } from "@/components/insight/NeededDataPanel";
 import { ImpactTracker } from "@/components/insight/ImpactTracker";
 import { OwnerTeamCard } from "@/components/insight/OwnerTeamCard";
-import { NextSteps } from "@/components/insight/NextSteps";
 import { StickyActions } from "@/components/insight/StickyActions";
 import {
   INSIGHTS,
@@ -45,7 +47,7 @@ export const Route = createFileRoute("/insights/$insightId")({
   head: ({ params }) => ({
     meta: [
       { title: `Гипотеза ${params.insightId} — Voicelens` },
-      { name: "description", content: "Детальный разбор AI-гипотезы: доказательства, приоритет, рекомендации." },
+      { name: "description", content: "Расследование AI-гипотезы: возможные причины, что проверить, доказательства." },
     ],
   }),
   loader: ({ params }) => {
@@ -74,6 +76,15 @@ function InsightDetailPage() {
   const topic = getTopic(insight.topicId);
   const subtopic = insight.subtopicId ? getSubtopic(insight.subtopicId) : undefined;
   const [createdAgo, setCreatedAgo] = useState("");
+
+  const alternatives = insight.alternatives ?? [];
+  const [activeAltId, setActiveAltId] = useState<string>(alternatives[0]?.id ?? "");
+  const activeAlt = useMemo(
+    () => alternatives.find((a) => a.id === activeAltId) ?? alternatives[0],
+    [alternatives, activeAltId],
+  );
+
+  const followUpRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setCreatedAgo(formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }));
@@ -144,47 +155,91 @@ function InsightDetailPage() {
             </div>
           </header>
 
-          {/* 1. ГИПОТЕЗА — главный блок */}
-          {insight.hypothesisStatement && (
-            <HypothesisStatementCard statement={insight.hypothesisStatement} />
+          {/* 1. ПОДТВЕРЖДЁННОСТЬ ПРОБЛЕМЫ — отдельный сигнал */}
+          {insight.problemConfidence && (
+            <ProblemConfidenceCard confidence={insight.problemConfidence} />
           )}
 
-          {/* 2. Почему система её предложила */}
+          {/* 2. ДОКАЗАТЕЛЬСТВА проблемы */}
+          <section className="space-y-4">
+            <SectionHeader
+              title={`Доказательства · ${insight.evidenceReviews.length} отзывов`}
+              subtitle="Подсвечены фрагменты, на которых система зафиксировала проблему. Каждый отзыв можно открыть на источнике."
+            />
+            <EvidenceList items={insight.evidenceReviews} />
+          </section>
+
+          {/* 3. ПОЧЕМУ проблема замечена */}
           <section className="space-y-4">
             <SectionHeader title="Почему система предложила гипотезу" subtitle="На какие наблюдения опирается AI-анализ" />
             <GenerationReason reasons={insight.generationReason} />
           </section>
 
-          {/* 3. Доказательства */}
-          <section className="space-y-4">
-            <SectionHeader
-              title={`Доказательства · ${insight.evidenceReviews.length} отзывов`}
-              subtitle="Подсвечены фрагменты, на которых система построила гипотезу. Каждый отзыв можно открыть на источнике."
-            />
-            <EvidenceList items={insight.evidenceReviews} />
-          </section>
+          {/* 4. АЛЬТЕРНАТИВНЫЕ ВОЗМОЖНЫЕ ПРИЧИНЫ */}
+          {alternatives.length > 0 && activeAlt && (
+            <section className="space-y-4">
+              <SectionHeader
+                title={
+                  <span className="inline-flex items-center gap-1.5">
+                    Возможные причины
+                    <InfoHint text="AI разложил проблему на 2–4 версии. Это не «правильный ответ», а варианты для исследования. Каждая требует разных проверок." />
+                  </span>
+                }
+                subtitle="Brainstorming, а не готовое решение — выберите версию для расследования"
+              />
+              <AlternativeHypotheses
+                alternatives={alternatives}
+                activeId={activeAlt.id}
+                onSelect={setActiveAltId}
+              />
 
-          {/* 4. Метрики и уверенность */}
+              {/* Активная альтернатива — раскрытие */}
+              <div className="grid gap-4 lg:grid-cols-2">
+                <WhatToCheck items={activeAlt.whatToCheck} />
+                <NeededDataPanel items={activeAlt.missingData} />
+              </div>
+
+              {activeAlt.nextActions.length > 0 && (
+                <Card className="p-5 md:p-6">
+                  <h3 className="mb-3 text-sm font-semibold tracking-tight">
+                    Следующие исследовательские шаги
+                  </h3>
+                  <ol className="stagger space-y-2">
+                    {activeAlt.nextActions.map((s, idx) => (
+                      <li key={s} className="flex items-start gap-3 rounded-md border bg-muted/30 px-3 py-2.5">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ai-soft text-[11px] font-semibold text-ai-foreground">
+                          {idx + 1}
+                        </span>
+                        <p className="flex-1 text-sm leading-snug">{s}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </Card>
+              )}
+            </section>
+          )}
+
+          {/* 5. УВЕРЕННОСТЬ СИСТЕМЫ (в сигнале) */}
           <section className="space-y-4">
             <SectionHeader
               title={
                 <span className="inline-flex items-center gap-1.5">
-                  Уверенность системы
-                  <InfoHint text="Сколько баллов из 100 даёт каждый фактор. Сумма формирует общий процент уверенности — он показывает, насколько надёжен сигнал в отзывах." />
+                  Уверенность системы в сигнале
+                  <InfoHint text="Насколько надёжен сам сигнал в отзывах. Это НЕ уверенность в конкретной причине — у каждой альтернативной гипотезы выше своя оценка." />
                 </span>
               }
-              subtitle="Из чего складывается процент уверенности AI"
+              subtitle="Из чего складывается процент"
             />
             <ConfidenceBreakdown value={insight.confidence} breakdown={insight.confidenceBreakdown} />
           </section>
 
-          {/* 5. Ожидаемый эффект */}
+          {/* 6. ОЖИДАЕМЫЙ ЭФФЕКТ */}
           <section className="space-y-4">
             <SectionHeader
               title={
                 <span className="inline-flex items-center gap-1.5">
                   Ожидаемый эффект
-                  <InfoHint text="Прогнозируемое изменение метрики, если гипотеза будет реализована. Оценка системы на основе частоты проблемы, динамики и похожих кейсов." />
+                  <InfoHint text="Прогноз изменения метрики, если одна из гипотез подтвердится и будет реализована. Это диапазон, а не точная цифра." />
                 </span>
               }
               subtitle="Диапазон, в котором AI ожидает результат"
@@ -192,23 +247,21 @@ function InsightDetailPage() {
             <ExpectedEffectCard effect={insight.expectedEffectV2} />
           </section>
 
-          {/* 6. Риски и недостающие данные */}
-          <section className="grid gap-6 lg:grid-cols-2">
+          {/* 7. РИСКИ */}
+          <section className="space-y-4">
+            <SectionHeader title="Риски и ограничения" subtitle="Что может уменьшить достоверность гипотезы" />
             <RisksList risks={insight.risks} />
-            {insight.neededData && <NeededDataPanel items={insight.neededData} />}
           </section>
 
-          {/* 7. Что делать дальше */}
-          {insight.nextSteps && (
-            <section className="space-y-4">
-              <SectionHeader title="Что делать дальше" subtitle="Конкретные шаги и план проверки гипотезы" />
-              <NextSteps steps={insight.nextSteps} plan={insight.validationPlan} />
-            </section>
-          )}
+          {/* 8. FOLLOW-UP с клиентами */}
+          <section ref={followUpRef} className="space-y-4 scroll-mt-20">
+            <SectionHeader title="Связаться с клиентами" subtitle="Персональный follow-up для расследования — не публичный ответ" />
+            <CustomerFollowUp />
+          </section>
 
-          {/* 8. Команда-владелец */}
+          {/* 9. КОМАНДА (если расследование подтвердит причину) */}
           <section className="space-y-4">
-            <SectionHeader title="Кому передать" subtitle="Команда-владелец и описание задачи" />
+            <SectionHeader title="Кому передать на следующем шаге" subtitle="Команда-владелец, если расследование подтвердит причину" />
             <OwnerTeamCard
               team={localizeTeam(insight.ownerTeam)}
               owner={insight.owner.name}
@@ -217,7 +270,7 @@ function InsightDetailPage() {
             />
           </section>
 
-          {/* 9. Эффект внедрения (если уже внедрено) */}
+          {/* 10. ЭФФЕКТ внедрения (если уже внедрено) */}
           {insight.implementationTracking && (
             <section className="space-y-4">
               <SectionHeader title="Фактический эффект" subtitle="Сравнение прогноза и реальной динамики после внедрения" />
@@ -240,7 +293,6 @@ function InsightDetailPage() {
                       <p className="truncate text-xs font-medium">{i.title}</p>
                       <div className="mt-1 flex items-center gap-1.5">
                         <StatusBadge status={i.status} />
-                        <span className="num text-[10px] text-muted-foreground">{i.confidence}%</span>
                       </div>
                     </div>
                     <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
@@ -256,7 +308,10 @@ function InsightDetailPage() {
 
         {/* === STICKY ACTIONS === */}
         <aside className="lg:block">
-          <StickyActions defaultDecision={insight.status === "needs_data" ? "needs_data" : null} />
+          <StickyActions
+            hypothesisStatement={activeAlt?.statement}
+            onContact={() => followUpRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          />
         </aside>
       </div>
     </AppShell>

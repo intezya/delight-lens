@@ -3,16 +3,17 @@ import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  KPI, TIMESERIES, TOPIC_DISTRIBUTION, REVIEWS, INSIGHTS, ANOMALIES, IMPACT_CASES, getTopic, getInsight,
+  KPI, TIMESERIES, TOPIC_DISTRIBUTION, REVIEWS, INSIGHTS, ANOMALIES, getTopic,
 } from "@/lib/mock/data";
-import { SectionHeader, AiBadge, StatusBadge, Delta, TopicChip } from "@/components/atoms";
+import { SectionHeader, AiBadge, Delta, TopicChip } from "@/components/atoms";
+import { PeriodToggle, periodLabel, type Period } from "@/components/period-toggle";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid,
-  ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, ReferenceLine, Cell, Line, LineChart,
+  ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis, ReferenceLine, Cell,
 } from "recharts";
 import {
   Sparkles, ArrowRight, AlertTriangle, Repeat, TrendingUp, MessageSquare,
-  ChevronRight, CheckCircle2, ChevronDown,
+  ChevronRight, ChevronDown,
 } from "lucide-react";
 import { useState, type ElementType } from "react";
 import { cn } from "@/lib/utils";
@@ -36,28 +37,36 @@ const chartTooltip = {
 // ──────────────────────────────────────────────────────────────────────────
 // Hero: AI brief
 
-function AiBrief() {
+function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) => void }) {
   const headline = INSIGHTS.find(i => i.id === "i-2")!;
+  const title = period === "24h"
+    ? "Утренний брифинг · последние 24 часа"
+    : period === "7d"
+      ? "Сводка за 7 дней"
+      : "Сводка за 30 дней";
+  const body = period === "24h"
+    ? <>За сутки AI зафиксировал <span className="text-negative">+12 новых жалоб</span> на доставку и <span className="text-ai">1 новую гипотезу</span>.</>
+    : period === "7d"
+      ? <>За неделю негатив по доставке вырос на <span className="text-negative">+18%</span>, готовы <span className="text-ai">2 новые гипотезы</span> к проверке.</>
+      : <>За 30 дней негатив по доставке вырос на <span className="text-negative">+42%</span>, готовы <span className="text-ai">3 новые гипотезы</span> к работе.</>;
   return (
     <Card className="relative overflow-hidden border-ai/20 bg-gradient-to-br from-ai-soft/40 via-card to-card p-5 shadow-[var(--shadow-elev-2)]">
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-ai/10 blur-3xl" />
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-2.5">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <AiBadge />
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">Утренний brief · 30 дней</span>
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground">{title}</span>
           </div>
-          <h2 className="text-xl font-semibold leading-snug tracking-tight md:text-2xl">
-            За 30 дней негатив по доставке вырос на <span className="text-negative">+42%</span>,
-            готовы <span className="text-ai">3 новые гипотезы</span> к работе.
-          </h2>
+          <h2 className="text-xl font-semibold leading-snug tracking-tight md:text-2xl">{body}</h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Главное событие — кластер задержек по выходным (<b>17 повторных жалоб</b>, signal 79).
-            Сильные стороны бренда устойчиво растут: <b>+34%</b> упоминаний программы лояльности.
-            Рекомендуем начать с гипотезы по логистике — потенциальный эффект <b>−25%</b> повторов.
+            Главное событие — кластер задержек по выходным.
+            Сильные стороны бренда устойчиво растут — упоминания программы лояльности.
+            Рекомендуем начать с гипотезы по логистике — расследовать причины переноса слотов.
           </p>
         </div>
-        <div className="flex shrink-0 flex-col gap-2 lg:items-end">
+        <div className="flex shrink-0 flex-col items-stretch gap-2 lg:items-end">
+          <PeriodToggle value={period} onChange={onChange} />
           <Button asChild size="sm" className="h-9">
             <Link to="/insights/$insightId" params={{ insightId: headline.id }}>
               Открыть главную гипотезу <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -290,80 +299,12 @@ function DivergingChart() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Impact section
-
-function ImpactRow({ c }: { c: typeof IMPACT_CASES[number] }) {
-  const insight = getInsight(c.insightId);
-  const dSent = c.after.sentiment - c.before.sentiment;
-  const dRating = +(c.after.rating - c.before.rating).toFixed(1);
-  const dCompl = Math.round(((c.after.complaints - c.before.complaints) / c.before.complaints) * 100);
-  const trend = [c.before, ...Array.from({ length: 5 }).map((_, i) => ({
-    sentiment: c.before.sentiment + ((c.after.sentiment - c.before.sentiment) * (i + 1)) / 5,
-  })), c.after].map((p, i) => ({ i, v: p.sentiment }));
-
-  return (
-    <div className="flex flex-col gap-3 rounded-lg border bg-card p-3.5 md:flex-row md:items-center md:gap-5">
-      <div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-positive" />
-        <span className="rounded-md bg-positive-soft px-1.5 py-0.5 text-[10px] font-semibold text-positive-foreground">Implemented</span>
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{c.action}</p>
-        {insight && (
-          <Link to="/insights/$insightId" params={{ insightId: insight.id }} className="text-[11px] text-muted-foreground hover:text-foreground">
-            из гипотезы «{insight.title}» →
-          </Link>
-        )}
-      </div>
-      <div className="flex items-center gap-5 md:gap-6">
-        <Metric label="Sentiment" value={`${c.after.sentiment > 0 ? "+" : ""}${c.after.sentiment}`} delta={dSent} />
-        <Metric label="Рейтинг" value={c.after.rating.toFixed(1)} delta={Math.round(dRating * 100)} suffix="" />
-        <Metric label="Жалобы" value={c.after.complaints.toString()} delta={dCompl} invert />
-      </div>
-      <div className="h-10 w-24 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={trend}>
-            <Line dataKey="v" stroke="var(--positive)" strokeWidth={1.8} dot={false} type="monotone" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function Metric({ label, value, delta, suffix = "%", invert }: { label: string; value: string; delta: number; suffix?: string; invert?: boolean }) {
-  return (
-    <div className="flex flex-col items-end gap-0.5">
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>
-      <div className="flex items-baseline gap-1.5">
-        <span className="num text-sm font-semibold tabular-nums">{value}</span>
-        <Delta value={delta} suffix={suffix} invert={invert} />
-      </div>
-    </div>
-  );
-}
-
-function ImpactBlock() {
-  return (
-    <Card className="p-4">
-      <SectionHeader
-        title="Эффект внедрённых решений"
-        subtitle="Метрики до и после · последние 30 дней"
-        action={<Button asChild variant="ghost" size="sm" className="h-7 text-xs"><Link to="/impact">Подробно <ChevronRight className="ml-0.5 h-3 w-3" /></Link></Button>}
-      />
-      <div className="space-y-2">
-        {IMPACT_CASES.map(c => <ImpactRow key={c.id} c={c} />)}
-      </div>
-    </Card>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
 // Page
 
 function DashboardPage() {
   const newCount = INSIGHTS.filter(i => i.status === "new").length;
   const repeatCount = REVIEWS.filter(r => r.repeatCount > 5).length;
+  const [period, setPeriod] = useState<Period>("24h");
 
   return (
     <AppShell
@@ -376,7 +317,7 @@ function DashboardPage() {
       }
     >
       <div className="space-y-5 p-4 md:p-6">
-        <AiBrief />
+        <AiBrief period={period} onChange={setPeriod} />
 
         <HealthStrip />
 
@@ -390,8 +331,19 @@ function DashboardPage() {
           </div>
         </div>
 
-        <ImpactBlock />
+        <Card className="p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold tracking-tight">Эффект внедрённых решений вынесен на отдельную вкладку</h3>
+              <p className="mt-0.5 text-xs text-muted-foreground">Главный дашборд показывает только то, что требует внимания {periodLabel(period)}.</p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+              <Link to="/impact">Открыть «Эффект» <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            </Button>
+          </div>
+        </Card>
       </div>
     </AppShell>
   );
 }
+
