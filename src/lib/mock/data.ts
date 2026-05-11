@@ -1068,11 +1068,16 @@ const INSIGHT_EXTRAS: Record<string, { hypothesisStatement: HypothesisStatement;
   },
 };
 
-export function getInsight(id: string) {
+export function getInsight(id: string): Insight | undefined {
   const i = INSIGHTS.find((i) => i.id === id);
   if (!i) return undefined;
   const extras = INSIGHT_EXTRAS[id];
-  return extras ? { ...i, ...extras } : i;
+  return {
+    ...i,
+    ...(extras ?? {}),
+    problemConfidence: PROBLEM_CONFIDENCE[id],
+    alternatives: INSIGHT_ALTERNATIVES[id],
+  };
 }
 
 
