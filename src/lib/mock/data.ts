@@ -248,6 +248,10 @@ export type Insight = {
   hypothesisStatement?: HypothesisStatement;
   nextSteps?: string[];
   validationPlan?: ValidationPlan;
+  /** Подтверждённость проблемы (отдельно от уверенности в решении) */
+  problemConfidence?: ProblemConfidence;
+  /** Альтернативные возможные причины (≥2 — это brainstorming, а не готовое решение) */
+  alternatives?: CauseHypothesis[];
 };
 
 // Map english team names to friendly Russian labels
