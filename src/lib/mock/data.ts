@@ -187,6 +187,37 @@ export type ValidationPlan = {
   teams: string[];
 };
 
+/**
+ * Подтверждённость самой проблемы (отдельно от уверенности в причине).
+ * Высокая = отзывы устойчиво указывают, что проблема существует.
+ */
+export type ProblemConfidence = {
+  level: "low" | "medium" | "high";
+  reviewsCount: number;
+  description: string;
+};
+
+/**
+ * Одна из альтернативных возможных причин одной и той же проблемы.
+ * AI предлагает несколько версий — пользователь выбирает, какую расследовать.
+ */
+export type CauseHypothesis = {
+  id: string;
+  /** Одна фраза в стиле «Возможная причина: …» */
+  statement: string;
+  /** Уверенность системы именно в этой причине (отдельно от подтверждённости проблемы) */
+  solutionConfidence: number;
+  confidenceLabel: "низкая" | "средняя" | "высокая";
+  /** Чек-лист «что проверить перед внедрением» */
+  whatToCheck: string[];
+  /** Чего не хватает в данных */
+  missingData: string[];
+  /** Исследовательские шаги (а не «внедрить») */
+  nextActions: string[];
+  /** Поддерживающие отзывы (id) */
+  supportingReviewIds: string[];
+};
+
 export type Insight = {
   id: string;
   title: string;
