@@ -17,7 +17,10 @@ export function EvidenceList({ items }: { items: EvidenceReview[] }) {
         if (!r) return null;
         const split = splitHighlight(r.text, ev.highlight);
         return (
-          <Card key={ev.reviewId} className="lift flex flex-col gap-3 border p-5 hover:border-ai/40">
+          <Card
+            key={ev.reviewId}
+            className="lift flex flex-col gap-3 border p-5 hover:border-ai/40"
+          >
             <div className="flex items-start gap-2.5">
               <Quote className="mt-1 h-4 w-4 shrink-0 text-ai/60" />
               <p className="text-sm leading-relaxed text-foreground">
@@ -39,7 +42,9 @@ export function EvidenceList({ items }: { items: EvidenceReview[] }) {
             <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-3 text-[11px]">
               <SentimentPill sentiment={r.sentiment} />
               <SourceBadge source={r.source} />
-              <span className="text-muted-foreground">· {format(new Date(r.date), "d MMM yyyy", { locale: ru })}</span>
+              <span className="text-muted-foreground">
+                · {format(new Date(r.date), "d MMM yyyy", { locale: ru })}
+              </span>
               <span className="text-muted-foreground">· {r.author}</span>
               <a
                 href={r.sourceUrl}

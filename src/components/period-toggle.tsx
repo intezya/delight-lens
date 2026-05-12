@@ -8,7 +8,13 @@ const OPTIONS: { id: Period; label: string }[] = [
   { id: "30d", label: "30 дней" },
 ];
 
-export function PeriodToggle({ value, onChange }: { value: Period; onChange: (v: Period) => void }) {
+export function PeriodToggle({
+  value,
+  onChange,
+}: {
+  value: Period;
+  onChange: (v: Period) => void;
+}) {
   return (
     <div className="inline-flex items-center rounded-md border bg-card p-0.5">
       {OPTIONS.map((o) => (

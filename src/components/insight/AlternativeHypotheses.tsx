@@ -31,8 +31,8 @@ export function AlternativeHypotheses({
         </span>
       </div>
       <p className="mb-4 max-w-2xl text-xs text-muted-foreground">
-        AI не выбирает за вас — он раскладывает проблему на несколько правдоподобных версий.
-        Каждая требует разных проверок и данных.
+        AI не выбирает за вас — он раскладывает проблему на несколько правдоподобных версий. Каждая
+        требует разных проверок и данных.
       </p>
 
       <div className="stagger grid gap-2.5 md:grid-cols-2">

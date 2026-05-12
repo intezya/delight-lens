@@ -3,10 +3,28 @@ import { ShieldCheck, ShieldAlert, ShieldQuestion, MessageSquare } from "lucide-
 import { InfoHint } from "@/components/info-hint";
 import type { ProblemConfidence } from "@/lib/mock/data";
 
-const meta: Record<ProblemConfidence["level"], { label: string; cls: string; tone: string; Icon: typeof ShieldCheck }> = {
-  high: { label: "Высокая", cls: "text-positive", tone: "border-positive/40 bg-positive-soft/30", Icon: ShieldCheck },
-  medium: { label: "Средняя", cls: "text-mixed-foreground", tone: "border-mixed/40 bg-mixed-soft/30", Icon: ShieldAlert },
-  low: { label: "Низкая", cls: "text-muted-foreground", tone: "border-border bg-muted/30", Icon: ShieldQuestion },
+const meta: Record<
+  ProblemConfidence["level"],
+  { label: string; cls: string; tone: string; Icon: typeof ShieldCheck }
+> = {
+  high: {
+    label: "Высокая",
+    cls: "text-positive",
+    tone: "border-positive/40 bg-positive-soft/30",
+    Icon: ShieldCheck,
+  },
+  medium: {
+    label: "Средняя",
+    cls: "text-mixed-foreground",
+    tone: "border-mixed/40 bg-mixed-soft/30",
+    Icon: ShieldAlert,
+  },
+  low: {
+    label: "Низкая",
+    cls: "text-muted-foreground",
+    tone: "border-border bg-muted/30",
+    Icon: ShieldQuestion,
+  },
 };
 
 /**
@@ -18,7 +36,9 @@ export function ProblemConfidenceCard({ confidence }: { confidence: ProblemConfi
   const Icon = m.Icon;
   return (
     <Card className={`anim-rise motion-surface flex items-start gap-4 border p-5 ${m.tone}`}>
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-background/60 ${m.cls}`}>
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-background/60 ${m.cls}`}
+      >
         <Icon className="h-5 w-5" />
       </div>
       <div className="min-w-0 flex-1">
@@ -35,7 +55,9 @@ export function ProblemConfidenceCard({ confidence }: { confidence: ProblemConfi
             {confidence.reviewsCount} отзывов
           </span>
         </p>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{confidence.description}</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          {confidence.description}
+        </p>
       </div>
     </Card>
   );

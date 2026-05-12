@@ -19,7 +19,10 @@ export function WhatToCheck({ items }: { items: string[] }) {
       </p>
       <ul className="stagger space-y-2">
         {items.map((it, i) => (
-          <li key={it} className="motion-row flex items-start gap-3 rounded-lg border bg-muted/20 px-3 py-2.5">
+          <li
+            key={it}
+            className="motion-row flex items-start gap-3 rounded-lg border bg-muted/20 px-3 py-2.5"
+          >
             <Checkbox id={`wtc-${i}`} className="mt-0.5" />
             <label htmlFor={`wtc-${i}`} className="flex-1 cursor-pointer text-sm leading-snug">
               {it}

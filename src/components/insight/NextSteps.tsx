@@ -15,7 +15,10 @@ export function NextSteps({ steps, plan }: { steps: string[]; plan?: ValidationP
         </p>
         <ol className="stagger space-y-2.5">
           {steps.map((s, idx) => (
-            <li key={s} className="motion-row flex items-start gap-3 rounded-lg border bg-muted/30 px-3 py-2.5">
+            <li
+              key={s}
+              className="motion-row flex items-start gap-3 rounded-lg border bg-muted/30 px-3 py-2.5"
+            >
               <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ai-soft text-[11px] font-semibold text-ai-foreground">
                 {idx + 1}
               </span>

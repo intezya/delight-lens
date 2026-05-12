@@ -4,7 +4,17 @@ import { HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OnboardingModal, useOnboarding } from "./onboarding-modal";
 
-export function AppShell({ children, title, subtitle, actions }: { children: React.ReactNode; title: string; subtitle?: string; actions?: React.ReactNode }) {
+export function AppShell({
+  children,
+  title,
+  subtitle,
+  actions,
+}: {
+  children: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  actions?: React.ReactNode;
+}) {
   const { open, close, reopen } = useOnboarding();
   return (
     <SidebarProvider>
@@ -16,7 +26,9 @@ export function AppShell({ children, title, subtitle, actions }: { children: Rea
             <div className="ml-1 flex min-w-0 flex-1 items-center gap-3">
               <div className="flex min-w-0 flex-col leading-tight">
                 <h1 className="truncate text-sm font-semibold tracking-tight">{title}</h1>
-                {subtitle && <span className="truncate text-[10px] text-muted-foreground">{subtitle}</span>}
+                {subtitle && (
+                  <span className="truncate text-[10px] text-muted-foreground">{subtitle}</span>
+                )}
               </div>
             </div>
             <div className="ml-auto flex items-center gap-1.5">

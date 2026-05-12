@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Beaker, Clock, Target, Users, FileSearch } from "lucide-react";
 import { toast } from "sonner";
@@ -13,11 +19,31 @@ export function InvestigationPlanDialog({
   hypothesis: string;
 }) {
   const steps = [
-    { icon: FileSearch, title: "Шаг 1 · Сбор данных", text: "Выгрузить заказы клиентов из 14 жалоб, проверить SKU и пути товаров на складе." },
-    { icon: Users, title: "Шаг 2 · Интервью", text: "Связаться с 5 клиентами и 2 менеджерами, чтобы услышать обе стороны." },
-    { icon: Beaker, title: "Шаг 3 · Локальный пилот", text: "Запустить мини-эксперимент в 3 точках — фотофиксация состояния товара перед отгрузкой." },
-    { icon: Target, title: "Шаг 4 · Метрика", text: "Через 2 недели сравнить долю жалоб «витринный» в пилотных точках с базовой группой." },
-    { icon: Clock, title: "Шаг 5 · Решение", text: "Если в пилоте −20% жалоб — масштабировать. Иначе — вернуться к альтернативным гипотезам." },
+    {
+      icon: FileSearch,
+      title: "Шаг 1 · Сбор данных",
+      text: "Выгрузить заказы клиентов из 14 жалоб, проверить SKU и пути товаров на складе.",
+    },
+    {
+      icon: Users,
+      title: "Шаг 2 · Интервью",
+      text: "Связаться с 5 клиентами и 2 менеджерами, чтобы услышать обе стороны.",
+    },
+    {
+      icon: Beaker,
+      title: "Шаг 3 · Локальный пилот",
+      text: "Запустить мини-эксперимент в 3 точках — фотофиксация состояния товара перед отгрузкой.",
+    },
+    {
+      icon: Target,
+      title: "Шаг 4 · Метрика",
+      text: "Через 2 недели сравнить долю жалоб «витринный» в пилотных точках с базовой группой.",
+    },
+    {
+      icon: Clock,
+      title: "Шаг 5 · Решение",
+      text: "Если в пилоте −20% жалоб — масштабировать. Иначе — вернуться к альтернативным гипотезам.",
+    },
   ];
 
   return (
@@ -25,9 +51,7 @@ export function InvestigationPlanDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg">План исследования гипотезы</DialogTitle>
-          <DialogDescription className="text-sm">
-            «{hypothesis}»
-          </DialogDescription>
+          <DialogDescription className="text-sm">«{hypothesis}»</DialogDescription>
         </DialogHeader>
 
         <ol className="space-y-2.5">

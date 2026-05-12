@@ -18,7 +18,9 @@ export function OwnerTeamCard({
       <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-start">
         <div className="space-y-4">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Команда-владелец</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Команда-владелец
+            </p>
             <div className="mt-2 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-ai-soft text-ai-foreground">
                 <Users className="h-5 w-5" />
@@ -31,7 +33,9 @@ export function OwnerTeamCard({
           </div>
 
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Рекомендованное действие</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Рекомендованное действие
+            </p>
             <p className="mt-1.5 inline-flex items-center gap-2 text-sm font-medium">
               <Target className="h-4 w-4 text-ai" />
               {recommendedAction}

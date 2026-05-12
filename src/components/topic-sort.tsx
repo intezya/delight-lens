@@ -1,4 +1,10 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowUpDown } from "lucide-react";
 
 export type TopicSortKey = "neg_growth" | "reviews_count" | "criticality" | "freshness";
@@ -10,7 +16,13 @@ const LABELS: Record<TopicSortKey, string> = {
   freshness: "Свежесть",
 };
 
-export function TopicSort({ value, onChange }: { value: TopicSortKey; onChange: (v: TopicSortKey) => void }) {
+export function TopicSort({
+  value,
+  onChange,
+}: {
+  value: TopicSortKey;
+  onChange: (v: TopicSortKey) => void;
+}) {
   return (
     <div className="inline-flex items-center gap-2">
       <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
@@ -21,7 +33,9 @@ export function TopicSort({ value, onChange }: { value: TopicSortKey; onChange: 
         </SelectTrigger>
         <SelectContent>
           {(Object.keys(LABELS) as TopicSortKey[]).map((k) => (
-            <SelectItem key={k} value={k} className="text-xs">{LABELS[k]}</SelectItem>
+            <SelectItem key={k} value={k} className="text-xs">
+              {LABELS[k]}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>

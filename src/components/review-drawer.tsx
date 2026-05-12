@@ -6,10 +6,20 @@ import { Star, Repeat, Link2, Sparkles, Quote, Flag, ExternalLink } from "lucide
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
-export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | null; open: boolean; onOpenChange: (v: boolean) => void }) {
+export function ReviewDrawer({
+  review,
+  open,
+  onOpenChange,
+}: {
+  review: Review | null;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
   if (!review) return null;
-  const similar = REVIEWS.filter(r => r.id !== review.id && r.topics.some(t => review.topics.includes(t))).slice(0, 4);
-  const relatedInsights = INSIGHTS.filter(i => review.topics.includes(i.topicId)).slice(0, 3);
+  const similar = REVIEWS.filter(
+    (r) => r.id !== review.id && r.topics.some((t) => review.topics.includes(t)),
+  ).slice(0, 4);
+  const relatedInsights = INSIGHTS.filter((i) => review.topics.includes(i.topicId)).slice(0, 3);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -38,7 +48,8 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
             <span>{review.author}</span>
             <span>·</span>
             <span className="inline-flex items-center gap-0.5 num">
-              {review.rating}<Star className="h-3 w-3 fill-mixed text-mixed" />
+              {review.rating}
+              <Star className="h-3 w-3 fill-mixed text-mixed" />
             </span>
           </div>
         </SheetHeader>
@@ -52,11 +63,15 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
           <section>
             <div className="mb-2 flex items-center gap-2">
               <AiBadge />
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Разбор AI</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Разбор AI
+              </h4>
             </div>
             <div className="space-y-3 rounded-xl border bg-card p-3.5">
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Темы</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Темы
+                </span>
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {review.topics.map((t) => {
                     const topic = getTopic(t);
@@ -66,19 +81,39 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
               </div>
               <div className="grid grid-cols-2 gap-3 border-t pt-3">
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Сила сигнала</span>
-                  <div className="mt-1.5"><SignalBar value={review.signal} /></div>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Сила сигнала
+                  </span>
+                  <div className="mt-1.5">
+                    <SignalBar value={review.signal} />
+                  </div>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Сегмент</span>
-                  <p className="mt-1.5 text-xs">{review.region} · {review.category}</p>
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Сегмент
+                  </span>
+                  <p className="mt-1.5 text-xs">
+                    {review.region} · {review.category}
+                  </p>
                 </div>
               </div>
               <div className="border-t pt-3">
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Эмоции</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Эмоции
+                </span>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {(review.sentiment === "negative" ? ["разочарование", "недоверие", "злость"] : review.sentiment === "positive" ? ["удовлетворение", "доверие"] : ["амбивалентность"]).map((e) => (
-                    <span key={e} className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{e}</span>
+                  {(review.sentiment === "negative"
+                    ? ["разочарование", "недоверие", "злость"]
+                    : review.sentiment === "positive"
+                      ? ["удовлетворение", "доверие"]
+                      : ["амбивалентность"]
+                  ).map((e) => (
+                    <span
+                      key={e}
+                      className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
+                    >
+                      {e}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -87,14 +122,21 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
 
           {relatedInsights.length > 0 && (
             <section>
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Связанные AI-инсайты</h4>
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Связанные AI-инсайты
+              </h4>
               <div className="space-y-2">
                 {relatedInsights.map((i) => (
-                  <div key={i.id} className="motion-row flex items-start gap-2 rounded-lg border border-ai/20 bg-ai-soft/30 p-2.5">
+                  <div
+                    key={i.id}
+                    className="motion-row flex items-start gap-2 rounded-lg border border-ai/20 bg-ai-soft/30 p-2.5"
+                  >
                     <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ai" />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-xs font-medium">{i.title}</p>
-                      <p className="num text-[10px] text-muted-foreground">confidence {i.confidence}% · {i.expectedEffect}</p>
+                      <p className="num text-[10px] text-muted-foreground">
+                        confidence {i.confidence}% · {i.expectedEffect}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -104,7 +146,9 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
 
           {similar.length > 0 && (
             <section>
-              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Похожие отзывы</h4>
+              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Похожие отзывы
+              </h4>
               <div className="space-y-2">
                 {similar.map((r) => (
                   <div key={r.id} className="motion-row rounded-lg border bg-card p-2.5">
@@ -125,8 +169,12 @@ export function ReviewDrawer({ review, open, onOpenChange }: { review: Review | 
                 <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Открыть на {review.source}
               </a>
             </Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs"><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Создать гипотезу</Button>
-            <Button size="sm" variant="ghost" className="h-8 text-xs"><Flag className="mr-1.5 h-3.5 w-3.5" /> В работу</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs">
+              <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Создать гипотезу
+            </Button>
+            <Button size="sm" variant="ghost" className="h-8 text-xs">
+              <Flag className="mr-1.5 h-3.5 w-3.5" /> В работу
+            </Button>
           </div>
         </div>
       </SheetContent>

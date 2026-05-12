@@ -3,7 +3,15 @@ import { Card } from "@/components/ui/card";
 import { PriorityBadge, StatusBadge, TopicChip } from "./atoms";
 import { InfoHint } from "./info-hint";
 import { getTopic, localizeTeam, type Insight } from "@/lib/mock/data";
-import { ArrowRight, GitBranch, MessageSquare, ShieldCheck, ShieldAlert, ShieldQuestion, Users } from "lucide-react";
+import {
+  ArrowRight,
+  GitBranch,
+  MessageSquare,
+  ShieldCheck,
+  ShieldAlert,
+  ShieldQuestion,
+  Users,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 import { Link } from "@tanstack/react-router";
@@ -18,14 +26,18 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
   const topic = getTopic(insight.topicId);
   const [relativeTime, setRelativeTime] = useState<string>("");
   useEffect(() => {
-    setRelativeTime(formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }));
+    setRelativeTime(
+      formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true, locale: ru }),
+    );
   }, [insight.createdAt]);
 
   const effect = insight.expectedEffectV2;
-  const sign = effect.type === "complaints_reduction" || effect.type === "repeat_reduction" ? "−" : "+";
+  const sign =
+    effect.type === "complaints_reduction" || effect.type === "repeat_reduction" ? "−" : "+";
   const effectShort = `${sign}${effect.range.min}–${effect.range.max}${effect.unit}`;
   const altCount = insight.alternatives?.length ?? 0;
-  const reviewsCount = insight.problemConfidence?.reviewsCount ?? insight.confidenceBreakdown.reviewsCount;
+  const reviewsCount =
+    insight.problemConfidence?.reviewsCount ?? insight.confidenceBreakdown.reviewsCount;
 
   const pc = insight.problemConfidence;
   const PcIcon = pc ? PROBLEM_LEVEL_META[pc.level].Icon : null;
@@ -64,7 +76,9 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
               <InfoHint text="Подтверждённость самой проблемы — отдельный сигнал от уверенности в причине." />
             </span>
             {pc && PcIcon ? (
-              <span className={`inline-flex items-center gap-1 text-sm font-semibold ${PROBLEM_LEVEL_META[pc.level].cls}`}>
+              <span
+                className={`inline-flex items-center gap-1 text-sm font-semibold ${PROBLEM_LEVEL_META[pc.level].cls}`}
+              >
                 <PcIcon className="h-3.5 w-3.5" /> {PROBLEM_LEVEL_META[pc.level].label}
               </span>
             ) : (
@@ -83,7 +97,14 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
         {altCount > 0 && (
           <div className="inline-flex items-center gap-1.5 text-[11px] text-ai-foreground">
             <GitBranch className="h-3 w-3" />
-            <span className="font-medium">{altCount} {altCount === 1 ? "возможная причина" : altCount < 5 ? "возможные причины" : "возможных причин"}</span>
+            <span className="font-medium">
+              {altCount}{" "}
+              {altCount === 1
+                ? "возможная причина"
+                : altCount < 5
+                  ? "возможные причины"
+                  : "возможных причин"}
+            </span>
           </div>
         )}
 

@@ -15,7 +15,9 @@ export function HypothesisStatementCard({ statement }: { statement: HypothesisSt
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ai-soft text-ai-foreground">
             <Lightbulb className="h-4 w-4" />
           </div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ai-foreground">Гипотеза</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ai-foreground">
+            Гипотеза
+          </p>
         </div>
 
         <p className="display text-[22px] font-semibold leading-[1.35] tracking-tight md:text-[26px]">

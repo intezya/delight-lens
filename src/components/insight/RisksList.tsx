@@ -14,7 +14,10 @@ export function RisksList({ risks }: { risks: string[] }) {
       </p>
       <ul className="stagger space-y-2">
         {risks.map((r) => (
-          <li key={r} className="motion-row flex items-start gap-2.5 text-sm leading-snug text-foreground/90">
+          <li
+            key={r}
+            className="motion-row flex items-start gap-2.5 text-sm leading-snug text-foreground/90"
+          >
             <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
             {r}
           </li>

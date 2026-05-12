@@ -38,17 +38,37 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses." },
+      {
+        name: "description",
+        content:
+          "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses." },
+      {
+        property: "og:description",
+        content:
+          "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41bde296-0300-4179-afab-beb4c7ec654a/id-preview-82a3f5ff--9a7140f9-4d48-46de-9cc1-a0b8e16b79ad.lovable.app-1776449952438.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41bde296-0300-4179-afab-beb4c7ec654a/id-preview-82a3f5ff--9a7140f9-4d48-46de-9cc1-a0b8e16b79ad.lovable.app-1776449952438.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Insight Spark is a B2B SaaS application that analyzes customer feedback to generate actionable product insights and hypotheses.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41bde296-0300-4179-afab-beb4c7ec654a/id-preview-82a3f5ff--9a7140f9-4d48-46de-9cc1-a0b8e16b79ad.lovable.app-1776449952438.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/41bde296-0300-4179-afab-beb4c7ec654a/id-preview-82a3f5ff--9a7140f9-4d48-46de-9cc1-a0b8e16b79ad.lovable.app-1776449952438.png",
+      },
     ],
     links: [
       {

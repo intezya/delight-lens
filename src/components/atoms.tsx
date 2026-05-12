@@ -1,15 +1,32 @@
 import { cn } from "@/lib/utils";
 import type { Sentiment, TopicKind, Priority, InsightStatus, InsightImpact } from "@/lib/mock/data";
-import { ArrowDown, ArrowUp, Minus, Repeat, Star, TrendingDown, TrendingUp, Target, ThumbsUp } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Minus,
+  Repeat,
+  Star,
+  TrendingDown,
+  TrendingUp,
+  Target,
+  ThumbsUp,
+} from "lucide-react";
 
-export function SentimentPill({ sentiment, size = "sm" }: { sentiment: Sentiment; size?: "sm" | "md" }) {
+export function SentimentPill({
+  sentiment,
+  size = "sm",
+}: {
+  sentiment: Sentiment;
+  size?: "sm" | "md";
+}) {
   const cls =
     sentiment === "positive"
       ? "bg-positive-soft text-positive-foreground"
       : sentiment === "negative"
         ? "bg-negative-soft text-negative-foreground"
         : "bg-mixed-soft text-mixed-foreground";
-  const label = sentiment === "positive" ? "Позитив" : sentiment === "negative" ? "Негатив" : "Смешанный";
+  const label =
+    sentiment === "positive" ? "Позитив" : sentiment === "negative" ? "Негатив" : "Смешанный";
   return (
     <span
       className={cn(
@@ -21,7 +38,11 @@ export function SentimentPill({ sentiment, size = "sm" }: { sentiment: Sentiment
       <span
         className={cn(
           "h-1.5 w-1.5 rounded-full",
-          sentiment === "positive" ? "bg-positive" : sentiment === "negative" ? "bg-negative" : "bg-mixed",
+          sentiment === "positive"
+            ? "bg-positive"
+            : sentiment === "negative"
+              ? "bg-negative"
+              : "bg-mixed",
         )}
       />
       {label}
@@ -29,7 +50,15 @@ export function SentimentPill({ sentiment, size = "sm" }: { sentiment: Sentiment
   );
 }
 
-export function TopicChip({ name, kind, count }: { name: string; kind?: TopicKind; count?: number }) {
+export function TopicChip({
+  name,
+  kind,
+  count,
+}: {
+  name: string;
+  kind?: TopicKind;
+  count?: number;
+}) {
   const cls =
     kind === "risk"
       ? "border-negative/30 bg-negative-soft/60 text-negative-foreground"
@@ -39,7 +68,12 @@ export function TopicChip({ name, kind, count }: { name: string; kind?: TopicKin
           ? "border-ai/30 bg-ai-soft/60 text-ai-foreground"
           : "border-border bg-muted text-foreground";
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium", cls)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
+        cls,
+      )}
+    >
       {name}
       {count !== undefined && <span className="opacity-60">·{count}</span>}
     </span>
@@ -51,7 +85,10 @@ export function SignalBar({ value, className }: { value: number; className?: str
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
       <div className="relative h-1 w-16 overflow-hidden rounded-full bg-muted">
-        <div className={cn("absolute inset-y-0 left-0 rounded-full", tone)} style={{ width: `${value}%` }} />
+        <div
+          className={cn("absolute inset-y-0 left-0 rounded-full", tone)}
+          style={{ width: `${value}%` }}
+        />
       </div>
       <span className="num text-[10px] tabular-nums text-muted-foreground">{value}</span>
     </div>
@@ -62,7 +99,10 @@ export function ConfidenceBar({ value }: { value: number }) {
   return (
     <div className="flex items-center gap-2">
       <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[var(--ai)] to-[color-mix(in_oklab,var(--ai)_60%,white)]" style={{ width: `${value}%` }} />
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[var(--ai)] to-[color-mix(in_oklab,var(--ai)_60%,white)]"
+          style={{ width: `${value}%` }}
+        />
       </div>
       <span className="num text-[11px] font-medium tabular-nums text-foreground">{value}%</span>
     </div>
@@ -77,7 +117,9 @@ export function PriorityBadge({ priority }: { priority: Priority }) {
     low: { label: "Низкий", cls: "bg-muted text-muted-foreground" },
   };
   const m = map[priority];
-  return <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>;
+  return (
+    <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>
+  );
 }
 
 export function StatusBadge({ status }: { status: InsightStatus }) {
@@ -87,10 +129,15 @@ export function StatusBadge({ status }: { status: InsightStatus }) {
     in_progress: { label: "В работе", cls: "bg-mixed-soft text-mixed-foreground" },
     implemented: { label: "Внедрена", cls: "bg-positive text-white" },
     rejected: { label: "Отклонена", cls: "bg-muted text-muted-foreground line-through" },
-    needs_data: { label: "Нужны данные", cls: "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200" },
+    needs_data: {
+      label: "Нужны данные",
+      cls: "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200",
+    },
   };
   const m = map[status];
-  return <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>;
+  return (
+    <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", m.cls)}>{m.label}</span>
+  );
 }
 
 export function ImpactIcon({ impact, className }: { impact: InsightImpact; className?: string }) {
@@ -103,19 +150,34 @@ export function ImpactIcon({ impact, className }: { impact: InsightImpact; class
   };
   const m = map[impact];
   return (
-    <span className={cn("inline-flex items-center gap-1 text-[11px] font-medium", m.cls, className)}>
+    <span
+      className={cn("inline-flex items-center gap-1 text-[11px] font-medium", m.cls, className)}
+    >
       <m.Icon className="h-3.5 w-3.5" /> {m.label}
     </span>
   );
 }
 
-export function Delta({ value, suffix = "%", invert = false }: { value: number; suffix?: string; invert?: boolean }) {
+export function Delta({
+  value,
+  suffix = "%",
+  invert = false,
+}: {
+  value: number;
+  suffix?: string;
+  invert?: boolean;
+}) {
   const positive = invert ? value < 0 : value > 0;
   const neutral = value === 0;
   const Icon = neutral ? Minus : positive ? ArrowUp : ArrowDown;
   const cls = neutral ? "text-muted-foreground" : positive ? "text-positive" : "text-negative";
   return (
-    <span className={cn("inline-flex items-center gap-0.5 num text-[11px] font-medium tabular-nums", cls)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 num text-[11px] font-medium tabular-nums",
+        cls,
+      )}
+    >
       <Icon className="h-3 w-3" />
       {Math.abs(value)}
       {suffix}
@@ -123,7 +185,15 @@ export function Delta({ value, suffix = "%", invert = false }: { value: number; 
   );
 }
 
-export function SectionHeader({ title, subtitle, action }: { title: React.ReactNode; subtitle?: React.ReactNode; action?: React.ReactNode }) {
+export function SectionHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>
@@ -138,10 +208,10 @@ export function SectionHeader({ title, subtitle, action }: { title: React.ReactN
 export function SourceBadge({ source }: { source: string }) {
   const map: Record<string, string> = {
     "Я.Маркет": "ЯМ",
-    "Otzovik": "OZ",
+    Otzovik: "OZ",
     "2GIS": "2G",
     "Google Maps": "GM",
-    "Trustpilot": "TP",
+    Trustpilot: "TP",
     "App Store": "AS",
   };
   return (

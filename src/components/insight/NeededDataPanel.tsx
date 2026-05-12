@@ -11,11 +11,15 @@ export function NeededDataPanel({ items }: { items: string[] }) {
         <h3 className="text-sm font-semibold tracking-tight">Нужны дополнительные данные</h3>
       </div>
       <p className="mb-4 text-xs text-muted-foreground">
-        Система считает гипотезу перспективной, но для передачи в работу не хватает следующих данных:
+        Система считает гипотезу перспективной, но для передачи в работу не хватает следующих
+        данных:
       </p>
       <ul className="stagger space-y-2">
         {items.map((it, i) => (
-          <li key={it} className="motion-row flex items-start gap-2.5 rounded-md border bg-card/80 px-3 py-2.5">
+          <li
+            key={it}
+            className="motion-row flex items-start gap-2.5 rounded-md border bg-card/80 px-3 py-2.5"
+          >
             <Checkbox id={`need-${i}`} className="mt-0.5" />
             <label htmlFor={`need-${i}`} className="flex-1 cursor-pointer text-sm leading-snug">
               <Database className="mr-1.5 inline h-3.5 w-3.5 text-muted-foreground" />

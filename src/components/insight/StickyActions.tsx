@@ -8,12 +8,48 @@ import { InvestigationPlanDialog } from "./InvestigationPlanDialog";
 
 type Action = "investigate" | "plan" | "request_data" | "contact" | "reject" | null;
 
-const ACTIONS: { id: Exclude<Action, null>; title: string; icon: typeof Search; tone: "ai" | "mixed" | "negative"; hint: string }[] = [
-  { id: "investigate", title: "Начать проверку", icon: Search, tone: "ai", hint: "Гипотеза переходит в статус «расследование». Команде придёт чек-лист «Что проверить» и список нужных данных." },
-  { id: "plan", title: "Сформировать план исследования", icon: FileSearch, tone: "ai", hint: "AI составит пошаговый план проверки гипотезы — выгрузка данных, интервью, локальный пилот, метрика, решение." },
-  { id: "request_data", title: "Запросить данные", icon: Database, tone: "mixed", hint: "Создаст запрос к нужной системе или команде на основе блока «Каких данных не хватает»." },
-  { id: "contact", title: "Связаться с клиентами", icon: Users, tone: "mixed", hint: "Откроет персональный follow-up — это не публичный ответ, а сценарий уточнить детали с клиентами из жалоб." },
-  { id: "reject", title: "Отклонить как нерелевантную", icon: X, tone: "negative", hint: "Гипотеза будет скрыта из активного списка с причиной отклонения. Сохранится в архиве." },
+const ACTIONS: {
+  id: Exclude<Action, null>;
+  title: string;
+  icon: typeof Search;
+  tone: "ai" | "mixed" | "negative";
+  hint: string;
+}[] = [
+  {
+    id: "investigate",
+    title: "Начать проверку",
+    icon: Search,
+    tone: "ai",
+    hint: "Гипотеза переходит в статус «расследование». Команде придёт чек-лист «Что проверить» и список нужных данных.",
+  },
+  {
+    id: "plan",
+    title: "Сформировать план исследования",
+    icon: FileSearch,
+    tone: "ai",
+    hint: "AI составит пошаговый план проверки гипотезы — выгрузка данных, интервью, локальный пилот, метрика, решение.",
+  },
+  {
+    id: "request_data",
+    title: "Запросить данные",
+    icon: Database,
+    tone: "mixed",
+    hint: "Создаст запрос к нужной системе или команде на основе блока «Каких данных не хватает».",
+  },
+  {
+    id: "contact",
+    title: "Связаться с клиентами",
+    icon: Users,
+    tone: "mixed",
+    hint: "Откроет персональный follow-up — это не публичный ответ, а сценарий уточнить детали с клиентами из жалоб.",
+  },
+  {
+    id: "reject",
+    title: "Отклонить как нерелевантную",
+    icon: X,
+    tone: "negative",
+    hint: "Гипотеза будет скрыта из активного списка с причиной отклонения. Сохранится в архиве.",
+  },
 ];
 
 /**
@@ -53,23 +89,23 @@ export function StickyActions({
         <div>
           <h3 className="text-sm font-semibold tracking-tight">Что сделать с гипотезой</h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            Гипотеза — это <b className="text-foreground">старт расследования</b>, а не готовое решение.
-            Выберите следующий исследовательский шаг.
+            Гипотеза — это <b className="text-foreground">старт расследования</b>, а не готовое
+            решение. Выберите следующий исследовательский шаг.
           </p>
         </div>
 
         <div className="stagger space-y-1.5">
           {ACTIONS.map((a) => (
-            <ActionRow
-              key={a.id}
-              {...a}
-              active={active === a.id}
-              onClick={() => setActive(a.id)}
-            />
+            <ActionRow key={a.id} {...a} active={active === a.id} onClick={() => setActive(a.id)} />
           ))}
         </div>
 
-        <Button size="sm" disabled={!active} onClick={handleSubmit} className="press w-full h-9 text-xs">
+        <Button
+          size="sm"
+          disabled={!active}
+          onClick={handleSubmit}
+          className="press w-full h-9 text-xs"
+        >
           <Send className="mr-1.5 h-3.5 w-3.5" /> Подтвердить действие
         </Button>
       </Card>
@@ -109,8 +145,14 @@ function ActionRow({
     negative: "text-negative bg-negative-soft",
   }[tone];
   return (
-    <div className={`flex items-center gap-2.5 rounded-lg border p-2.5 transition ${active ? activeCls : "border-border bg-card hover:border-foreground/20"}`}>
-      <button type="button" onClick={onClick} className="flex flex-1 items-center gap-2.5 text-left">
+    <div
+      className={`flex items-center gap-2.5 rounded-lg border p-2.5 transition ${active ? activeCls : "border-border bg-card hover:border-foreground/20"}`}
+    >
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex flex-1 items-center gap-2.5 text-left"
+      >
         <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${iconCls}`}>
           <Icon className="h-3.5 w-3.5" />
         </div>

@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, AlertCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
@@ -48,14 +54,21 @@ export function CustomerFollowUp() {
 
       <div className="mb-4 flex items-start gap-2 rounded-md border border-mixed/30 bg-mixed-soft/20 p-2.5 text-[11px] text-mixed-foreground">
         <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        <span>Это не публичный ответ — он не заменяет проверку проблемы и не публикуется на площадке.</span>
+        <span>
+          Это не публичный ответ — он не заменяет проверку проблемы и не публикуется на площадке.
+        </span>
       </div>
 
       <ul className="stagger space-y-1.5">
         {STEPS.map((s, i) => (
-          <li key={s} className="motion-row flex items-start gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted/30">
+          <li
+            key={s}
+            className="motion-row flex items-start gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted/30"
+          >
             <Checkbox id={`fu-${i}`} className="mt-0.5" />
-            <label htmlFor={`fu-${i}`} className="flex-1 cursor-pointer text-xs leading-snug">{s}</label>
+            <label htmlFor={`fu-${i}`} className="flex-1 cursor-pointer text-xs leading-snug">
+              {s}
+            </label>
           </li>
         ))}
       </ul>

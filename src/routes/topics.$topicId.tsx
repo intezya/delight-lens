@@ -3,12 +3,55 @@ import { AppShell } from "@/components/app-shell";
 import { TopicDetailSkeleton } from "@/components/skeletons/topic-detail";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TOPICS, REVIEWS, INSIGHTS, IMPACT_CASES, TIMESERIES, getSubtopicsByTopic } from "@/lib/mock/data";
-import { SentimentPill, TopicChip, SourceBadge, SignalBar, PriorityBadge, AiBadge, SectionHeader, StatusBadge } from "@/components/atoms";
+import {
+  TOPICS,
+  REVIEWS,
+  INSIGHTS,
+  IMPACT_CASES,
+  TIMESERIES,
+  getSubtopicsByTopic,
+} from "@/lib/mock/data";
+import {
+  SentimentPill,
+  TopicChip,
+  SourceBadge,
+  SignalBar,
+  PriorityBadge,
+  AiBadge,
+  SectionHeader,
+  StatusBadge,
+} from "@/components/atoms";
 import { InsightCard } from "@/components/insight-card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis } from "recharts";
-import { ArrowLeft, Quote, CheckCircle2, Clock, Layers, Sparkles, ArrowRight, TrendingUp } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip as RTooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ArrowLeft,
+  Quote,
+  CheckCircle2,
+  Clock,
+  Layers,
+  Sparkles,
+  ArrowRight,
+  TrendingUp,
+} from "lucide-react";
 
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -18,7 +61,7 @@ export const Route = createFileRoute("/topics/$topicId")({
   pendingMs: 120,
   pendingMinMs: 180,
   loader: ({ params }) => {
-    const topic = TOPICS.find(t => t.id === params.topicId);
+    const topic = TOPICS.find((t) => t.id === params.topicId);
     if (!topic) throw notFound();
     return { topic };
   },
@@ -29,29 +72,44 @@ export const Route = createFileRoute("/topics/$topicId")({
     ],
   }),
   notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center"><Link to="/topics" className="text-sm">← Все темы</Link></div>
+    <div className="flex min-h-screen items-center justify-center">
+      <Link to="/topics" className="text-sm">
+        ← Все темы
+      </Link>
+    </div>
   ),
   component: TopicDetailPage,
 });
 
 const tt = {
-  contentStyle: { background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 10, fontSize: 11, padding: 8 },
+  contentStyle: {
+    background: "var(--popover)",
+    border: "1px solid var(--border)",
+    borderRadius: 10,
+    fontSize: 11,
+    padding: 8,
+  },
   labelStyle: { color: "var(--muted-foreground)", fontSize: 10 },
   cursor: { stroke: "var(--border)", strokeDasharray: "3 3" },
 };
 
 function TopicDetailPage() {
   const { topic } = Route.useLoaderData();
-  const reviews = REVIEWS.filter(r => r.topics.includes(topic.id));
-  const pos = reviews.filter(r => r.sentiment === "positive").length;
-  const neg = reviews.filter(r => r.sentiment === "negative").length;
-  const mix = reviews.filter(r => r.sentiment === "mixed").length;
-  const insights = INSIGHTS.filter(i => i.topicId === topic.id);
-  const impacts = IMPACT_CASES.filter(c => c.topicId === topic.id);
+  const reviews = REVIEWS.filter((r) => r.topics.includes(topic.id));
+  const pos = reviews.filter((r) => r.sentiment === "positive").length;
+  const neg = reviews.filter((r) => r.sentiment === "negative").length;
+  const mix = reviews.filter((r) => r.sentiment === "mixed").length;
+  const insights = INSIGHTS.filter((i) => i.topicId === topic.id);
+  const impacts = IMPACT_CASES.filter((c) => c.topicId === topic.id);
   const subtopics = getSubtopicsByTopic(topic.id);
 
   const segments = [
-    { name: "Москва", value: 38 }, { name: "СПб", value: 24 }, { name: "Екатеринбург", value: 14 }, { name: "Казань", value: 12 }, { name: "Новосибирск", value: 8 }, { name: "Краснодар", value: 4 },
+    { name: "Москва", value: 38 },
+    { name: "СПб", value: 24 },
+    { name: "Екатеринбург", value: 14 },
+    { name: "Казань", value: 12 },
+    { name: "Новосибирск", value: 8 },
+    { name: "Краснодар", value: 4 },
   ];
   const patterns = [
     { name: "«звонишь — обещают перезвонить — не перезванивают»", count: 13 },
@@ -60,29 +118,74 @@ function TopicDetailPage() {
     { name: "«деньги списались — заказа нет»", count: 9 },
   ];
   const quotes = reviews.slice(0, 4);
-  const series = TIMESERIES.slice(-60).map(d => ({ ...d, topic: Math.round((d.negative + d.positive) * 0.35 + Math.random() * 6) }));
+  const series = TIMESERIES.slice(-60).map((d) => ({
+    ...d,
+    topic: Math.round((d.negative + d.positive) * 0.35 + Math.random() * 6),
+  }));
 
-  const kindColor = topic.kind === "strength" ? "var(--positive)" : topic.kind === "opportunity" ? "var(--ai)" : "var(--negative)";
+  const kindColor =
+    topic.kind === "strength"
+      ? "var(--positive)"
+      : topic.kind === "opportunity"
+        ? "var(--ai)"
+        : "var(--negative)";
 
   return (
-    <AppShell title={topic.name} subtitle={`Детальный разбор темы · ${reviews.length} отзывов · AI-анализ`}>
+    <AppShell
+      title={topic.name}
+      subtitle={`Детальный разбор темы · ${reviews.length} отзывов · AI-анализ`}
+    >
       <div className="motion-page space-y-5 p-4 md:p-6">
-        <Link to="/topics" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"><ArrowLeft className="h-3.5 w-3.5" /> Все темы</Link>
+        <Link
+          to="/topics"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Все темы
+        </Link>
 
         {/* Header card */}
         <Card className="motion-surface p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
-              <div className="mb-2 flex items-center gap-2"><TopicChip name={topic.kind === "risk" ? "Risk" : topic.kind === "strength" ? "Strength" : "Opportunity"} kind={topic.kind} /><AiBadge /></div>
+              <div className="mb-2 flex items-center gap-2">
+                <TopicChip
+                  name={
+                    topic.kind === "risk"
+                      ? "Risk"
+                      : topic.kind === "strength"
+                        ? "Strength"
+                        : "Opportunity"
+                  }
+                  kind={topic.kind}
+                />
+                <AiBadge />
+              </div>
               <h2 className="display text-2xl font-semibold tracking-tight">{topic.name}</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Тема концентрируется в категории «Электроника», 62% упоминаний с тональностью {topic.kind === "strength" ? "позитив" : "негатив"}. AI выделил {patterns.length} устойчивых паттернов и {insights.length} актуальных гипотез.
+                Тема концентрируется в категории «Электроника», 62% упоминаний с тональностью{" "}
+                {topic.kind === "strength" ? "позитив" : "негатив"}. AI выделил {patterns.length}{" "}
+                устойчивых паттернов и {insights.length} актуальных гипотез.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-lg border bg-card px-3 py-2"><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Отзывов</p><p className="num display text-xl font-semibold">{reviews.length}</p></div>
-              <div className="rounded-lg border bg-card px-3 py-2"><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Гипотез</p><p className="num display text-xl font-semibold">{insights.length}</p></div>
-              <div className="rounded-lg border bg-card px-3 py-2"><p className="text-[10px] uppercase tracking-wider text-muted-foreground">Внедрено</p><p className="num display text-xl font-semibold">{impacts.length}</p></div>
+              <div className="rounded-lg border bg-card px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Отзывов
+                </p>
+                <p className="num display text-xl font-semibold">{reviews.length}</p>
+              </div>
+              <div className="rounded-lg border bg-card px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Гипотез
+                </p>
+                <p className="num display text-xl font-semibold">{insights.length}</p>
+              </div>
+              <div className="rounded-lg border bg-card px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Внедрено
+                </p>
+                <p className="num display text-xl font-semibold">{impacts.length}</p>
+              </div>
             </div>
           </div>
         </Card>
@@ -93,14 +196,22 @@ function TopicDetailPage() {
             <SectionHeader
               title="Подтемы и гипотезы"
               subtitle={`Тема разбита на ${subtopics.length} подтемы. Раскройте, чтобы увидеть гипотезы по каждой.`}
-              action={<span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground"><Layers className="h-3 w-3" /> AI-кластеризация</span>}
+              action={
+                <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <Layers className="h-3 w-3" /> AI-кластеризация
+                </span>
+              }
             />
             <Accordion type="multiple" className="space-y-2">
               {subtopics.map((sub) => {
-                const subInsights = INSIGHTS.filter(i => i.subtopicId === sub.id);
+                const subInsights = INSIGHTS.filter((i) => i.subtopicId === sub.id);
                 const trendUp = sub.trend.startsWith("+");
                 return (
-                  <AccordionItem key={sub.id} value={sub.id} className="overflow-hidden rounded-lg border bg-card data-[state=open]:border-ai/40">
+                  <AccordionItem
+                    key={sub.id}
+                    value={sub.id}
+                    className="overflow-hidden rounded-lg border bg-card data-[state=open]:border-ai/40"
+                  >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
                       <div className="flex flex-1 items-center gap-3 pr-3 text-left">
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-muted-foreground">
@@ -109,9 +220,14 @@ function TopicDetailPage() {
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold leading-tight">{sub.name}</p>
                           <p className="mt-0.5 text-[11px] text-muted-foreground">
-                            {sub.reviewsCount} отзывов · <span className={trendUp ? "text-negative" : "text-positive"}>
-                              <TrendingUp className={`mr-0.5 inline h-3 w-3 ${trendUp ? "" : "rotate-180"}`} />{sub.trend}
-                            </span> за 30 дней
+                            {sub.reviewsCount} отзывов ·{" "}
+                            <span className={trendUp ? "text-negative" : "text-positive"}>
+                              <TrendingUp
+                                className={`mr-0.5 inline h-3 w-3 ${trendUp ? "" : "rotate-180"}`}
+                              />
+                              {sub.trend}
+                            </span>{" "}
+                            за 30 дней
                           </p>
                         </div>
                         <span className="num text-[10px] text-muted-foreground">
@@ -121,7 +237,9 @@ function TopicDetailPage() {
                     </AccordionTrigger>
                     <AccordionContent className="border-t bg-muted/20 px-4 py-3">
                       {subInsights.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">По этой подтеме гипотез пока нет.</p>
+                        <p className="text-xs text-muted-foreground">
+                          По этой подтеме гипотез пока нет.
+                        </p>
                       ) : (
                         <div className="space-y-1.5">
                           {subInsights.map((ins) => (
@@ -133,7 +251,9 @@ function TopicDetailPage() {
                             >
                               <Sparkles className="h-3.5 w-3.5 shrink-0 text-ai" />
                               <span className="line-clamp-1 flex-1">{ins.title}</span>
-                              <span className="num text-[10px] text-muted-foreground">conf {ins.confidence}%</span>
+                              <span className="num text-[10px] text-muted-foreground">
+                                conf {ins.confidence}%
+                              </span>
                               <StatusBadge status={ins.status} />
                               <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                             </Link>
@@ -162,10 +282,28 @@ function TopicDetailPage() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
-                  <XAxis dataKey="label" stroke="var(--muted-foreground)" fontSize={10} interval={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} />
+                  <XAxis
+                    dataKey="label"
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    interval={9}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                   <RTooltip {...tt} />
-                  <Area dataKey="topic" stroke={kindColor} strokeWidth={2} fill="url(#tdg)" type="monotone" />
+                  <Area
+                    dataKey="topic"
+                    stroke={kindColor}
+                    strokeWidth={2}
+                    fill="url(#tdg)"
+                    type="monotone"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -177,7 +315,17 @@ function TopicDetailPage() {
               <div className="h-[180px] w-[180px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={[{ n: "pos", v: pos }, { n: "mix", v: mix }, { n: "neg", v: neg }]} dataKey="v" innerRadius={50} outerRadius={75} paddingAngle={2}>
+                    <Pie
+                      data={[
+                        { n: "pos", v: pos },
+                        { n: "mix", v: mix },
+                        { n: "neg", v: neg },
+                      ]}
+                      dataKey="v"
+                      innerRadius={50}
+                      outerRadius={75}
+                      paddingAngle={2}
+                    >
                       <Cell fill="var(--positive)" />
                       <Cell fill="var(--mixed)" />
                       <Cell fill="var(--negative)" />
@@ -186,9 +334,27 @@ function TopicDetailPage() {
                 </ResponsiveContainer>
               </div>
               <div className="flex-1 space-y-2 text-xs">
-                <div className="flex items-center justify-between"><span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-positive" />Позитив</span><span className="num font-medium">{pos}</span></div>
-                <div className="flex items-center justify-between"><span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-mixed" />Смешанный</span><span className="num font-medium">{mix}</span></div>
-                <div className="flex items-center justify-between"><span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-negative" />Негатив</span><span className="num font-medium">{neg}</span></div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-positive" />
+                    Позитив
+                  </span>
+                  <span className="num font-medium">{pos}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-mixed" />
+                    Смешанный
+                  </span>
+                  <span className="num font-medium">{mix}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-negative" />
+                    Негатив
+                  </span>
+                  <span className="num font-medium">{neg}</span>
+                </div>
               </div>
             </div>
           </Card>
@@ -198,11 +364,16 @@ function TopicDetailPage() {
           <Card className="motion-surface p-4">
             <SectionHeader title="Повторяющиеся паттерны" subtitle="Кластеры формулировок" />
             <div className="space-y-2">
-              {patterns.map(p => (
-                <div key={p.name} className="flex items-start gap-2 rounded-lg border bg-card p-2.5">
+              {patterns.map((p) => (
+                <div
+                  key={p.name}
+                  className="flex items-start gap-2 rounded-lg border bg-card p-2.5"
+                >
                   <Quote className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
                   <p className="flex-1 text-xs">{p.name}</p>
-                  <span className="num rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold">×{p.count}</span>
+                  <span className="num rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold">
+                    ×{p.count}
+                  </span>
                 </div>
               ))}
             </div>
@@ -214,8 +385,22 @@ function TopicDetailPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={segments} layout="vertical" margin={{ left: 8 }}>
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" horizontal={false} />
-                  <XAxis type="number" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis type="category" dataKey="name" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} width={100} />
+                  <XAxis
+                    type="number"
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    stroke="var(--muted-foreground)"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    width={100}
+                  />
                   <RTooltip {...tt} />
                   <Bar dataKey="value" fill={kindColor} fillOpacity={0.85} radius={[0, 4, 4, 0]} />
                 </BarChart>
@@ -226,8 +411,11 @@ function TopicDetailPage() {
           <Card className="motion-surface p-4">
             <SectionHeader title="Ключевые цитаты" subtitle="Из реальных отзывов" />
             <div className="space-y-2">
-              {quotes.map(q => (
-                <blockquote key={q.id} className={`rounded-lg border-l-2 bg-muted/30 p-2.5 text-xs ${q.sentiment === "positive" ? "border-positive" : q.sentiment === "negative" ? "border-negative" : "border-mixed"}`}>
+              {quotes.map((q) => (
+                <blockquote
+                  key={q.id}
+                  className={`rounded-lg border-l-2 bg-muted/30 p-2.5 text-xs ${q.sentiment === "positive" ? "border-positive" : q.sentiment === "negative" ? "border-negative" : "border-mixed"}`}
+                >
                   <p className="line-clamp-3 italic">«{q.text}»</p>
                   <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
                     <SourceBadge source={q.source} />
@@ -241,9 +429,14 @@ function TopicDetailPage() {
 
         {insights.length > 0 && (
           <div>
-            <SectionHeader title="Связанные AI-гипотезы" subtitle="Сгенерированы на основе этой темы" />
+            <SectionHeader
+              title="Связанные AI-гипотезы"
+              subtitle="Сгенерированы на основе этой темы"
+            />
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {insights.map(i => <InsightCard key={i.id} insight={i} />)}
+              {insights.map((i) => (
+                <InsightCard key={i.id} insight={i} />
+              ))}
             </div>
           </div>
         )}
@@ -252,17 +445,35 @@ function TopicDetailPage() {
           <Card className="motion-surface p-4">
             <SectionHeader title="Принятые действия и эффект" subtitle="Таймлайн внедрений" />
             <div className="space-y-3">
-              {impacts.map(c => (
+              {impacts.map((c) => (
                 <div key={c.id} className="flex items-start gap-3 rounded-lg border bg-card p-3">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium">{c.action}</p>
-                    <p className="num mt-0.5 inline-flex items-center gap-1 text-[10px] text-muted-foreground"><Clock className="h-3 w-3" /> Внедрено {format(new Date(c.deployedAt), "d MMM yyyy", { locale: ru })}</p>
+                    <p className="num mt-0.5 inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Clock className="h-3 w-3" /> Внедрено{" "}
+                      {format(new Date(c.deployedAt), "d MMM yyyy", { locale: ru })}
+                    </p>
                   </div>
                   <div className="grid grid-cols-3 gap-3 text-right text-[10px]">
-                    <div><p className="text-muted-foreground">Sentiment</p><p className="num font-semibold text-positive">{c.before.sentiment} → {c.after.sentiment}</p></div>
-                    <div><p className="text-muted-foreground">Rating</p><p className="num font-semibold">{c.before.rating} → {c.after.rating}</p></div>
-                    <div><p className="text-muted-foreground">Жалоб</p><p className="num font-semibold text-positive">{c.before.complaints} → {c.after.complaints}</p></div>
+                    <div>
+                      <p className="text-muted-foreground">Sentiment</p>
+                      <p className="num font-semibold text-positive">
+                        {c.before.sentiment} → {c.after.sentiment}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Rating</p>
+                      <p className="num font-semibold">
+                        {c.before.rating} → {c.after.rating}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Жалоб</p>
+                      <p className="num font-semibold text-positive">
+                        {c.before.complaints} → {c.after.complaints}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -273,7 +484,11 @@ function TopicDetailPage() {
         <Card className="motion-surface overflow-hidden">
           <div className="flex items-center justify-between border-b p-3">
             <SectionHeader title="Связанные отзывы" subtitle={`${reviews.length} отзывов в теме`} />
-            <Link to="/reviews"><Button variant="outline" size="sm" className="h-7 text-xs">Все отзывы</Button></Link>
+            <Link to="/reviews">
+              <Button variant="outline" size="sm" className="h-7 text-xs">
+                Все отзывы
+              </Button>
+            </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -288,14 +503,26 @@ function TopicDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {reviews.slice(0, 8).map(r => (
+                {reviews.slice(0, 8).map((r) => (
                   <tr key={r.id} className="motion-row border-b transition hover:bg-muted/30">
-                    <td className="max-w-[420px] px-4 py-2.5"><span className="line-clamp-1">{r.text}</span></td>
-                    <td className="px-2 py-2.5"><SentimentPill sentiment={r.sentiment} /></td>
-                    <td className="px-2 py-2.5"><SignalBar value={r.signal} /></td>
-                    <td className="px-2 py-2.5"><SourceBadge source={r.source} /></td>
-                    <td className="px-2 py-2.5 num text-muted-foreground">{format(new Date(r.date), "d MMM", { locale: ru })}</td>
-                    <td className="px-2 py-2.5"><PriorityBadge priority={r.priority} /></td>
+                    <td className="max-w-[420px] px-4 py-2.5">
+                      <span className="line-clamp-1">{r.text}</span>
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <SentimentPill sentiment={r.sentiment} />
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <SignalBar value={r.signal} />
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <SourceBadge source={r.source} />
+                    </td>
+                    <td className="px-2 py-2.5 num text-muted-foreground">
+                      {format(new Date(r.date), "d MMM", { locale: ru })}
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <PriorityBadge priority={r.priority} />
+                    </td>
                   </tr>
                 ))}
               </tbody>

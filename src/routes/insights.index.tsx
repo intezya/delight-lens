@@ -45,11 +45,12 @@ function InsightsPage() {
   const [layout, setLayout] = useState<"grid" | "kanban">("grid");
 
   const counts = STATUSES.reduce<Record<string, number>>((acc, s) => {
-    acc[s.key] = s.key === "all" ? INSIGHTS.length : INSIGHTS.filter(i => i.status === s.key).length;
+    acc[s.key] =
+      s.key === "all" ? INSIGHTS.length : INSIGHTS.filter((i) => i.status === s.key).length;
     return acc;
   }, {});
 
-  const filtered = status === "all" ? INSIGHTS : INSIGHTS.filter(i => i.status === status);
+  const filtered = status === "all" ? INSIGHTS : INSIGHTS.filter((i) => i.status === status);
 
   return (
     <AppShell
@@ -61,17 +62,34 @@ function InsightsPage() {
           <div className="grid-bg pointer-events-none absolute inset-0 opacity-20" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="max-w-xl">
-              <div className="mb-2 flex items-center gap-2"><AiBadge /><span className="text-[10px] uppercase tracking-wider text-muted-foreground">Сводка периода</span></div>
-              <h2 className="display text-2xl font-semibold tracking-tight">AI выделил {INSIGHTS.filter(i => i.signal > 70).length} сильных гипотез из 1 792 отзывов</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Принятие в работу всех «critical» гипотез ожидаемо снизит долю негатива на 22% в течение 4 недель.</p>
+              <div className="mb-2 flex items-center gap-2">
+                <AiBadge />
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Сводка периода
+                </span>
+              </div>
+              <h2 className="display text-2xl font-semibold tracking-tight">
+                AI выделил {INSIGHTS.filter((i) => i.signal > 70).length} сильных гипотез из 1 792
+                отзывов
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Принятие в работу всех «critical» гипотез ожидаемо снизит долю негатива на 22% в
+                течение 4 недель.
+              </p>
             </div>
             <div className="flex gap-3">
               <div className="rounded-lg border bg-card px-4 py-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Средняя уверенность</p>
-                <p className="num display text-2xl font-semibold">{Math.round(INSIGHTS.reduce((s, i) => s + i.confidence, 0) / INSIGHTS.length)}%</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Средняя уверенность
+                </p>
+                <p className="num display text-2xl font-semibold">
+                  {Math.round(INSIGHTS.reduce((s, i) => s + i.confidence, 0) / INSIGHTS.length)}%
+                </p>
               </div>
               <div className="rounded-lg border bg-card px-4 py-3">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">В работе</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  В работе
+                </p>
                 <p className="num display text-2xl font-semibold">{counts.in_progress}</p>
               </div>
             </div>
@@ -81,10 +99,12 @@ function InsightsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <Tabs value={status} onValueChange={(v) => setStatus(v as InsightStatus | "all")}>
             <TabsList className="h-9">
-              {STATUSES.map(s => (
+              {STATUSES.map((s) => (
                 <TabsTrigger key={s.key} value={s.key} className="h-8 gap-1.5 text-xs">
                   {s.label}
-                  <span className="num rounded bg-muted px-1 text-[10px] font-medium tabular-nums text-muted-foreground">{counts[s.key]}</span>
+                  <span className="num rounded bg-muted px-1 text-[10px] font-medium tabular-nums text-muted-foreground">
+                    {counts[s.key]}
+                  </span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -92,8 +112,12 @@ function InsightsPage() {
           <div className="ml-auto">
             <Tabs value={layout} onValueChange={(v) => setLayout(v as "grid" | "kanban")}>
               <TabsList className="h-9">
-                <TabsTrigger value="grid" className="h-8 px-2 text-xs"><LayoutGrid className="mr-1 h-3.5 w-3.5" /> Сетка</TabsTrigger>
-                <TabsTrigger value="kanban" className="h-8 px-2 text-xs"><Columns3 className="mr-1 h-3.5 w-3.5" /> Канбан</TabsTrigger>
+                <TabsTrigger value="grid" className="h-8 px-2 text-xs">
+                  <LayoutGrid className="mr-1 h-3.5 w-3.5" /> Сетка
+                </TabsTrigger>
+                <TabsTrigger value="kanban" className="h-8 px-2 text-xs">
+                  <Columns3 className="mr-1 h-3.5 w-3.5" /> Канбан
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -101,25 +125,40 @@ function InsightsPage() {
 
         {layout === "grid" ? (
           <div className="stagger grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map(i => <InsightCard key={i.id} insight={i} />)}
+            {filtered.map((i) => (
+              <InsightCard key={i.id} insight={i} />
+            ))}
           </div>
         ) : (
           <div className="-mx-4 overflow-x-auto px-4 pb-2 md:-mx-6 md:px-6">
             <div className="flex gap-4 min-w-max">
-              {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(col => (
-                <div key={col} className="motion-surface flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3">
-                  <div className="flex items-center justify-between sticky top-0">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider">{KANBAN_LABELS[col]}</h4>
-                    <span className="num rounded bg-card px-1.5 text-[10px] font-medium">{counts[col]}</span>
+              {(["new", "validated", "in_progress", "implemented", "rejected"] as const).map(
+                (col) => (
+                  <div
+                    key={col}
+                    className="motion-surface flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3"
+                  >
+                    <div className="flex items-center justify-between sticky top-0">
+                      <h4 className="text-xs font-semibold uppercase tracking-wider">
+                        {KANBAN_LABELS[col]}
+                      </h4>
+                      <span className="num rounded bg-card px-1.5 text-[10px] font-medium">
+                        {counts[col]}
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {INSIGHTS.filter((i) => i.status === col).map((i) => (
+                        <InsightCard key={i.id} insight={i} compact />
+                      ))}
+                      {counts[col] === 0 && (
+                        <p className="rounded-lg border border-dashed py-6 text-center text-[11px] text-muted-foreground">
+                          пусто
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    {INSIGHTS.filter(i => i.status === col).map(i => <InsightCard key={i.id} insight={i} compact />)}
-                    {counts[col] === 0 && (
-                      <p className="rounded-lg border border-dashed py-6 text-center text-[11px] text-muted-foreground">пусто</p>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         )}

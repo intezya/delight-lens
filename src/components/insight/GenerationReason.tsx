@@ -13,7 +13,10 @@ export function GenerationReason({ reasons }: { reasons: string[] }) {
       </p>
       <ul className="stagger space-y-2.5">
         {reasons.map((r) => (
-          <li key={r} className="motion-row flex items-start gap-2.5 rounded-lg border bg-muted/30 px-3 py-2.5">
+          <li
+            key={r}
+            className="motion-row flex items-start gap-2.5 rounded-lg border bg-muted/30 px-3 py-2.5"
+          >
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-ai" />
             <p className="text-sm leading-snug text-foreground/90">{r}</p>
           </li>

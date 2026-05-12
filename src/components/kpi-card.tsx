@@ -17,21 +17,44 @@ type Props = {
   suffix?: string;
 };
 
-export function KpiCard({ label, value, hint, delta, invertDelta, deltaSuffix, spark, tone = "neutral", suffix }: Props) {
+export function KpiCard({
+  label,
+  value,
+  hint,
+  delta,
+  invertDelta,
+  deltaSuffix,
+  spark,
+  tone = "neutral",
+  suffix,
+}: Props) {
   const toneCls = {
     neutral: "from-transparent to-transparent",
     positive: "from-positive/10 to-transparent",
     negative: "from-negative/10 to-transparent",
     ai: "from-ai/10 to-transparent",
   }[tone];
-  const sparkColor = tone === "positive" ? "var(--positive)" : tone === "negative" ? "var(--negative)" : tone === "ai" ? "var(--ai)" : "var(--muted-foreground)";
+  const sparkColor =
+    tone === "positive"
+      ? "var(--positive)"
+      : tone === "negative"
+        ? "var(--negative)"
+        : tone === "ai"
+          ? "var(--ai)"
+          : "var(--muted-foreground)";
 
   return (
-    <Card className={cn("motion-surface relative overflow-hidden border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]")}>
+    <Card
+      className={cn(
+        "motion-surface relative overflow-hidden border bg-card p-4 shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]",
+      )}
+    >
       <div className={cn("pointer-events-none absolute inset-0 bg-gradient-to-br", toneCls)} />
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            {label}
+          </p>
           {hint && (
             <TooltipProvider delayDuration={150}>
               <Tooltip>
@@ -40,7 +63,9 @@ export function KpiCard({ label, value, hint, delta, invertDelta, deltaSuffix, s
                     <Info className="h-3 w-3" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[220px] text-[11px]">{hint}</TooltipContent>
+                <TooltipContent side="top" className="max-w-[220px] text-[11px]">
+                  {hint}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -50,7 +75,9 @@ export function KpiCard({ label, value, hint, delta, invertDelta, deltaSuffix, s
             <span className="num display text-3xl font-semibold tracking-tight">{value}</span>
             {suffix && <span className="text-sm font-medium text-muted-foreground">{suffix}</span>}
           </div>
-          {delta !== undefined && <Delta value={delta} invert={invertDelta} suffix={deltaSuffix ?? "%"} />}
+          {delta !== undefined && (
+            <Delta value={delta} invert={invertDelta} suffix={deltaSuffix ?? "%"} />
+          )}
         </div>
         {spark && spark.length > 0 && (
           <div className="-mb-1 -mx-1 h-8">
@@ -62,7 +89,13 @@ export function KpiCard({ label, value, hint, delta, invertDelta, deltaSuffix, s
                     <stop offset="100%" stopColor={sparkColor} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <Area dataKey="v" type="monotone" stroke={sparkColor} strokeWidth={1.5} fill={`url(#spk-${label})`} />
+                <Area
+                  dataKey="v"
+                  type="monotone"
+                  stroke={sparkColor}
+                  strokeWidth={1.5}
+                  fill={`url(#spk-${label})`}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
