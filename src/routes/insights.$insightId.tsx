@@ -4,7 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { InsightDetailSkeleton } from "@/components/skeletons/insight-detail";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AiBadge, PriorityBadge, SectionHeader, StatusBadge, TopicChip } from "@/components/atoms";
+import { PriorityBadge, SectionHeader, StatusBadge, TopicChip } from "@/components/atoms";
 import { InfoHint } from "@/components/info-hint";
 import { ProblemConfidenceCard } from "@/components/insight/ProblemConfidenceCard";
 import { AlternativeHypotheses } from "@/components/insight/AlternativeHypotheses";
@@ -27,7 +27,6 @@ import {
   ChevronRight,
   Clock,
   MessageSquareQuote,
-  Users,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -104,7 +103,7 @@ function InsightDetailPage() {
         </Button>
       }
     >
-      <div className="motion-page mx-auto grid max-w-[1280px] gap-8 p-4 md:p-8 lg:grid-cols-[1fr_320px] lg:p-10">
+      <div className="motion-page mx-auto w-full max-w-[1440px] px-4 py-5 md:px-6 md:py-6 lg:px-8">
         {/* === MAIN COLUMN === */}
         <div className="min-w-0 space-y-8">
           {/* Breadcrumbs */}
@@ -141,7 +140,6 @@ function InsightDetailPage() {
           {/* Заголовок проблемы */}
           <header className="anim-rise space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <AiBadge />
               <StatusBadge status={insight.status} />
               <PriorityBadge priority={insight.priority} />
               {topic && <TopicChip name={topic.name} kind={topic.kind} />}
@@ -153,13 +151,6 @@ function InsightDetailPage() {
               {insight.description}
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5" />
-                <span className="font-medium text-foreground">
-                  {localizeTeam(insight.ownerTeam)}
-                </span>
-                · {insight.owner.name}
-              </span>
               <span className="inline-flex items-center gap-1.5" suppressHydrationWarning>
                 <Calendar className="h-3.5 w-3.5" /> Создано {createdAgo}
               </span>
@@ -187,7 +178,7 @@ function InsightDetailPage() {
           <section className="space-y-4">
             <SectionHeader
               title="Почему система предложила гипотезу"
-              subtitle="На какие наблюдения опирается AI-анализ"
+              subtitle="На какие наблюдения опирается автоматический анализ"
             />
             <GenerationReason reasons={insight.generationReason} />
           </section>
@@ -199,10 +190,10 @@ function InsightDetailPage() {
                 title={
                   <span className="inline-flex items-center gap-1.5">
                     Возможные причины
-                    <InfoHint text="AI разложил проблему на 2–4 версии. Это не «правильный ответ», а варианты для исследования. Каждая требует разных проверок." />
+                    <InfoHint text="Система разложила проблему на 2–4 версии. Это не «правильный ответ», а варианты для исследования. Каждая требует разных проверок." />
                   </span>
                 }
-                subtitle="Brainstorming, а не готовое решение — выберите версию для расследования"
+                subtitle="Черновой разбор, а не готовое решение — выберите версию для расследования"
               />
               <AlternativeHypotheses
                 alternatives={alternatives}
@@ -265,7 +256,7 @@ function InsightDetailPage() {
                   <InfoHint text="Прогноз изменения метрики, если одна из гипотез подтвердится и будет реализована. Это диапазон, а не точная цифра." />
                 </span>
               }
-              subtitle="Диапазон, в котором AI ожидает результат"
+              subtitle="Диапазон ожидаемого результата"
             />
             <ExpectedEffectCard effect={insight.expectedEffectV2} />
           </section>
@@ -283,7 +274,7 @@ function InsightDetailPage() {
           <section ref={followUpRef} className="space-y-4 scroll-mt-20">
             <SectionHeader
               title="Связаться с клиентами"
-              subtitle="Персональный follow-up для расследования — не публичный ответ"
+              subtitle="Персональная связь для расследования — не публичный ответ"
             />
             <CustomerFollowUp />
           </section>
@@ -344,17 +335,16 @@ function InsightDetailPage() {
               )}
             </div>
           </section>
-        </div>
 
-        {/* === STICKY ACTIONS === */}
-        <aside className="lg:block">
-          <StickyActions
-            hypothesisStatement={activeAlt?.statement}
-            onContact={() =>
-              followUpRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-          />
-        </aside>
+          <section className="pt-2">
+            <StickyActions
+              hypothesisStatement={activeAlt?.statement}
+              onContact={() =>
+                followUpRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+            />
+          </section>
+        </div>
       </div>
     </AppShell>
   );

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { ReviewsSkeleton } from "@/components/skeletons/reviews";
 import { Card } from "@/components/ui/card";
@@ -26,27 +26,6 @@ import { LayoutGrid, List, Repeat, Link2, Search, Star } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
-const REVIEW_SOURCES = [
-  "Я.Маркет",
-  "Otzovik",
-  "2GIS",
-  "Google Maps",
-  "Trustpilot",
-  "App Store",
-] as const satisfies readonly Source[];
-
-const REVIEW_VIEWS = ["table", "cards"] as const;
-type ReviewView = (typeof REVIEW_VIEWS)[number];
-type SourceFilter = Source | "all";
-
-function isSourceFilter(value: string): value is SourceFilter {
-  return value === "all" || (REVIEW_SOURCES as readonly string[]).includes(value);
-}
-
-function isReviewView(value: string): value is ReviewView {
-  return (REVIEW_VIEWS as readonly string[]).includes(value);
-}
-
 export const Route = createFileRoute("/reviews")({
   pendingComponent: ReviewsSkeleton,
   pendingMs: 120,
@@ -63,14 +42,26 @@ export const Route = createFileRoute("/reviews")({
   component: ReviewsPage,
 });
 
+type GroupBy = "topic" | "sent" | "src" | "period" | "none";
+
+const SENTIMENT_LABEL: Record<Sentiment, string> = {
+  positive: "Позитив",
+  negative: "Негатив",
+  mixed: "Смешанные",
+};
+
 function ReviewsPage() {
-  const [view, setView] = useState<ReviewView>("table");
+  const [view, setView] = useState<"table" | "cards">("table");
   const [sentiment, setSentiment] = useState<Sentiment | "all">("all");
-  const [source, setSource] = useState<SourceFilter>("all");
+  const [source, setSource] = useState<Source | "all">("all");
+  const [groupBy, setGroupBy] = useState<GroupBy>("topic");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Review | null>(null);
   const [open, setOpen] = useState(false);
   const [onlyRepeats, setOnlyRepeats] = useState(false);
+
+  const handleSourceChange = (value: string) => setSource(value as Source | "all");
+  const handleViewChange = (value: string) => setView(value as "table" | "cards");
 
   const filtered = useMemo(
     () =>
@@ -90,6 +81,24 @@ function ReviewsPage() {
     neg: REVIEWS.filter((r) => r.sentiment === "negative").length,
     mix: REVIEWS.filter((r) => r.sentiment === "mixed").length,
   };
+
+  const groups = useMemo(() => {
+    const labelFor = (review: Review) => {
+      if (groupBy === "none") return "Все отзывы";
+      if (groupBy === "sent") return SENTIMENT_LABEL[review.sentiment];
+      if (groupBy === "src") return review.source;
+      if (groupBy === "period") return format(new Date(review.date), "LLLL yyyy", { locale: ru });
+      const topic = getTopic(review.topics[0]);
+      return topic?.name ?? "Без темы";
+    };
+
+    const map = new Map<string, Review[]>();
+    for (const review of filtered) {
+      const label = labelFor(review);
+      map.set(label, [...(map.get(label) ?? []), review]);
+    }
+    return Array.from(map, ([label, items]) => ({ label, items }));
+  }, [filtered, groupBy]);
 
   const openReview = (r: Review) => {
     setSelected(r);
@@ -140,7 +149,7 @@ function ReviewsPage() {
           </button>
         </div>
 
-        <Card className="motion-surface overflow-hidden">
+        <Card className="overflow-hidden">
           <div className="flex flex-wrap items-center gap-2 border-b p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -151,29 +160,27 @@ function ReviewsPage() {
                 className="h-8 w-[260px] pl-8 text-xs"
               />
             </div>
-            <Select
-              value={source}
-              onValueChange={(value) => {
-                if (isSourceFilter(value)) setSource(value);
-              }}
-            >
+            <Select value={source} onValueChange={handleSourceChange}>
               <SelectTrigger className="h-8 w-[150px] text-xs">
                 <SelectValue placeholder="Источник" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все источники</SelectItem>
-                {REVIEW_SOURCES.map((s) => (
+                {(
+                  ["Я.Маркет", "Otzovik", "2GIS", "Google Maps", "Trustpilot", "App Store"] as const
+                ).map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select defaultValue="topic">
+            <Select value={groupBy} onValueChange={(v) => setGroupBy(v as GroupBy)}>
               <SelectTrigger className="h-8 w-[160px] text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">Без группировки</SelectItem>
                 <SelectItem value="topic">Группировка: Тема</SelectItem>
                 <SelectItem value="sent">Группировка: Тональность</SelectItem>
                 <SelectItem value="src">Группировка: Источник</SelectItem>
@@ -190,12 +197,7 @@ function ReviewsPage() {
             </Button>
 
             <div className="ml-auto">
-              <Tabs
-                value={view}
-                onValueChange={(value) => {
-                  if (isReviewView(value)) setView(value);
-                }}
-              >
+              <Tabs value={view} onValueChange={handleViewChange}>
                 <TabsList className="h-8">
                   <TabsTrigger value="table" className="h-7 px-2 text-xs">
                     <List className="mr-1 h-3.5 w-3.5" /> Таблица
@@ -224,97 +226,125 @@ function ReviewsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((r) => (
-                    <tr
-                      key={r.id}
-                      onClick={() => openReview(r)}
-                      className="motion-row cursor-pointer border-b transition hover:bg-muted/30"
-                    >
-                      <td className="max-w-[420px] px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          {r.repeatCount > 5 && (
-                            <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-mixed-soft px-1 py-0.5 text-[9px] font-semibold text-mixed-foreground">
-                              <Repeat className="h-2.5 w-2.5" />×{r.repeatCount}
+                  {groups.map((group) => (
+                    <Fragment key={group.label}>
+                      {groupBy !== "none" && (
+                        <tr key={`${group.label}-header`} className="bg-muted/35">
+                          <td
+                            colSpan={8}
+                            className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
+                          >
+                            {group.label} · {group.items.length}
+                          </td>
+                        </tr>
+                      )}
+                      {group.items.map((r) => (
+                        <tr
+                          key={r.id}
+                          onClick={() => openReview(r)}
+                          className="review-table-row cursor-pointer border-b"
+                        >
+                          <td className="max-w-[420px] px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              {r.repeatCount > 5 && (
+                                <span className="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-mixed-soft px-1 py-0.5 text-[9px] font-semibold text-mixed-foreground">
+                                  <Repeat className="h-2.5 w-2.5" />×{r.repeatCount}
+                                </span>
+                              )}
+                              {r.linkedToKnown && <Link2 className="h-3 w-3 shrink-0 text-ai" />}
+                              <span className="line-clamp-1 text-xs">{r.text}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-3">
+                            <SentimentPill sentiment={r.sentiment} />
+                          </td>
+                          <td className="px-2 py-3">
+                            <div className="flex flex-wrap gap-1">
+                              {r.topics.slice(0, 2).map((t) => {
+                                const tp = getTopic(t);
+                                return tp ? (
+                                  <TopicChip
+                                    key={t}
+                                    name={
+                                      tp.name.length > 14 ? tp.name.slice(0, 14) + "…" : tp.name
+                                    }
+                                    kind={tp.kind}
+                                  />
+                                ) : null;
+                              })}
+                            </div>
+                          </td>
+                          <td className="px-2 py-3">
+                            <SignalBar value={r.signal} />
+                          </td>
+                          <td className="px-2 py-3">
+                            <SourceBadge source={r.source} />
+                          </td>
+                          <td className="px-2 py-3 num text-muted-foreground">
+                            {format(new Date(r.date), "d MMM", { locale: ru })}
+                          </td>
+                          <td className="px-2 py-3">
+                            <PriorityBadge priority={r.priority} />
+                          </td>
+                          <td className="px-2 py-3 text-center">
+                            <span className="num inline-flex items-center gap-0.5 text-[11px]">
+                              {r.rating}
+                              <Star className="h-2.5 w-2.5 fill-mixed text-mixed" />
                             </span>
-                          )}
-                          {r.linkedToKnown && <Link2 className="h-3 w-3 shrink-0 text-ai" />}
-                          <span className="line-clamp-1 text-xs">{r.text}</span>
-                        </div>
-                      </td>
-                      <td className="px-2 py-3">
-                        <SentimentPill sentiment={r.sentiment} />
-                      </td>
-                      <td className="px-2 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {r.topics.slice(0, 2).map((t) => {
-                            const tp = getTopic(t);
-                            return tp ? (
-                              <TopicChip
-                                key={t}
-                                name={tp.name.length > 14 ? tp.name.slice(0, 14) + "…" : tp.name}
-                                kind={tp.kind}
-                              />
-                            ) : null;
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-2 py-3">
-                        <SignalBar value={r.signal} />
-                      </td>
-                      <td className="px-2 py-3">
-                        <SourceBadge source={r.source} />
-                      </td>
-                      <td className="px-2 py-3 num text-muted-foreground">
-                        {format(new Date(r.date), "d MMM", { locale: ru })}
-                      </td>
-                      <td className="px-2 py-3">
-                        <PriorityBadge priority={r.priority} />
-                      </td>
-                      <td className="px-2 py-3 text-center">
-                        <span className="num inline-flex items-center gap-0.5 text-[11px]">
-                          {r.rating}
-                          <Star className="h-2.5 w-2.5 fill-mixed text-mixed" />
-                        </span>
-                      </td>
-                    </tr>
+                          </td>
+                        </tr>
+                      ))}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div className="stagger grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => openReview(r)}
-                  className="motion-surface press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-card p-4 text-left shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]"
-                >
-                  <span
-                    className={`absolute inset-y-0 left-0 w-1 ${r.sentiment === "positive" ? "bg-positive" : r.sentiment === "negative" ? "bg-negative" : "bg-mixed"}`}
-                  />
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <SentimentPill sentiment={r.sentiment} />
-                    <PriorityBadge priority={r.priority} />
-                    {r.repeatCount > 5 && (
-                      <span className="inline-flex items-center gap-0.5 rounded-md bg-mixed-soft px-1 py-0.5 text-[10px] font-semibold text-mixed-foreground">
-                        <Repeat className="h-2.5 w-2.5" />×{r.repeatCount}
-                      </span>
-                    )}
+            <div className="space-y-5 p-4">
+              {groups.map((group) => (
+                <section key={group.label} className="space-y-2">
+                  {groupBy !== "none" && (
+                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      <span>{group.label}</span>
+                      <span>{group.items.length}</span>
+                    </div>
+                  )}
+                  <div className="stagger grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {group.items.map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => openReview(r)}
+                        className="motion-surface press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border bg-card p-4 text-left shadow-[var(--shadow-elev-1)] transition hover:shadow-[var(--shadow-elev-2)]"
+                      >
+                        <span
+                          className={`absolute inset-y-0 left-0 w-1 ${r.sentiment === "positive" ? "bg-positive" : r.sentiment === "negative" ? "bg-negative" : "bg-mixed"}`}
+                        />
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <SentimentPill sentiment={r.sentiment} />
+                          <PriorityBadge priority={r.priority} />
+                          {r.repeatCount > 5 && (
+                            <span className="inline-flex items-center gap-0.5 rounded-md bg-mixed-soft px-1 py-0.5 text-[10px] font-semibold text-mixed-foreground">
+                              <Repeat className="h-2.5 w-2.5" />×{r.repeatCount}
+                            </span>
+                          )}
+                        </div>
+                        <p className="line-clamp-4 text-sm leading-snug">«{r.text}»</p>
+                        <div className="mt-auto flex flex-wrap gap-1">
+                          {r.topics.slice(0, 3).map((t) => {
+                            const tp = getTopic(t);
+                            return tp ? <TopicChip key={t} name={tp.name} kind={tp.kind} /> : null;
+                          })}
+                        </div>
+                        <div className="flex items-center justify-between border-t pt-2 text-[10px] text-muted-foreground">
+                          <SourceBadge source={r.source} />
+                          <span className="num">
+                            {format(new Date(r.date), "d MMM yyyy", { locale: ru })}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-sm leading-snug line-clamp-4">«{r.text}»</p>
-                  <div className="mt-auto flex flex-wrap gap-1">
-                    {r.topics.slice(0, 3).map((t) => {
-                      const tp = getTopic(t);
-                      return tp ? <TopicChip key={t} name={tp.name} kind={tp.kind} /> : null;
-                    })}
-                  </div>
-                  <div className="flex items-center justify-between border-t pt-2 text-[10px] text-muted-foreground">
-                    <SourceBadge source={r.source} />
-                    <span className="num">
-                      {format(new Date(r.date), "d MMM yyyy", { locale: ru })}
-                    </span>
-                  </div>
-                </button>
+                </section>
               ))}
             </div>
           )}

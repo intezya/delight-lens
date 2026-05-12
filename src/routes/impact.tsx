@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import {
   IMPACT_CASES,
   INSIGHTS,
+  TOPIC_DISTRIBUTION,
   getTopic,
   getInsight,
+  localizeTeam,
   TIMESERIES,
   SOURCE_RATINGS,
 } from "@/lib/mock/data";
-import { SectionHeader, Delta, TopicChip, AiBadge } from "@/components/atoms";
+import { SectionHeader, Delta, TopicChip } from "@/components/atoms";
 import { KpiCard } from "@/components/kpi-card";
 import {
   Area,
@@ -19,9 +21,11 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Label,
   Line,
   LineChart,
   ReferenceDot,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip as RTooltip,
   XAxis,
@@ -56,6 +60,138 @@ const tt = {
   cursor: { stroke: "var(--border)", strokeDasharray: "3 3" },
 };
 
+const axisLabelStyle = { fill: "var(--muted-foreground)", fontSize: 10 };
+
+function TrendChart() {
+  return (
+    <Card className="motion-surface p-4">
+      <SectionHeader title="Динамика тональности" subtitle="Объём по тональности · 90 дней" />
+      <div className="motion-chart h-[260px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={TIMESERIES} margin={{ left: 8, right: 8, bottom: 18 }}>
+            <defs>
+              <linearGradient id="impact-trend-pos" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="var(--positive)" stopOpacity={0.5} />
+                <stop offset="100%" stopColor="var(--positive)" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="impact-trend-neg" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="var(--negative)" stopOpacity={0.5} />
+                <stop offset="100%" stopColor="var(--negative)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
+            <XAxis
+              dataKey="label"
+              stroke="var(--muted-foreground)"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              interval={11}
+            >
+              <Label value="Дата" position="insideBottom" offset={-12} style={axisLabelStyle} />
+            </XAxis>
+            <YAxis stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false}>
+              <Label
+                value="Количество отзывов"
+                angle={-90}
+                position="insideLeft"
+                style={axisLabelStyle}
+              />
+            </YAxis>
+            <RTooltip {...tt} />
+            <Area
+              type="monotone"
+              dataKey="positive"
+              name="Позитив"
+              stackId="1"
+              stroke="var(--positive)"
+              strokeWidth={1.5}
+              fill="url(#impact-trend-pos)"
+            />
+            <Area
+              type="monotone"
+              dataKey="negative"
+              name="Негатив"
+              stackId="1"
+              stroke="var(--negative)"
+              strokeWidth={1.5}
+              fill="url(#impact-trend-neg)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+function DivergingChart() {
+  const data = TOPIC_DISTRIBUTION.slice(0, 7).map((t) => ({
+    name: t.name.length > 22 ? `${t.name.slice(0, 22)}...` : t.name,
+    pos: t.positive,
+    neg: -t.negative,
+  }));
+  return (
+    <Card className="motion-surface p-4">
+      <SectionHeader title="Вклад тем" subtitle="Слева негатив · справа позитив" />
+      <div className="motion-chart h-[260px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            layout="vertical"
+            stackOffset="sign"
+            margin={{ left: 8, right: 8, bottom: 18 }}
+          >
+            <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" horizontal={false} />
+            <XAxis
+              type="number"
+              stroke="var(--muted-foreground)"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            >
+              <Label
+                value="Количество отзывов"
+                position="insideBottom"
+                offset={-12}
+                style={axisLabelStyle}
+              />
+            </XAxis>
+            <YAxis
+              type="category"
+              dataKey="name"
+              stroke="var(--muted-foreground)"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+              width={140}
+            >
+              <Label value="Темы" angle={-90} position="insideLeft" style={axisLabelStyle} />
+            </YAxis>
+            <RTooltip {...tt} />
+            <ReferenceLine x={0} stroke="var(--border)" />
+            <Bar
+              dataKey="neg"
+              name="Негатив"
+              stackId="x"
+              fill="var(--negative)"
+              fillOpacity={0.85}
+              radius={[4, 0, 0, 4]}
+            />
+            <Bar
+              dataKey="pos"
+              name="Позитив"
+              stackId="x"
+              fill="var(--positive)"
+              fillOpacity={0.85}
+              radius={[0, 4, 4, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
 function ImpactPage() {
   const totalDelta = IMPACT_CASES.reduce((s, c) => s + (c.after.sentiment - c.before.sentiment), 0);
   const avgEffect = Math.round(totalDelta / IMPACT_CASES.length);
@@ -71,7 +207,7 @@ function ImpactPage() {
       <div className="motion-page space-y-5 p-4 md:p-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <KpiCard
-            label="Δ Sentiment overall"
+            label="Изменение тональности"
             value={`+${totalDelta}`}
             delta={12}
             hint="Сумма изменений по всем гипотезам"
@@ -88,12 +224,12 @@ function ImpactPage() {
             label="Средний эффект"
             value={`+${avgEffect}`}
             delta={8}
-            suffix="pt"
-            hint="Средний прирост sentiment-индекса"
+            suffix="п."
+            hint="Средний прирост индекса тональности"
             tone="positive"
           />
           <KpiCard
-            label="ROI инсайтов"
+            label="Окупаемость гипотез"
             value="3.2×"
             delta={18}
             suffix=""
@@ -102,12 +238,19 @@ function ImpactPage() {
           />
         </div>
 
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <TrendChart />
+          <DivergingChart />
+        </div>
+
         {/* Featured before/after */}
         <Card className="motion-surface p-5">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="mb-1 flex items-center gap-2">
-                <AiBadge />
+                <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                  Внедрение
+                </span>
                 <TopicChip
                   name={getTopic(featured.topicId)?.name ?? ""}
                   kind={getTopic(featured.topicId)?.kind}
@@ -122,7 +265,7 @@ function ImpactPage() {
             <div className="flex gap-3 text-right">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Sentiment
+                  Тональность
                 </p>
                 <p className="num display text-xl font-semibold">
                   {featured.before.sentiment} <span className="text-muted-foreground/50">→</span>{" "}
@@ -140,7 +283,7 @@ function ImpactPage() {
           </div>
           <div className="motion-chart h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={beforeAfter}>
+              <AreaChart data={beforeAfter} margin={{ left: 8, right: 8, bottom: 18 }}>
                 <defs>
                   <linearGradient id="ba-b" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor="var(--negative)" stopOpacity={0.35} />
@@ -159,13 +302,22 @@ function ImpactPage() {
                   interval={9}
                   tickLine={false}
                   axisLine={false}
-                />
+                >
+                  <Label value="Дата" position="insideBottom" offset={-12} style={axisLabelStyle} />
+                </XAxis>
                 <YAxis
                   stroke="var(--muted-foreground)"
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                />
+                >
+                  <Label
+                    value="Индекс тональности"
+                    angle={-90}
+                    position="insideLeft"
+                    style={axisLabelStyle}
+                  />
+                </YAxis>
                 <RTooltip {...tt} />
                 <Area
                   dataKey="before"
@@ -225,8 +377,8 @@ function ImpactPage() {
                   <th className="px-4 py-2.5 text-left font-medium">Гипотеза</th>
                   <th className="px-2 py-2.5 text-left font-medium">Действие</th>
                   <th className="px-2 py-2.5 text-left font-medium">Тема</th>
-                  <th className="px-2 py-2.5 text-right font-medium">Sentiment</th>
-                  <th className="px-2 py-2.5 text-right font-medium">Rating</th>
+                  <th className="px-2 py-2.5 text-right font-medium">Тональность</th>
+                  <th className="px-2 py-2.5 text-right font-medium">Оценка</th>
                   <th className="px-2 py-2.5 text-right font-medium">Жалоб</th>
                   <th className="px-2 py-2.5 text-right font-medium">Δ</th>
                 </tr>
@@ -260,7 +412,7 @@ function ImpactPage() {
                         <span className="text-positive">{c.after.complaints}</span>
                       </td>
                       <td className="px-2 py-3 text-right">
-                        <Delta value={dSent} suffix=" pt" />
+                        <Delta value={dSent} suffix=" п." />
                       </td>
                     </tr>
                   );
@@ -284,6 +436,7 @@ function ImpactPage() {
                     before: c.before.complaints,
                     after: c.after.complaints,
                   }))}
+                  margin={{ left: 8, right: 8, bottom: 18 }}
                 >
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
                   <XAxis
@@ -292,13 +445,27 @@ function ImpactPage() {
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
-                  />
+                  >
+                    <Label
+                      value="Тема"
+                      position="insideBottom"
+                      offset={-12}
+                      style={axisLabelStyle}
+                    />
+                  </XAxis>
                   <YAxis
                     stroke="var(--muted-foreground)"
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
-                  />
+                  >
+                    <Label
+                      value="Количество жалоб"
+                      angle={-90}
+                      position="insideLeft"
+                      style={axisLabelStyle}
+                    />
+                  </YAxis>
                   <RTooltip {...tt} />
                   <Bar
                     dataKey="before"
@@ -321,7 +488,7 @@ function ImpactPage() {
             <SectionHeader title="Изменение средней оценки" subtitle="Маркеры — деплои" />
             <div className="motion-chart h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={SOURCE_RATINGS}>
+                <LineChart data={SOURCE_RATINGS} margin={{ left: 8, right: 8, bottom: 18 }}>
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
                   <XAxis
                     dataKey="date"
@@ -329,14 +496,28 @@ function ImpactPage() {
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
-                  />
+                  >
+                    <Label
+                      value="Дата"
+                      position="insideBottom"
+                      offset={-12}
+                      style={axisLabelStyle}
+                    />
+                  </XAxis>
                   <YAxis
                     domain={[3, 5]}
                     stroke="var(--muted-foreground)"
                     fontSize={10}
                     tickLine={false}
                     axisLine={false}
-                  />
+                  >
+                    <Label
+                      value="Средняя оценка"
+                      angle={-90}
+                      position="insideLeft"
+                      style={axisLabelStyle}
+                    />
+                  </YAxis>
                   <RTooltip {...tt} />
                   <Line dataKey="Я.Маркет" stroke="var(--chart-1)" strokeWidth={2} dot={false} />
                   <Line dataKey="Otzovik" stroke="var(--chart-3)" strokeWidth={2} dot={false} />
@@ -377,10 +558,10 @@ function ImpactPage() {
                     <p className="text-xs font-medium">{c.action}</p>
                     <p className="num text-[10px] text-muted-foreground">
                       {format(new Date(c.deployedAt), "d MMM yyyy", { locale: ru })} ·{" "}
-                      {INSIGHTS.find((i) => i.id === c.insightId)?.owner.team}
+                      {localizeTeam(INSIGHTS.find((i) => i.id === c.insightId)?.owner.team ?? "")}
                     </p>
                   </div>
-                  <Delta value={c.after.sentiment - c.before.sentiment} suffix=" pt" />
+                  <Delta value={c.after.sentiment - c.before.sentiment} suffix=" п." />
                   <Button size="sm" variant="ghost" className="h-7 text-xs">
                     Детали
                   </Button>

@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Send, Target } from "lucide-react";
+import { Users, Send } from "lucide-react";
 
 export function OwnerTeamCard({
   team,
@@ -36,10 +36,7 @@ export function OwnerTeamCard({
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
               Рекомендованное действие
             </p>
-            <p className="mt-1.5 inline-flex items-center gap-2 text-sm font-medium">
-              <Target className="h-4 w-4 text-ai" />
-              {recommendedAction}
-            </p>
+            <p className="mt-1.5 text-sm font-medium">{recommendedAction}</p>
           </div>
 
           <div className="rounded-lg border-l-2 border-ai/50 bg-muted/30 p-3">

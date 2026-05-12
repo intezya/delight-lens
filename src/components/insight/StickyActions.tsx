@@ -27,7 +27,7 @@ const ACTIONS: {
     title: "Сформировать план исследования",
     icon: FileSearch,
     tone: "ai",
-    hint: "AI составит пошаговый план проверки гипотезы — выгрузка данных, интервью, локальный пилот, метрика, решение.",
+    hint: "Система составит пошаговый план проверки гипотезы — выгрузка данных, интервью, локальный пилот, метрика, решение.",
   },
   {
     id: "request_data",
@@ -41,7 +41,7 @@ const ACTIONS: {
     title: "Связаться с клиентами",
     icon: Users,
     tone: "mixed",
-    hint: "Откроет персональный follow-up — это не публичный ответ, а сценарий уточнить детали с клиентами из жалоб.",
+    hint: "Откроет персональный сценарий связи — это не публичный ответ, а способ уточнить детали с клиентами из жалоб.",
   },
   {
     id: "reject",
@@ -85,7 +85,7 @@ export function StickyActions({
 
   return (
     <>
-      <Card className="motion-surface sticky top-16 space-y-4 p-5 shadow-[var(--shadow-elev-2)]">
+      <Card className="space-y-4 p-5 shadow-[var(--shadow-elev-1)]">
         <div>
           <h3 className="text-sm font-semibold tracking-tight">Что сделать с гипотезой</h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -151,7 +151,7 @@ function ActionRow({
       <button
         type="button"
         onClick={onClick}
-        className="flex flex-1 items-center gap-2.5 text-left"
+        className="flex flex-1 items-center gap-2.5 text-left transition-transform active:scale-[0.99]"
       >
         <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${iconCls}`}>
           <Icon className="h-3.5 w-3.5" />

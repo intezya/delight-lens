@@ -10,13 +10,18 @@ const LABEL_TONE: Record<ExpectedEffect["label"], string> = {
 };
 
 export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
-  const sign =
-    effect.type === "complaints_reduction" || effect.type === "repeat_reduction" ? "−" : "+";
-  // Position of midpoint on 0-100 thermometer (using max as scale cap of 50%)
+  const isReduction = effect.type === "complaints_reduction" || effect.type === "repeat_reduction";
+  const sign = isReduction ? "−" : "+";
   const cap = effect.unit === "★" ? 1 : 50;
-  const midPct = Math.min(100, ((effect.range.min + effect.range.max) / 2 / cap) * 100);
-  const minPct = Math.min(100, (effect.range.min / cap) * 100);
-  const maxPct = Math.min(100, (effect.range.max / cap) * 100);
+  const minPct = isReduction
+    ? Math.max(0, ((cap - effect.range.max) / cap) * 100)
+    : Math.min(100, (effect.range.min / cap) * 100);
+  const maxPct = isReduction
+    ? Math.min(100, ((cap - effect.range.min) / cap) * 100)
+    : Math.min(100, (effect.range.max / cap) * 100);
+  const midPct = (minPct + maxPct) / 2;
+  const leftScaleLabel = isReduction ? `−${cap}${effect.unit}` : `0${effect.unit}`;
+  const rightScaleLabel = isReduction ? `0${effect.unit}` : `+${cap}${effect.unit}`;
 
   return (
     <Card className="motion-surface p-6 md:p-7">
@@ -48,6 +53,10 @@ export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
 
       {/* Thermometer */}
       <div className="mt-6 space-y-2">
+        <div className="flex justify-between text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <span>{isReduction ? "Снижение метрики" : "Рост метрики"}</span>
+          <span>{isReduction ? "Без изменений" : "Максимум шкалы"}</span>
+        </div>
         <div className="relative h-3 overflow-hidden rounded-full bg-muted">
           <div
             className="absolute inset-y-0 rounded-full bg-gradient-to-r from-ai/60 to-ai transition-[left,width] duration-500"
@@ -59,11 +68,8 @@ export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
           />
         </div>
         <div className="flex justify-between text-[10px] text-muted-foreground num">
-          <span>0{effect.unit}</span>
-          <span>
-            {cap}
-            {effect.unit}
-          </span>
+          <span>{leftScaleLabel}</span>
+          <span>{rightScaleLabel}</span>
         </div>
       </div>
 

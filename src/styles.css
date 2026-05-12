@@ -320,14 +320,9 @@
       border-color var(--motion-fast) ease,
       background-color var(--motion-fast) ease;
   }
-  .motion-surface:hover,
-  .motion-surface:focus-within {
+  .motion-surface:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-elev-2);
-  }
-  .motion-surface:active {
-    transform: translateY(0) scale(0.99);
-    transition-duration: 90ms;
   }
 
   .motion-row {
@@ -337,6 +332,23 @@
   }
   .motion-row:hover {
     transform: translateX(2px);
+  }
+
+  .review-table-row {
+    transition:
+      background-color var(--motion-fast) ease,
+      box-shadow var(--motion-fast) ease;
+  }
+  .review-table-row:hover {
+    background-color: color-mix(in oklab, var(--muted) 62%, transparent);
+    box-shadow: inset 3px 0 0 var(--ai);
+  }
+  .review-table-row:active {
+    background-color: color-mix(in oklab, var(--muted) 88%, transparent);
+  }
+
+  .sheet-content-motion {
+    will-change: transform, opacity;
   }
 
   .motion-expand {
@@ -681,8 +693,8 @@
     transform: none;
   }
   .motion-surface:hover,
-  .motion-surface:focus-within,
   .motion-row:hover,
+  .review-table-row:hover,
   .motion-nav-link:hover svg,
   .motion-nav-link:focus-visible svg,
   .motion-chip:hover {
@@ -692,6 +704,7 @@
   .press,
   .motion-surface,
   .motion-row,
+  .review-table-row,
   .motion-nav-link svg,
   .motion-chip {
     transition: none !important;

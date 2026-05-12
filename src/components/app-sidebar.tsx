@@ -25,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 const NAV = [
   { to: "/", label: "Дашборд", icon: LayoutDashboard, exact: true },
   { to: "/reviews", label: "Отзывы", icon: MessageSquareQuote, badge: "1.7k" },
-  { to: "/insights", label: "Гипотезы", icon: Sparkles, badge: "AI" },
+  { to: "/insights", label: "Гипотезы", icon: Sparkles },
   { to: "/topics", label: "Темы", icon: Tags },
   { to: "/impact", label: "Эффект", icon: TrendingUp },
 ] as const;
@@ -48,10 +48,7 @@ export function AppSidebar() {
             <Sparkle className="h-4 w-4" />
           </div>
           <div className="sidebar-copy-motion flex flex-col leading-tight">
-            <span className="text-sm font-semibold tracking-tight">Voicelens</span>
-            <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-              Review Intelligence
-            </span>
+            <span className="text-sm font-semibold tracking-tight">Дашборд</span>
           </div>
         </Link>
       </SidebarHeader>

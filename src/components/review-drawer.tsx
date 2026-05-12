@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { type Review, getTopic, REVIEWS, INSIGHTS } from "@/lib/mock/data";
-import { SentimentPill, SourceBadge, TopicChip, SignalBar, PriorityBadge, AiBadge } from "./atoms";
+import { SentimentPill, SourceBadge, TopicChip, SignalBar, PriorityBadge } from "./atoms";
 import { Button } from "@/components/ui/button";
 import { Star, Repeat, Link2, Sparkles, Quote, Flag, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
@@ -62,9 +62,8 @@ export function ReviewDrawer({
 
           <section>
             <div className="mb-2 flex items-center gap-2">
-              <AiBadge />
               <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Разбор AI
+                Разбор системой
               </h4>
             </div>
             <div className="space-y-3 rounded-xl border bg-card p-3.5">
@@ -123,7 +122,7 @@ export function ReviewDrawer({
           {relatedInsights.length > 0 && (
             <section>
               <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Связанные AI-инсайты
+                Связанные гипотезы
               </h4>
               <div className="space-y-2">
                 {relatedInsights.map((i) => (
@@ -135,7 +134,7 @@ export function ReviewDrawer({
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-xs font-medium">{i.title}</p>
                       <p className="num text-[10px] text-muted-foreground">
-                        confidence {i.confidence}% · {i.expectedEffect}
+                        уверенность {i.confidence}% · {i.expectedEffect}
                       </p>
                     </div>
                   </div>

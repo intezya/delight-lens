@@ -3,30 +3,9 @@ import { AppShell } from "@/components/app-shell";
 import { DashboardSkeleton } from "@/components/skeletons/dashboard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  KPI,
-  TIMESERIES,
-  TOPIC_DISTRIBUTION,
-  REVIEWS,
-  INSIGHTS,
-  ANOMALIES,
-  getTopic,
-} from "@/lib/mock/data";
-import { SectionHeader, AiBadge, Delta, TopicChip } from "@/components/atoms";
+import { KPI, REVIEWS, INSIGHTS, ANOMALIES, getTopic } from "@/lib/mock/data";
+import { SectionHeader, Delta, TopicChip } from "@/components/atoms";
 import { PeriodToggle, periodLabel, type Period } from "@/components/period-toggle";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip as RTooltip,
-  XAxis,
-  YAxis,
-  ReferenceLine,
-  Cell,
-} from "recharts";
 import {
   Sparkles,
   ArrowRight,
@@ -46,28 +25,15 @@ export const Route = createFileRoute("/")({
   pendingMinMs: 180,
   head: () => ({
     meta: [
-      { title: "Dashboard — Voicelens Review Intelligence" },
+      { title: "Дашборд" },
       {
         name: "description",
-        content: "AI-аналитика клиентских отзывов: тональность, темы, инсайты и эффект изменений.",
+        content: "Аналитика клиентских отзывов: тональность, темы, гипотезы и эффект изменений.",
       },
     ],
   }),
   component: DashboardPage,
 });
-
-const chartTooltip = {
-  contentStyle: {
-    background: "var(--popover)",
-    border: "1px solid var(--border)",
-    borderRadius: 10,
-    fontSize: 11,
-    padding: 8,
-    boxShadow: "var(--shadow-elev-2)",
-  },
-  labelStyle: { color: "var(--muted-foreground)", fontSize: 10, marginBottom: 4 },
-  cursor: { stroke: "var(--border)", strokeDasharray: "3 3" },
-};
 
 // ──────────────────────────────────────────────────────────────────────────
 // Hero: AI brief
@@ -83,8 +49,8 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
   const body =
     period === "24h" ? (
       <>
-        За сутки AI зафиксировал <span className="text-negative">+12 новых жалоб</span> на доставку
-        и <span className="text-ai">1 новую гипотезу</span>.
+        За сутки система зафиксировала <span className="text-negative">+12 новых жалоб</span> на
+        доставку и <span className="text-ai">1 новую гипотезу</span>.
       </>
     ) : period === "7d" ? (
       <>
@@ -103,7 +69,6 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-2.5">
           <div className="flex items-center gap-3">
-            <AiBadge />
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
               {title}
             </span>
@@ -137,28 +102,28 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
 function HealthStrip() {
   const items = [
     {
-      label: "Sentiment Index",
+      label: "Индекс тональности",
       value: KPI.sentimentIndex,
       suffix: "/100",
       delta: KPI.sentimentDelta,
       tone: KPI.sentimentIndex >= 0 ? "positive" : "negative",
     },
     {
-      label: "Insight → Action",
+      label: "Гипотезы в действия",
       value: KPI.conversion,
       suffix: "%",
       delta: KPI.conversionDelta,
       tone: "ai",
     },
     {
-      label: "Сильных в работе",
+      label: "Приоритетных гипотез",
       value: KPI.strongInsightsInWork,
       suffix: "",
       delta: 4,
       tone: "neutral",
     },
     {
-      label: "Δ Sentiment после внедрений",
+      label: "Тональность после внедрений",
       value: `+${KPI.sentimentAfter}`,
       suffix: "",
       delta: 6,
@@ -210,7 +175,7 @@ const ATTENTION: AttentionItem[] = [
     severity: "critical",
     kind: "anomaly",
     title: "Резкий рост жалоб на сроки доставки",
-    reason: "AI заметил всплеск +142% за 7 дней. Связан с гипотезой о слотах выходного дня.",
+    reason: "Система заметила всплеск +142% за 7 дней. Связан с гипотезой о слотах выходного дня.",
     metric: "+142%",
     insightId: "i-2",
     topicId: "delay",
@@ -222,7 +187,7 @@ const ATTENTION: AttentionItem[] = [
     kind: "insight",
     title: "Витринный товар продаётся как новый",
     reason: "14 повторов за 30 дней, концентрация в Москве и СПб. Гипотеза валидирована.",
-    metric: "signal 88",
+    metric: "сигнал 88",
     insightId: "i-1",
     topicId: "defective",
     reviewCount: 14,
@@ -242,7 +207,7 @@ const ATTENTION: AttentionItem[] = [
     id: "att-4",
     severity: "medium",
     kind: "growth",
-    title: "Программа лояльности — главный driver позитива",
+    title: "Программа лояльности — главный источник позитива",
     reason: "76 упоминаний с 5★. Возможность конвертировать в NPS-кампанию.",
     metric: "+34%",
     insightId: "i-3",
@@ -254,7 +219,7 @@ const ATTENTION: AttentionItem[] = [
     severity: "high",
     kind: "anomaly",
     title: "Подозрение на серый канал в категории Аудио",
-    reason: "Новый кластер «серийник не пробивается» — 9 отзывов, конфиденс 71%.",
+    reason: "Новый кластер «серийник не пробивается» — 9 отзывов, уверенность 71%.",
     metric: "новый кластер",
     insightId: "i-7",
     topicId: "fake",
@@ -356,7 +321,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
             </Button>
           )}
           <span className="ml-auto text-[10px] text-muted-foreground">
-            Замечено AI · {new Date().toLocaleDateString("ru-RU")}
+            Замечено системой · {new Date().toLocaleDateString("ru-RU")}
           </span>
         </div>
       )}
@@ -369,7 +334,7 @@ function AttentionFeed() {
     <Card className="motion-surface p-4">
       <SectionHeader
         title="Требует вашего внимания"
-        subtitle="Приоритизированные сигналы AI · 5 пунктов"
+        subtitle="Приоритизированные сигналы · 5 пунктов"
         action={
           <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
             <Link to="/insights">
@@ -388,122 +353,6 @@ function AttentionFeed() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Charts: sentiment trend + diverging topics
-
-function TrendChart() {
-  return (
-    <Card className="motion-surface p-4">
-      <SectionHeader title="Динамика тональности" subtitle="Объём по тональности · 90 дней" />
-      <div className="motion-chart h-[240px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={TIMESERIES}>
-            <defs>
-              <linearGradient id="g-pos" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="var(--positive)" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="var(--positive)" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="g-neg" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="var(--negative)" stopOpacity={0.5} />
-                <stop offset="100%" stopColor="var(--negative)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
-            <XAxis
-              dataKey="label"
-              stroke="var(--muted-foreground)"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-              interval={11}
-            />
-            <YAxis
-              stroke="var(--muted-foreground)"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-            />
-            <RTooltip {...chartTooltip} />
-            <Area
-              type="monotone"
-              dataKey="positive"
-              stackId="1"
-              stroke="var(--positive)"
-              strokeWidth={1.5}
-              fill="url(#g-pos)"
-            />
-            <Area
-              type="monotone"
-              dataKey="negative"
-              stackId="1"
-              stroke="var(--negative)"
-              strokeWidth={1.5}
-              fill="url(#g-neg)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
-  );
-}
-
-function DivergingChart() {
-  const data = TOPIC_DISTRIBUTION.slice(0, 7).map((t) => ({
-    name: t.name.length > 22 ? t.name.slice(0, 22) + "…" : t.name,
-    pos: t.positive,
-    neg: -t.negative,
-    id: t.id,
-  }));
-  return (
-    <Card className="motion-surface p-4">
-      <SectionHeader title="Вклад тем" subtitle="Слева негатив · справа позитив" />
-      <div className="motion-chart h-[240px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="vertical" stackOffset="sign" margin={{ left: 8 }}>
-            <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" horizontal={false} />
-            <XAxis
-              type="number"
-              stroke="var(--muted-foreground)"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              stroke="var(--muted-foreground)"
-              fontSize={10}
-              tickLine={false}
-              axisLine={false}
-              width={140}
-            />
-            <RTooltip {...chartTooltip} />
-            <ReferenceLine x={0} stroke="var(--border)" />
-            <Bar
-              dataKey="neg"
-              stackId="x"
-              fill="var(--negative)"
-              fillOpacity={0.85}
-              radius={[4, 0, 0, 4]}
-            >
-              {data.map((_, i) => (
-                <Cell key={i} />
-              ))}
-            </Bar>
-            <Bar
-              dataKey="pos"
-              stackId="x"
-              fill="var(--positive)"
-              fillOpacity={0.85}
-              radius={[0, 4, 4, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────
 // Page
 
 function DashboardPage() {
@@ -513,8 +362,7 @@ function DashboardPage() {
 
   return (
     <AppShell
-      title="Главный дашборд"
-      subtitle={`AI заметил ${ANOMALIES.length} новых сигналов · ${newCount} новых гипотез · ${repeatCount} повторов`}
+      subtitle={`Система заметила ${ANOMALIES.length} новых сигналов · ${newCount} новых гипотез · ${repeatCount} повторов`}
       actions={
         <Button asChild size="sm" className="h-8 text-xs">
           <Link to="/insights">
@@ -528,15 +376,7 @@ function DashboardPage() {
 
         <HealthStrip />
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-          <div className="lg:col-span-3">
-            <AttentionFeed />
-          </div>
-          <div className="space-y-4 lg:col-span-2">
-            <TrendChart />
-            <DivergingChart />
-          </div>
-        </div>
+        <AttentionFeed />
 
         <Card className="motion-surface p-4">
           <div className="flex items-center justify-between gap-3">
@@ -545,7 +385,7 @@ function DashboardPage() {
                 Эффект внедрённых решений вынесен на отдельную вкладку
               </h3>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Главный дашборд показывает только то, что требует внимания {periodLabel(period)}.
+                Этот экран показывает только то, что требует внимания {periodLabel(period)}.
               </p>
             </div>
             <Button asChild size="sm" variant="outline" className="h-8 text-xs">

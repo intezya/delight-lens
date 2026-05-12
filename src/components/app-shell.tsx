@@ -11,11 +11,12 @@ export function AppShell({
   actions,
 }: {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   subtitle?: string;
   actions?: React.ReactNode;
 }) {
   const { open, close, reopen } = useOnboarding();
+  const hasHeaderCopy = Boolean(title || subtitle);
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
@@ -24,12 +25,16 @@ export function AppShell({
           <header className="anim-drop sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <SidebarTrigger className="-ml-1" />
             <div className="ml-1 flex min-w-0 flex-1 items-center gap-3">
-              <div className="flex min-w-0 flex-col leading-tight">
-                <h1 className="truncate text-sm font-semibold tracking-tight">{title}</h1>
-                {subtitle && (
-                  <span className="truncate text-[10px] text-muted-foreground">{subtitle}</span>
-                )}
-              </div>
+              {hasHeaderCopy && (
+                <div className="flex min-w-0 flex-col leading-tight">
+                  {title && (
+                    <h1 className="truncate text-sm font-semibold tracking-tight">{title}</h1>
+                  )}
+                  {subtitle && (
+                    <span className="truncate text-[10px] text-muted-foreground">{subtitle}</span>
+                  )}
+                </div>
+              )}
             </div>
             <div className="ml-auto flex items-center gap-1.5">
               {actions}
