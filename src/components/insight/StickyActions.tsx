@@ -85,7 +85,7 @@ export function StickyActions({
 
   return (
     <>
-      <Card className="space-y-4 p-5 shadow-[var(--shadow-elev-1)]">
+      <Card className="space-y-4 p-4 shadow-[var(--shadow-elev-1)] sm:p-5">
         <div>
           <h3 className="text-sm font-semibold tracking-tight">Что сделать с гипотезой</h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
@@ -146,7 +146,7 @@ function ActionRow({
   }[tone];
   return (
     <div
-      className={`flex items-center gap-2.5 rounded-lg border p-2.5 transition ${active ? activeCls : "border-border bg-card hover:border-foreground/20"}`}
+      className={`flex items-center gap-2 rounded-lg border p-2.5 transition sm:gap-2.5 ${active ? activeCls : "border-border bg-card hover:border-foreground/20"}`}
     >
       <button
         type="button"
@@ -156,7 +156,7 @@ function ActionRow({
         <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md ${iconCls}`}>
           <Icon className="h-3.5 w-3.5" />
         </div>
-        <span className="text-[13px] font-medium leading-tight">{title}</span>
+        <span className="text-[12.5px] font-medium leading-tight sm:text-[13px]">{title}</span>
       </button>
       <InfoHint text={hint} />
     </div>

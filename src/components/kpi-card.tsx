@@ -71,8 +71,10 @@ export function KpiCard({
           )}
         </div>
         <div className="flex items-end justify-between gap-2">
-          <div className="flex items-baseline gap-1">
-            <span className="num display text-3xl font-semibold tracking-tight">{value}</span>
+          <div className="flex min-w-0 items-baseline gap-1">
+            <span className="num display truncate text-2xl font-semibold tracking-tight sm:text-3xl">
+              {value}
+            </span>
             {suffix && <span className="text-sm font-medium text-muted-foreground">{suffix}</span>}
           </div>
           {delta !== undefined && (

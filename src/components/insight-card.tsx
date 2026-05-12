@@ -69,7 +69,7 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-2.5 rounded-lg border bg-muted/30 p-2.5">
+        <div className="grid grid-cols-1 gap-2.5 rounded-lg border bg-muted/30 p-2.5 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
             <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground">
               Проблема
@@ -108,11 +108,11 @@ export function InsightCard({ insight }: { insight: Insight; compact?: boolean }
           </div>
         )}
 
-        <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3 text-[11px]">
-          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+        <div className="mt-auto flex flex-col items-start justify-between gap-2 border-t pt-3 text-[11px] sm:flex-row sm:items-center">
+          <span className="inline-flex min-w-0 items-center gap-1.5 text-muted-foreground">
             <Users className="h-3 w-3" /> {localizeTeam(insight.ownerTeam)}
           </span>
-          <span className="inline-flex items-center gap-2 text-muted-foreground">
+          <span className="inline-flex items-center gap-2 text-muted-foreground sm:ml-auto">
             <span className="inline-flex items-center gap-1">
               <MessageSquare className="h-3 w-3" /> {reviewsCount}
             </span>

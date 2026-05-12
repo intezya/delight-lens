@@ -43,7 +43,7 @@ const TEAM = [
 function SettingsPage() {
   return (
     <AppShell title="Настройки" subtitle="Источники, команда, AI и уведомления">
-      <div className="motion-page grid grid-cols-1 gap-4 p-4 md:p-6 lg:grid-cols-3">
+      <div className="motion-page mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 px-3 py-4 sm:px-4 md:px-6 lg:grid-cols-3">
         <Card className="motion-surface p-5 lg:col-span-2">
           <SectionHeader
             title="Источники отзывов"
@@ -58,7 +58,7 @@ function SettingsPage() {
             {SOURCES.map((s) => (
               <div
                 key={s.name}
-                className="motion-row flex items-center justify-between rounded-lg border bg-card p-3"
+                className="motion-row flex flex-col items-start gap-2 rounded-lg border bg-card p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <p className="text-sm font-medium">{s.name}</p>
@@ -124,8 +124,8 @@ function SettingsPage() {
               </Button>
             }
           />
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full text-xs">
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="min-w-[620px] w-full text-xs">
               <thead className="border-b bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium">Имя</th>

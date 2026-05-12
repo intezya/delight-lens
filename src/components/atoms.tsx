@@ -70,11 +70,11 @@ export function TopicChip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
+        "inline-flex max-w-full min-w-0 items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
         cls,
       )}
     >
-      {name}
+      <span className="truncate">{name}</span>
       {count !== undefined && <span className="opacity-60">·{count}</span>}
     </span>
   );
@@ -195,12 +195,12 @@ export function SectionHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-3 flex items-end justify-between gap-3">
-      <div>
+    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+      <div className="min-w-0">
         <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
         {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
@@ -215,11 +215,11 @@ export function SourceBadge({ source }: { source: string }) {
     "App Store": "AS",
   };
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+    <span className="inline-flex min-w-0 items-center gap-1.5 text-[11px] text-muted-foreground">
       <span className="flex h-4 w-4 items-center justify-center rounded bg-muted text-[8px] font-bold tracking-tight text-foreground">
         {map[source] ?? "··"}
       </span>
-      {source}
+      <span className="truncate">{source}</span>
     </span>
   );
 }

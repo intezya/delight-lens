@@ -135,7 +135,7 @@ function TopicDetailPage() {
       title={topic.name}
       subtitle={`Детальный разбор темы · ${reviews.length} отзывов · AI-анализ`}
     >
-      <div className="motion-page space-y-5 p-4 md:p-6">
+      <div className="motion-page mx-auto w-full max-w-[1440px] space-y-5 px-3 py-4 sm:px-4 md:px-6">
         <Link
           to="/topics"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
@@ -145,7 +145,7 @@ function TopicDetailPage() {
 
         {/* Header card */}
         <Card className="motion-surface p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <div className="mb-2 flex items-center gap-2">
                 <TopicChip
@@ -160,14 +160,16 @@ function TopicDetailPage() {
                 />
                 <AiBadge />
               </div>
-              <h2 className="display text-2xl font-semibold tracking-tight">{topic.name}</h2>
+              <h2 className="display text-xl font-semibold tracking-tight sm:text-2xl">
+                {topic.name}
+              </h2>
               <p className="mt-2 text-sm text-muted-foreground">
                 Тема концентрируется в категории «Электроника», 62% упоминаний с тональностью{" "}
                 {topic.kind === "strength" ? "позитив" : "негатив"}. AI выделил {patterns.length}{" "}
                 устойчивых паттернов и {insights.length} актуальных гипотез.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid w-full grid-cols-3 gap-2 sm:gap-3 lg:w-auto">
               <div className="rounded-lg border bg-card px-3 py-2">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                   Отзывов
@@ -213,7 +215,7 @@ function TopicDetailPage() {
                     className="overflow-hidden rounded-lg border bg-card data-[state=open]:border-ai/40"
                   >
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                      <div className="flex flex-1 items-center gap-3 pr-3 text-left">
+                      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 pr-3 text-left">
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-muted-foreground">
                           {subInsights.length || 0}
                         </span>
@@ -230,7 +232,7 @@ function TopicDetailPage() {
                             за 30 дней
                           </p>
                         </div>
-                        <span className="num text-[10px] text-muted-foreground">
+                        <span className="num text-[10px] text-muted-foreground sm:ml-auto">
                           {subInsights.length} {subInsights.length === 1 ? "гипотеза" : "гипотез"}
                         </span>
                       </div>
@@ -247,7 +249,7 @@ function TopicDetailPage() {
                               key={ins.id}
                               to="/insights/$insightId"
                               params={{ insightId: ins.id }}
-                              className="motion-row flex items-center gap-2.5 rounded-md border bg-card px-3 py-2 text-sm transition hover:border-ai/40 hover:bg-ai-soft/20"
+                              className="motion-row flex flex-wrap items-center gap-2.5 rounded-md border bg-card px-3 py-2 text-sm transition hover:border-ai/40 hover:bg-ai-soft/20"
                             >
                               <Sparkles className="h-3.5 w-3.5 shrink-0 text-ai" />
                               <span className="line-clamp-1 flex-1">{ins.title}</span>
@@ -311,8 +313,8 @@ function TopicDetailPage() {
 
           <Card className="motion-surface p-4">
             <SectionHeader title="Доля тональности" subtitle="Внутри темы" />
-            <div className="flex items-center gap-3">
-              <div className="h-[180px] w-[180px] shrink-0">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mx-auto h-[160px] w-[160px] shrink-0 sm:h-[180px] sm:w-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -417,7 +419,7 @@ function TopicDetailPage() {
                   className={`rounded-lg border-l-2 bg-muted/30 p-2.5 text-xs ${q.sentiment === "positive" ? "border-positive" : q.sentiment === "negative" ? "border-negative" : "border-mixed"}`}
                 >
                   <p className="line-clamp-3 italic">«{q.text}»</p>
-                  <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
+                  <div className="mt-1.5 flex flex-wrap items-center justify-between gap-1 text-[10px] text-muted-foreground">
                     <SourceBadge source={q.source} />
                     <span>{q.author}</span>
                   </div>
@@ -446,7 +448,10 @@ function TopicDetailPage() {
             <SectionHeader title="Принятые действия и эффект" subtitle="Таймлайн внедрений" />
             <div className="space-y-3">
               {impacts.map((c) => (
-                <div key={c.id} className="flex items-start gap-3 rounded-lg border bg-card p-3">
+                <div
+                  key={c.id}
+                  className="flex flex-col gap-3 rounded-lg border bg-card p-3 sm:flex-row sm:items-start"
+                >
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-positive" />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium">{c.action}</p>
@@ -455,7 +460,7 @@ function TopicDetailPage() {
                       {format(new Date(c.deployedAt), "d MMM yyyy", { locale: ru })}
                     </p>
                   </div>
-                  <div className="grid grid-cols-3 gap-3 text-right text-[10px]">
+                  <div className="grid w-full grid-cols-3 gap-3 text-left text-[10px] sm:w-auto sm:text-right">
                     <div>
                       <p className="text-muted-foreground">Sentiment</p>
                       <p className="num font-semibold text-positive">
@@ -482,7 +487,7 @@ function TopicDetailPage() {
         )}
 
         <Card className="motion-surface overflow-hidden">
-          <div className="flex items-center justify-between border-b p-3">
+          <div className="flex flex-col gap-2 border-b p-3 sm:flex-row sm:items-center sm:justify-between">
             <SectionHeader title="Связанные отзывы" subtitle={`${reviews.length} отзывов в теме`} />
             <Link to="/reviews">
               <Button variant="outline" size="sm" className="h-7 text-xs">
@@ -491,7 +496,7 @@ function TopicDetailPage() {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="min-w-[760px] w-full text-xs">
               <thead className="border-b bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium">Текст</th>

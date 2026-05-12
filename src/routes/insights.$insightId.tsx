@@ -103,11 +103,11 @@ function InsightDetailPage() {
         </Button>
       }
     >
-      <div className="motion-page mx-auto w-full max-w-[1440px] px-4 py-5 md:px-6 md:py-6 lg:px-8">
+      <div className="motion-page mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4 md:px-6 md:py-6 lg:px-8">
         {/* === MAIN COLUMN === */}
         <div className="min-w-0 space-y-8">
           {/* Breadcrumbs */}
-          <nav className="anim-fade-in flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <nav className="anim-fade-in flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <Link to="/" className="hover:text-foreground">
               Дашборд
             </Link>
@@ -144,7 +144,7 @@ function InsightDetailPage() {
               <PriorityBadge priority={insight.priority} />
               {topic && <TopicChip name={topic.name} kind={topic.kind} />}
             </div>
-            <h1 className="display text-3xl font-semibold leading-[1.15] tracking-tight md:text-[34px]">
+            <h1 className="display text-2xl font-semibold leading-[1.15] tracking-tight sm:text-3xl md:text-[34px]">
               {insight.title}
             </h1>
             <p className="max-w-3xl text-[15px] leading-relaxed text-muted-foreground">
@@ -310,7 +310,7 @@ function InsightDetailPage() {
           {/* Связанные гипотезы */}
           <section className="pt-2">
             <SectionHeader title="Связанные гипотезы" subtitle="По той же теме" />
-            <div className="stagger mt-4 grid gap-3 md:grid-cols-3">
+            <div className="stagger mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {INSIGHTS.filter((i) => i.id !== insight.id && i.topicId === insight.topicId)
                 .slice(0, 3)
                 .map((i) => (
@@ -318,7 +318,7 @@ function InsightDetailPage() {
                     <Card className="lift group flex items-start gap-3 p-4 hover:border-ai/40">
                       <MessageSquareQuote className="mt-0.5 h-4 w-4 shrink-0 text-ai/70" />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium">{i.title}</p>
+                        <p className="line-clamp-2 text-xs font-medium">{i.title}</p>
                         <div className="mt-1 flex items-center gap-1.5">
                           <StatusBadge status={i.status} />
                         </div>

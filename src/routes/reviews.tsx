@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { ReviewsSkeleton } from "@/components/skeletons/reviews";
 import { Card } from "@/components/ui/card";
@@ -22,6 +22,7 @@ import {
   SourceBadge,
 } from "@/components/atoms";
 import { ReviewDrawer } from "@/components/review-drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { LayoutGrid, List, Repeat, Link2, Search, Star } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -51,6 +52,7 @@ const SENTIMENT_LABEL: Record<Sentiment, string> = {
 };
 
 function ReviewsPage() {
+  const isMobile = useIsMobile();
   const [view, setView] = useState<"table" | "cards">("table");
   const [sentiment, setSentiment] = useState<Sentiment | "all">("all");
   const [source, setSource] = useState<Source | "all">("all");
@@ -62,6 +64,10 @@ function ReviewsPage() {
 
   const handleSourceChange = (value: string) => setSource(value as Source | "all");
   const handleViewChange = (value: string) => setView(value as "table" | "cards");
+
+  useEffect(() => {
+    if (isMobile) setView("cards");
+  }, [isMobile]);
 
   const filtered = useMemo(
     () =>
@@ -110,9 +116,9 @@ function ReviewsPage() {
       title="Отзывы"
       subtitle={`${filtered.length} из ${REVIEWS.length} отзывов · фильтры активны`}
     >
-      <div className="motion-page space-y-4 p-4 md:p-6">
+      <div className="motion-page mx-auto w-full max-w-[1440px] space-y-4 px-3 py-4 sm:px-4 md:px-6">
         {/* Sentiment tabs counter */}
-        <div className="stagger grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="stagger grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <button
             onClick={() => setSentiment("all")}
             className={`motion-surface press rounded-xl border p-3 text-left transition ${sentiment === "all" ? "border-foreground/40 bg-card shadow-[var(--shadow-elev-1)]" : "border-border bg-card hover:bg-muted/40"}`}
@@ -150,18 +156,18 @@ function ReviewsPage() {
         </div>
 
         <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-center gap-2 border-b p-3">
-            <div className="relative">
+          <div className="flex flex-col gap-2 border-b p-3 lg:flex-row lg:flex-wrap lg:items-center">
+            <div className="relative w-full sm:w-auto">
               <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Поиск по тексту отзыва…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="h-8 w-[260px] pl-8 text-xs"
+                className="h-8 w-full pl-8 text-xs sm:w-[260px]"
               />
             </div>
             <Select value={source} onValueChange={handleSourceChange}>
-              <SelectTrigger className="h-8 w-[150px] text-xs">
+              <SelectTrigger className="h-8 w-full text-xs sm:w-[150px]">
                 <SelectValue placeholder="Источник" />
               </SelectTrigger>
               <SelectContent>
@@ -176,7 +182,7 @@ function ReviewsPage() {
               </SelectContent>
             </Select>
             <Select value={groupBy} onValueChange={(v) => setGroupBy(v as GroupBy)}>
-              <SelectTrigger className="h-8 w-[160px] text-xs">
+              <SelectTrigger className="h-8 w-full text-xs sm:w-[180px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -191,18 +197,18 @@ function ReviewsPage() {
               size="sm"
               variant={onlyRepeats ? "default" : "outline"}
               onClick={() => setOnlyRepeats(!onlyRepeats)}
-              className="h-8 text-xs"
+              className="h-8 w-full text-xs sm:w-auto"
             >
               <Repeat className="mr-1.5 h-3.5 w-3.5" /> Только повторяющиеся
             </Button>
 
-            <div className="ml-auto">
+            <div className="w-full sm:w-auto lg:ml-auto">
               <Tabs value={view} onValueChange={handleViewChange}>
-                <TabsList className="h-8">
-                  <TabsTrigger value="table" className="h-7 px-2 text-xs">
+                <TabsList className="h-8 w-full">
+                  <TabsTrigger value="table" className="h-7 flex-1 px-2 text-xs sm:flex-none">
                     <List className="mr-1 h-3.5 w-3.5" /> Таблица
                   </TabsTrigger>
-                  <TabsTrigger value="cards" className="h-7 px-2 text-xs">
+                  <TabsTrigger value="cards" className="h-7 flex-1 px-2 text-xs sm:flex-none">
                     <LayoutGrid className="mr-1 h-3.5 w-3.5" /> Карточки
                   </TabsTrigger>
                 </TabsList>
@@ -212,7 +218,7 @@ function ReviewsPage() {
 
           {view === "table" ? (
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="min-w-[980px] w-full text-xs">
                 <thead className="border-b bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground">
                   <tr>
                     <th className="px-4 py-2.5 text-left font-medium">Отзыв</th>

@@ -204,8 +204,8 @@ function ImpactPage() {
 
   return (
     <AppShell title="Эффект изменений" subtitle="Как внедрённые решения повлияли на метрики">
-      <div className="motion-page space-y-5 p-4 md:p-6">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="motion-page mx-auto w-full max-w-[1440px] space-y-5 px-3 py-4 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
             label="Изменение тональности"
             value={`+${totalDelta}`}
@@ -262,7 +262,7 @@ function ImpactPage() {
                 {format(new Date(featured.deployedAt), "d MMM yyyy", { locale: ru })}
               </p>
             </div>
-            <div className="flex gap-3 text-right">
+            <div className="grid w-full grid-cols-2 gap-3 text-left sm:w-auto sm:text-right">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                   Тональность
@@ -371,7 +371,7 @@ function ImpactPage() {
             />
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="min-w-[900px] w-full text-xs">
               <thead className="border-b bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2.5 text-left font-medium">Гипотеза</th>
@@ -549,11 +549,11 @@ function ImpactPage() {
           <SectionHeader title="Таймлайн внедрений" subtitle="Деплои на графике общего sentiment" />
           <div className="space-y-3">
             {IMPACT_CASES.map((c, i) => (
-              <div key={c.id} className="flex items-center gap-4">
+              <div key={c.id} className="flex items-start gap-3 sm:items-center sm:gap-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ai-soft text-[11px] font-semibold text-ai-foreground">
                   {i + 1}
                 </div>
-                <div className="flex flex-1 items-center gap-3 rounded-lg border bg-card p-3">
+                <div className="flex min-w-0 flex-1 flex-col gap-3 rounded-lg border bg-card p-3 sm:flex-row sm:items-center">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium">{c.action}</p>
                     <p className="num text-[10px] text-muted-foreground">
@@ -562,7 +562,7 @@ function ImpactPage() {
                     </p>
                   </div>
                   <Delta value={c.after.sentiment - c.before.sentiment} suffix=" п." />
-                  <Button size="sm" variant="ghost" className="h-7 text-xs">
+                  <Button size="sm" variant="ghost" className="h-7 w-full text-xs sm:w-auto">
                     Детали
                   </Button>
                 </div>

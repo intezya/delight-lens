@@ -24,17 +24,17 @@ export function ExpectedEffectCard({ effect }: { effect: ExpectedEffect }) {
   const rightScaleLabel = isReduction ? `0${effect.unit}` : `+${cap}${effect.unit}`;
 
   return (
-    <Card className="motion-surface p-6 md:p-7">
-      <div className="flex items-start gap-4">
+    <Card className="motion-surface p-4 sm:p-6 md:p-7">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ai-soft text-ai-foreground">
           <Gauge className="h-5 w-5" />
         </div>
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
             Потенциальный эффект
           </p>
-          <div className="flex items-baseline gap-2">
-            <span className="display num text-4xl font-semibold tabular-nums">
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="display num text-3xl font-semibold tabular-nums sm:text-4xl">
               {sign}
               {effect.range.min}–{effect.range.max}
               {effect.unit}

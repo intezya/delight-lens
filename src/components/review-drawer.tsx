@@ -132,7 +132,7 @@ export function ReviewDrawer({
                   >
                     <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ai" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium">{i.title}</p>
+                      <p className="line-clamp-2 text-xs font-medium">{i.title}</p>
                       <p className="num text-[10px] text-muted-foreground">
                         уверенность {i.confidence}% · {i.expectedEffect}
                       </p>
@@ -162,16 +162,16 @@ export function ReviewDrawer({
             </section>
           )}
 
-          <div className="flex flex-wrap items-center gap-2 border-t pt-4">
-            <Button asChild size="sm" className="h-8 text-xs">
+          <div className="grid gap-2 border-t pt-4 sm:flex sm:flex-wrap sm:items-center">
+            <Button asChild size="sm" className="h-8 w-full text-xs sm:w-auto">
               <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-1.5 h-3.5 w-3.5" /> Открыть на {review.source}
               </a>
             </Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs">
+            <Button size="sm" variant="outline" className="h-8 w-full text-xs sm:w-auto">
               <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Создать гипотезу
             </Button>
-            <Button size="sm" variant="ghost" className="h-8 text-xs">
+            <Button size="sm" variant="ghost" className="h-8 w-full text-xs sm:w-auto">
               <Flag className="mr-1.5 h-3.5 w-3.5" /> В работу
             </Button>
           </div>

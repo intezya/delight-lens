@@ -61,13 +61,13 @@ function TopicsPage() {
       title="Темы"
       subtitle={`${TOPIC_DISTRIBUTION.length} тем за период · автоматическая классификация AI`}
     >
-      <div className="motion-page space-y-8 p-4 md:p-6 max-w-[1400px] mx-auto">
+      <div className="motion-page mx-auto w-full max-w-[1400px] space-y-8 px-3 py-4 sm:px-4 md:px-6">
         {(["risk", "opportunity", "strength"] as const).map((kind) => {
           const meta = sectionMeta[kind];
           const Icon = meta.icon;
           return (
             <section key={kind}>
-              <div className="mb-4 flex items-end justify-between gap-3">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
                 <div>
                   <h3 className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
                     <Icon className="h-4 w-4" style={{ color: meta.color }} /> {meta.title}
@@ -88,7 +88,7 @@ function TopicsPage() {
                   return (
                     <Card
                       key={t.id}
-                      className="motion-surface group flex flex-col gap-4 p-5 shadow-[var(--shadow-elev-1)] transition hover:border-foreground/30 hover:shadow-[var(--shadow-elev-2)]"
+                      className="motion-surface group flex min-w-0 flex-col gap-4 p-4 shadow-[var(--shadow-elev-1)] transition hover:border-foreground/30 hover:shadow-[var(--shadow-elev-2)] sm:p-5"
                     >
                       <Link
                         to="/topics/$topicId"
@@ -96,7 +96,7 @@ function TopicsPage() {
                         className="flex flex-col gap-3"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2">
                             <TopicChip
                               name={
                                 t.kind === "risk"
@@ -116,7 +116,7 @@ function TopicsPage() {
                         <h4 className="text-base font-semibold leading-snug tracking-tight">
                           {t.name}
                         </h4>
-                        <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
                           <div className="h-12 -mx-1">
                             <ResponsiveContainer width="100%" height="100%">
                               <AreaChart data={genSpark(idx + kind.length)}>
@@ -136,7 +136,7 @@ function TopicsPage() {
                               </AreaChart>
                             </ResponsiveContainer>
                           </div>
-                          <div className="text-right text-[11px] num">
+                          <div className="num text-left text-[11px] sm:text-right">
                             <span className="text-positive">+{t.positive}</span> ·{" "}
                             <span className="text-negative">−{t.negative}</span>
                           </div>

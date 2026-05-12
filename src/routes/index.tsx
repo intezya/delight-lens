@@ -64,7 +64,7 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
       </>
     );
   return (
-    <Card className="motion-surface relative overflow-hidden border-ai/20 bg-gradient-to-br from-ai-soft/40 via-card to-card p-5 shadow-[var(--shadow-elev-2)]">
+    <Card className="motion-surface relative overflow-hidden border-ai/20 bg-gradient-to-br from-ai-soft/40 via-card to-card p-4 shadow-[var(--shadow-elev-2)] sm:p-5">
       <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-ai/10 blur-3xl" />
       <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-3xl space-y-2.5">
@@ -73,14 +73,16 @@ function AiBrief({ period, onChange }: { period: Period; onChange: (p: Period) =
               {title}
             </span>
           </div>
-          <h2 className="text-xl font-semibold leading-snug tracking-tight md:text-2xl">{body}</h2>
+          <h2 className="text-lg font-semibold leading-snug tracking-tight sm:text-xl md:text-2xl">
+            {body}
+          </h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
             Главное событие — кластер задержек по выходным. Сильные стороны бренда устойчиво растут
             — упоминания программы лояльности. Рекомендуем начать с гипотезы по логистике —
             расследовать причины переноса слотов.
           </p>
         </div>
-        <div className="flex shrink-0 flex-col items-stretch gap-2 lg:items-end">
+        <div className="flex w-full shrink-0 flex-col items-stretch gap-2 sm:w-auto lg:items-end">
           <PeriodToggle value={period} onChange={onChange} />
           <Button asChild size="sm" className="h-9">
             <Link to="/insights/$insightId" params={{ insightId: headline.id }}>
@@ -131,7 +133,7 @@ function HealthStrip() {
     },
   ] as const;
   return (
-    <Card className="motion-surface grid grid-cols-2 divide-y divide-border md:grid-cols-4 md:divide-x md:divide-y-0">
+    <Card className="motion-surface grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:[&>*:nth-child(2)]:border-t-0 md:grid-cols-4 md:divide-x md:divide-y-0">
       {items.map((it) => (
         <div key={it.label} className="flex flex-col gap-1 p-4">
           <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -269,8 +271,10 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       <div className="flex w-full items-start gap-3 p-3.5 text-left">
         <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", iconCls)} />
         <TitleWrap {...titleProps}>
-          <div className="flex items-center justify-between gap-3">
-            <h4 className="truncate text-sm font-medium transition-colors">{item.title}</h4>
+          <div className="flex flex-col items-start gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <h4 className="line-clamp-2 text-sm font-medium transition-colors sm:truncate">
+              {item.title}
+            </h4>
             <span className="num shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-foreground">
               {item.metric}
             </span>
@@ -320,7 +324,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
               </Link>
             </Button>
           )}
-          <span className="ml-auto text-[10px] text-muted-foreground">
+          <span className="w-full text-[10px] text-muted-foreground sm:ml-auto sm:w-auto">
             Замечено системой · {new Date().toLocaleDateString("ru-RU")}
           </span>
         </div>
@@ -371,7 +375,7 @@ function DashboardPage() {
         </Button>
       }
     >
-      <div className="motion-page space-y-5 p-4 md:p-6">
+      <div className="motion-page mx-auto w-full max-w-[1440px] space-y-4 px-3 py-4 sm:px-4 md:px-6">
         <AiBrief period={period} onChange={setPeriod} />
 
         <HealthStrip />
@@ -379,7 +383,7 @@ function DashboardPage() {
         <AttentionFeed />
 
         <Card className="motion-surface p-4">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-sm font-semibold tracking-tight">
                 Эффект внедрённых решений вынесен на отдельную вкладку
@@ -388,7 +392,7 @@ function DashboardPage() {
                 Этот экран показывает только то, что требует внимания {periodLabel(period)}.
               </p>
             </div>
-            <Button asChild size="sm" variant="outline" className="h-8 text-xs">
+            <Button asChild size="sm" variant="outline" className="h-8 w-full text-xs sm:w-auto">
               <Link to="/impact">
                 Открыть «Эффект» <ArrowRight className="ml-1 h-3 w-3" />
               </Link>

@@ -62,8 +62,9 @@ export function OnboardingModal({ open, onClose }: { open: boolean; onClose: () 
       }}
     >
       <DialogContent
+        disableDefaultAnimation
         overlayClassName="guide-dialog-overlay"
-        className="guide-dialog-content max-w-2xl overflow-hidden"
+        className="guide-dialog-content max-h-[calc(100dvh-2rem)] max-w-2xl overflow-y-auto p-4 sm:p-6"
       >
         <DialogHeader>
           <div className="mb-3 inline-flex w-fit items-center gap-2 rounded-full bg-ai-soft/60 px-3 py-1 text-[11px] font-medium text-ai-foreground">

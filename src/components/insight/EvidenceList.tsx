@@ -50,7 +50,7 @@ export function EvidenceList({ items }: { items: EvidenceReview[] }) {
                 href={r.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-auto inline-flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-[10.5px] font-medium text-foreground transition hover:border-ai/40 hover:text-ai"
+                className="inline-flex w-full items-center justify-center gap-1 rounded-md border bg-card px-2 py-1 text-[10.5px] font-medium text-foreground transition hover:border-ai/40 hover:text-ai sm:ml-auto sm:w-auto"
               >
                 <ExternalLink className="h-3 w-3" />
                 Открыть на {r.source}

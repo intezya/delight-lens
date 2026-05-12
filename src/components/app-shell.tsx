@@ -22,7 +22,7 @@ export function AppShell({
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         <SidebarInset className="flex min-w-0 flex-1 flex-col">
-          <header className="anim-drop sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <header className="anim-drop sticky top-0 z-20 flex min-h-12 shrink-0 items-center gap-2 border-b bg-background/80 px-2 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-3">
             <SidebarTrigger className="-ml-1" />
             <div className="ml-1 flex min-w-0 flex-1 items-center gap-3">
               {hasHeaderCopy && (
@@ -36,8 +36,12 @@ export function AppShell({
                 </div>
               )}
             </div>
-            <div className="ml-auto flex items-center gap-1.5">
-              {actions}
+            <div className="ml-auto flex min-w-0 items-center justify-end gap-1.5">
+              {actions && (
+                <div className="hidden min-w-0 items-center justify-end gap-1.5 sm:flex">
+                  {actions}
+                </div>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -50,7 +54,7 @@ export function AppShell({
               </Button>
             </div>
           </header>
-          <main className="flex-1 overflow-x-hidden">{children}</main>
+          <main className="min-w-0 flex-1 overflow-x-hidden">{children}</main>
         </SidebarInset>
       </div>
       <OnboardingModal open={open} onClose={close} />
