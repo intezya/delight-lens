@@ -79,7 +79,11 @@ export function CustomerFollowUp() {
             <Mail className="mr-1.5 h-3.5 w-3.5" /> Открыть шаблон сообщения
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-lg">
+        <DialogContent
+          disableDefaultAnimation
+          overlayClassName="guide-dialog-overlay"
+          className="guide-dialog-content max-h-[calc(100dvh-2rem)] max-w-lg overflow-y-auto"
+        >
           <DialogHeader>
             <DialogTitle className="text-base">Шаблон follow-up клиенту</DialogTitle>
           </DialogHeader>
