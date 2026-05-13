@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Tags, Lightbulb, Quote, ShieldCheck, Send } from "lucide-react";
 
 const LS_KEY = "voicelens.onboarding.seen";
+let onboardingSeenInSession = false;
 
 const STEPS = [
   {
@@ -39,14 +40,34 @@ const STEPS = [
   },
 ] as const;
 
+function hasSeenOnboarding() {
+  if (onboardingSeenInSession) return true;
+
+  try {
+    return typeof window !== "undefined" && window.localStorage.getItem(LS_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markOnboardingSeen() {
+  onboardingSeenInSession = true;
+
+  try {
+    window.localStorage.setItem(LS_KEY, "1");
+  } catch {
+    // Some mobile browsers block storage. Closing must still work for this session.
+  }
+}
+
 export function useOnboarding() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!localStorage.getItem(LS_KEY)) setOpen(true);
+    if (!hasSeenOnboarding()) setOpen(true);
   }, []);
   const close = () => {
-    if (typeof window !== "undefined") localStorage.setItem(LS_KEY, "1");
+    if (typeof window !== "undefined") markOnboardingSeen();
     setOpen(false);
   };
   const reopen = () => setOpen(true);
@@ -99,7 +120,7 @@ export function OnboardingModal({ open, onClose }: { open: boolean; onClose: () 
           ))}
         </ol>
 
-        <div className="mt-4 flex justify-end">
+        <div className="guide-dialog-actions mt-4 flex justify-end">
           <Button onClick={onClose} className="press h-9 text-xs">
             Начать работу
           </Button>

@@ -3,7 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeft } from "lucide-react";
 
-import { useIsMobile } from "@/hooks/use-mobile";
+import { isMobileViewport, useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +90,9 @@ const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
+      return isMobile || isMobileViewport()
+        ? setOpenMobile((open) => !open)
+        : setOpen((open) => !open);
     }, [isMobile, setOpen, setOpenMobile]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
@@ -261,14 +263,15 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { state, toggleSidebar } = useSidebar();
+  const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
+  const expanded = isMobile ? openMobile : state === "expanded";
 
   return (
     <Button
       ref={ref}
       data-sidebar="trigger"
       data-state={state}
-      aria-expanded={state === "expanded"}
+      aria-expanded={expanded}
       variant="ghost"
       size="icon"
       className={cn("sidebar-trigger-motion h-7 w-7", className)}

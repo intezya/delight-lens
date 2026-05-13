@@ -488,7 +488,9 @@
 
   .guide-dialog-content {
     transform-origin: center;
+    overscroll-behavior: contain;
     will-change: transform, opacity;
+    -webkit-overflow-scrolling: touch;
   }
 
   .guide-dialog-content[data-state="open"] {
@@ -517,6 +519,36 @@
   }
   .guide-dialog-content[data-state="open"] .guide-dialog-steps > *:nth-child(5) {
     animation-delay: 175ms;
+  }
+
+  @media (max-width: 640px) {
+    .guide-dialog-content {
+      bottom: max(0.75rem, env(safe-area-inset-bottom));
+      left: 0.5rem;
+      max-height: none;
+      right: 0.5rem;
+      top: max(0.75rem, env(safe-area-inset-top));
+      width: auto;
+      transform-origin: top center;
+      translate: none;
+    }
+
+    .guide-dialog-actions {
+      position: sticky;
+      bottom: -1rem;
+      margin-inline: -1rem;
+      padding: 0.75rem 1rem 0;
+      background: linear-gradient(
+        to top,
+        var(--background) 0%,
+        var(--background) 72%,
+        transparent 100%
+      );
+    }
+
+    .guide-dialog-actions > button {
+      width: 100%;
+    }
   }
 
   .press {
