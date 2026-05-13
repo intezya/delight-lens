@@ -15,6 +15,7 @@ import {
 } from "@/lib/mock/data";
 import { SectionHeader, Delta, TopicChip } from "@/components/atoms";
 import { KpiCard } from "@/components/kpi-card";
+import type { SVGProps } from "react";
 import {
   Area,
   AreaChart,
@@ -61,6 +62,25 @@ const tt = {
 };
 
 const axisLabelStyle = { fill: "var(--muted-foreground)", fontSize: 10 };
+
+type TopicAxisTickProps = SVGProps<SVGTextElement> & {
+  x?: number;
+  y?: number;
+  payload?: {
+    value?: string;
+  };
+};
+
+function TopicAxisTick({ x = 0, y = 0, payload }: TopicAxisTickProps) {
+  const value = payload?.value ?? "";
+
+  return (
+    <text x={x} y={y} dy={4} textAnchor="end" fill="var(--muted-foreground)" fontSize={10}>
+      <title>{value}</title>
+      {value}
+    </text>
+  );
+}
 
 function TrendChart() {
   return (
@@ -161,9 +181,11 @@ function DivergingChart() {
               dataKey="name"
               stroke="var(--muted-foreground)"
               fontSize={10}
+              tick={<TopicAxisTick />}
+              tickMargin={8}
               tickLine={false}
               axisLine={false}
-              width={140}
+              width={152}
             >
               <Label value="Темы" angle={-90} position="insideLeft" style={axisLabelStyle} />
             </YAxis>
@@ -432,17 +454,21 @@ function ImpactPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={IMPACT_CASES.map((c) => ({
-                    name: getTopic(c.topicId)?.name?.slice(0, 16) ?? "",
+                    name: getTopic(c.topicId)?.name ?? "",
                     before: c.before.complaints,
                     after: c.after.complaints,
                   }))}
-                  margin={{ left: 8, right: 8, bottom: 18 }}
+                  margin={{ left: 8, right: 8, bottom: 36 }}
                 >
                   <CartesianGrid stroke="var(--border)" strokeDasharray="2 4" vertical={false} />
                   <XAxis
                     dataKey="name"
                     stroke="var(--muted-foreground)"
                     fontSize={10}
+                    height={48}
+                    angle={-16}
+                    textAnchor="end"
+                    tickMargin={10}
                     tickLine={false}
                     axisLine={false}
                   >
